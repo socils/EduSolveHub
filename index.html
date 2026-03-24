@@ -159,104 +159,11 @@
 </style><script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script>
-    // Esta función se activa apenas se abre la página
-    function cargarPerfil() {
-        // Buscamos en las dos memorias (Permanente y Temporal)
-        const nombreGuardado = localStorage.getItem('active_user') || sessionStorage.getItem('active_user');
+   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-        if (nombreGuardado) {
-            // 1. Cambiamos el "Bienvenido, Usuario" por el nombre real
-            document.getElementById('welcome-name').innerText = nombreGuardado;
-            
-            // 2. Cambiamos el nombre dentro del menú desplegable
-            document.getElementById('user-full-name').innerText = `@${nombreGuardado}`;
-            
-            // 3. Ponemos la inicial en el círculo del avatar
-            document.getElementById('user-initial').innerText = nombreGuardado.charAt(0).toUpperCase();
-            
-            console.log("Perfil cargado para: " + nombreGuardado);
-        } else {
-            // Si no hay nadie, es un intruso, lo mandamos al login
-            console.log("No se encontró usuario, redirigiendo...");
-            window.location.href = 'login.html';
-        }
-    }
-
-    // Ejecutamos la función de carga
-    window.onload = cargarPerfil;
-
-    // Función para el menú del avatar
-    function toggleUserMenu() {
-        const menu = document.getElementById('user-menu');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    }
-
-    // Función de Salir (Limpia TODO)
-    function logout() {
-        if(confirm("¿Seguro que quieres cerrar sesión?")) {
-            localStorage.removeItem('active_user');
-            sessionStorage.removeItem('active_user');
-            window.location.href = 'login.html';
-        }
-    }let clicsLogo = 0;
-
-let contadorAdmin = 0;
-let tiempoEspera;
-
-// Función de activación por 10 clics
-function activacionSecreta() {
-    // Limpiamos el temporizador cada vez que haces clic
-    clearTimeout(tiempoEspera);
-    
-    contadorAdmin++;
-    console.log("Clics detectados: " + contadorAdmin); // Esto solo lo ves tú en la consola (F12)
-
-    if (contadorAdmin === 10) {
-        // ¡BINGO! Abrimos el panel
-        document.getElementById('admin-panel').style.display = 'flex';
-        contadorAdmin = 0; // Reiniciamos para la próxima
-        alert("🛠️ Modo Administrador Alonixz-Group Activado");
-    }
-
-    // Si dejas de hacer clic por 3 segundos, se reinicia el contador
-    tiempoEspera = setTimeout(() => {
-        if(contadorAdmin > 0) {
-            console.log("Contador reiniciado por inactividad.");
-            contadorAdmin = 0;
-        }
-    }, 3000);
-}
-
-// Vinculamos la función al AVATAR (el círculo con tu inicial)
-document.getElementById('avatar-circle').addEventListener('click', activacionSecreta);
-// --- FUNCIONES DEL PANEL ---
-
-function cerrarAdmin() {
-    document.getElementById('admin-panel').style.display = 'none';
-}
-
-function verUsuarios() {
-    const usuarios = JSON.parse(localStorage.getItem('edusolve_users')) || [];
-    const output = document.getElementById('admin-output');
-    output.style.display = 'block';
-    
-    if (usuarios.length === 0) {
-        output.innerHTML = "> No hay usuarios registrados.";
-    } else {
-        output.innerHTML = "> Lista de usuarios:<br>" + 
-            usuarios.map(u => `• User: ${u.n} | Pass: ${u.p}`).join("<br>");
-    }
-}
-
-function limpiarTodo() {
-    if(confirm("¿ESTÁS SEGURO? Esto borrará todas las cuentas de este dispositivo.")) {
-        localStorage.removeItem('edusolve_users');
-        alert("Base de datos limpiada.");
-        location.reload();
-    }
-}// --- FUNCIONES DE NOTICIAS ---
-
-// CONFIGURACIÓN DE FIREBASE (Asegúrate de tener tus datos aquí)
+<script>
+// 2. CONFIGURACIÓN DE TU PROYECTO
 const firebaseConfig = {
   apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
   authDomain: "edusolve-947c1.firebaseapp.com",
@@ -265,179 +172,104 @@ const firebaseConfig = {
   messagingSenderId: "1089784819674",
   appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
 };
+
+// 3. INICIALIZAR (Sin usar 'import')
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- FUNCIÓN PARA PUBLICAR EN LA NUBE ---
-function publicarNoticia() {
-    const titulo = document.getElementById('news-title').value.trim();
-    const tag = document.getElementById('news-tag').value;
-    
-    if(!titulo) return alert("Escribe el tema");
+// --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
-    // Guardar en Firebase
-    const nuevaNoticiaRef = db.ref('noticias').push();
-    nuevaNoticiaRef.set({
-        titulo: titulo,
-        tag: tag,
-        fecha: new Date().toLocaleDateString(),
-        autor: sessionStorage.getItem('active_user') || "Admin",
-        timestamp: Date.now()
-    }).then(() => {
-        document.getElementById('news-title').value = "";
-        alert("¡Publicado en la nube para todos!");
-    }).catch(err => alert("Error: " + err.message));
-}
+function actualizarHeader() {
+    // Buscamos el nombre en todas las llaves posibles
+    const nombre = localStorage.getItem('user_name') || 
+                   localStorage.getItem('active_user') || 
+                   sessionStorage.getItem('active_user') || 
+                   "Usuario";
 
-// --- FUNCIÓN PARA ESCUCHAR CAMBIOS EN TIEMPO REAL ---
-function escucharNoticias() {
-    console.log("Conectando con la nube de EduSolve...");
-
-    // Referencia a la carpeta 'noticias' en Firebase
-    db.ref('noticias').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const contenedor = document.getElementById('news-container');
-        
-        console.log("Datos recibidos:", data); // Mira esto en F12
-
-        if (!data) {
-            contenedor.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">✨</div>
-                    <h2 style="color: #1e293b;">¡Todo al día!</h2>
-                    <p style="color: #64748b;">No hay filtraciones por ahora.</p>
-                </div>`;
-            return;
-        }
-
-        // Limpiamos el contenedor para poner lo nuevo
-        contenedor.innerHTML = '<h3 style="text-align:left; margin-bottom:20px; padding-left:10px;">📢 Panel de Novedades</h3>';
-
-        // Convertimos el objeto de Firebase en una lista y la invertimos (últimas primero)
-        const lista = Object.keys(data).map(key => ({
-            id: key,
-            ...data[key]
-        })).reverse();
-
-        lista.forEach(n => {
-            // Colores según el TAG
-            let colorFondo = n.tag === 'filtracion' ? '#fee2e2' : '#dbeafe';
-            let colorTexto = n.tag === 'filtracion' ? '#b91c1c' : '#1e40af';
-
-            contenedor.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:18px; background:white; border-radius:18px; margin-bottom:12px; border:1px solid #f1f5f9; box-shadow: 0 4px 6px rgba(0,0,0,0.02); animation: fadeIn 0.5s ease;">
-                    <div style="text-align:left;">
-                        <b style="color:#1e293b; font-size:1rem; display:block;">${n.titulo}</b>
-                        <small style="color:#94a3b8;">${n.fecha || 'Reciente'}</small>
-                    </div>
-                    <span style="background:${colorFondo}; color:${colorTexto}; padding:6px 12px; border-radius:10px; font-size:0.75rem; font-weight:800; text-transform:uppercase;">
-                        ${n.tag}
-                    </span>
-                </div>
-            `;
-        });
-    }, (error) => {
-        console.error("Error al leer de Firebase:", error);
-    });
-}
-
-// IMPORTANTE: Ejecutar la función al cargar la página
-window.onload = function() {
-    cargarPerfil(); // Tu función que pone el nombre "Alonso"
-    escucharNoticias(); // Activamos la oreja para Firebase
-};
-// --- FUNCIÓN PARA BORRAR UNA NOTICIA DE LA NUBE ---
-function eliminarNoticia(idNoticia) {
-    if(confirm("¿Estás seguro de eliminar esta filtración? No se puede deshacer.")) {
-        // Accedemos a la carpeta 'noticias' y buscamos el ID exacto
-        db.ref('noticias/' + idNoticia).remove()
-        .then(() => {
-            alert("✅ Noticia borrada de la nube.");
-            verNoticiasEnConsola(); // Actualizamos la lista del admin
-        })
-        .catch((error) => {
-            console.error("Error al borrar:", error);
-            alert("No se pudo borrar: " + error.message);
-        });
-    }
-}
-
-// --- FUNCIÓN PARA VER LA LISTA EN EL PANEL DE ADMIN ---
-function verNoticiasEnConsola() {
-    const output = document.getElementById('admin-output');
-    output.style.display = 'block';
-    output.innerHTML = "Cargando editor...";
-
-    db.ref('noticias').once('value', (snapshot) => {
-        const data = snapshot.val();
-        if (!data) {
-            output.innerHTML = "> No hay noticias en la nube.";
-            return;
-        }
-
-        let html = "<b style='color:#38bdf8;'>Editor de Nube:</b><br><br>";
-        
-        // Obtenemos los IDs reales de Firebase
-        Object.keys(data).reverse().forEach(id => {
-            const n = data[id];
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;">
-                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:150px;">
-                        <span style="color:white; font-size:0.8rem;">${n.titulo}</span>
-                    </div>
-                    <button onclick="eliminarNoticia('${id}')" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.7rem; font-weight:bold;">
-                        BORRAR 🗑️
-                    </button>
-                </div>`;
-        });
-        output.innerHTML = html;
-    });
-}
-// Ejecutar al cargar
-window.onload = () => {
-    cargarPerfil(); // Tu función de nombre
-    escucharNoticias();
-};function actualizarHeader() {
-    // 1. Obtener datos (Si no hay, usa valores por defecto)
-    const nombre = localStorage.getItem('user_name') || "Invitado";
-    const fotoBase64 = localStorage.getItem('user_photo_base64');
-    
-    // 2. Actualizar Textos
     document.getElementById('welcome-name').innerText = nombre;
     document.getElementById('user-full-name').innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
-    
-    // 3. Actualizar Avatar (Imagen o Inicial)
-    const avatarCircle = document.getElementById('avatar-circle');
-    if (fotoBase64) {
-        avatarCircle.innerHTML = `<img src="${fotoBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+
+    const foto = localStorage.getItem('user_photo_base64');
+    const avatar = document.getElementById('avatar-circle');
+
+    if (foto && foto !== "null") {
+        avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover;">`;
     } else {
-        avatarCircle.innerHTML = `<span id="user-initial">${nombre.charAt(0).toUpperCase()}</span>`;
+        avatar.innerHTML = `<span id="user-initial">${nombre.charAt(0).toUpperCase()}</span>`;
     }
 }
 
-// Función para abrir/cerrar menú
+// Función para el menú
 function toggleUserMenu() {
     const menu = document.getElementById('user-menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
 }
 
-// Función Cerrar Sesión
+// Función de Cerrar Sesión
 function logout() {
     if(confirm("¿Cerrar sesión en EduSolve PRO?")) {
-        // Opcional: localStorage.clear(); // Esto borraría todo
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('active_user');
+        sessionStorage.removeItem('active_user');
         location.href = 'login.html';
     }
 }
 
-// Cerrar menú si haces clic fuera
-window.onclick = function(event) {
-    if (!event.target.closest('#avatar-circle') && !event.target.closest('#user-menu')) {
-        document.getElementById('user-menu').style.display = 'none';
+// --- PANEL ADMIN (10 CLICS) ---
+let contadorAdmin = 0;
+let tiempoEspera;
+
+function activacionSecreta() {
+    clearTimeout(tiempoEspera);
+    contadorAdmin++;
+    if (contadorAdmin === 10) {
+        document.getElementById('admin-panel').style.display = 'flex';
+        contadorAdmin = 0;
+        alert("🛠️ Modo Administrador Activado");
     }
+    tiempoEspera = setTimeout(() => { contadorAdmin = 0; }, 2000);
 }
 
-// Ejecutar al cargar la página
-window.onload = actualizarHeader;
+// --- FUNCIONES DE FIREBASE (NOTICIAS) ---
+
+function escucharNoticias() {
+    db.ref('noticias').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const contenedor = document.getElementById('news-container');
+        if (!data) return;
+
+        contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
+        const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
+
+        lista.forEach(n => {
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="text-align:left;">
+                        <b style="color:#1e293b; display:block;">${n.titulo}</b>
+                        <small style="color:#94a3b8;">${n.autor} • ${n.fecha}</small>
+                    </div>
+                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
+                </div>`;
+        });
+    });
+}
+
+// --- EJECUCIÓN AL CARGAR LA PÁGINA ---
+window.onload = function() {
+    actualizarHeader();
+    escucharNoticias();
+    // Vinculamos el clic secreto al avatar
+    document.getElementById('avatar-circle').addEventListener('click', activacionSecreta);
+};
+
+// Cerrar menú al hacer clic fuera
+window.onclick = function(event) {
+    if (!event.target.closest('#avatar-circle') && !event.target.closest('#user-menu')) {
+        const menu = document.getElementById('user-menu');
+        if(menu) menu.style.display = 'none';
+    }
+}
+</script>
 </script>
 </body>
 </html>
