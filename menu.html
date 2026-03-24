@@ -268,6 +268,74 @@ window.onclick = function(event) {
         const menu = document.getElementById('user-menu');
         if(menu) menu.style.display = 'none';
     }
+}// --- FUNCIONES DEL PANEL ADMINISTRADOR ---
+
+// 1. Cerrar el panel
+function cerrarAdmin() {
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('admin-output').style.display = 'none';
+}
+
+// 2. Ver usuarios registrados en este navegador
+function verUsuarios() {
+    const usuarios = JSON.parse(localStorage.getItem('edusolve_users')) || [];
+    const output = document.getElementById('admin-output');
+    output.style.display = 'block';
+    
+    if (usuarios.length === 0) {
+        output.innerHTML = "> No hay usuarios locales.";
+    } else {
+        output.innerHTML = "<b>Usuarios Locales:</b><br>" + 
+            usuarios.map(u => `• ${u.n} (Pass: ${u.p})`).join("<br>");
+    }
+}
+
+// 3. Ver y borrar noticias de la NUBE (Firebase)
+function verNoticiasEnConsola() {
+    const output = document.getElementById('admin-output');
+    output.style.display = 'block';
+    output.innerHTML = "Conectando a Firebase...";
+
+    // Usamos la variable 'db' que ya inicializaste arriba
+    db.ref('noticias').once('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+            output.innerHTML = "> La nube está vacía.";
+            return;
+        }
+
+        let html = "<b>Editor de Nube (Firebase):</b><br>";
+        Object.keys(data).reverse().forEach(id => {
+            const n = data[id];
+            html += `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:8px; border-radius:8px; margin-top:5px; border:1px solid #334155;">
+                    <span style="font-size:10px; color:#94a3b8;">${n.titulo.substring(0,15)}...</span>
+                    <button onclick="eliminarNoticia('${id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:5px; cursor:pointer; font-size:10px;">BORRAR</button>
+                </div>`;
+        });
+        output.innerHTML = html;
+    });
+}
+
+// 4. Función para borrar físicamente de Firebase
+function eliminarNoticia(id) {
+    if(confirm("¿Eliminar esta noticia de la nube para todos?")) {
+        db.ref('noticias/' + id).remove()
+        .then(() => {
+            alert("Noticia eliminada.");
+            verNoticiasEnConsola(); // Refrescar la lista
+        })
+        .catch(err => alert("Error: " + err.message));
+    }
+}
+
+// 5. Reset total del dispositivo
+function limpiarTodo() {
+    if(confirm("⚠️ ADVERTENCIA: Se borrarán todos tus datos locales (incluyendo tu sesión). ¿Continuar?")) {
+        localStorage.clear();
+        sessionStorage.clear();
+        location.href = 'index.html'; // Te manda al nuevo Login
+    }
 }
 </script>
 </script>
