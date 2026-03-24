@@ -163,48 +163,53 @@
 <script>
     const campos = ['name', 'email', 'bday', 'gender', 'bio'];
 
-    function cargarPerfil() {
-        const nombre = localStorage.getItem('user_name') || "Alonso";
-        const foto = localStorage.getItem('user_photo_base64');
+  function cargarPerfil() {
+    // 1. Buscamos el nombre que se usó al iniciar sesión
+    // Probamos con todas las llaves posibles para estar seguros
+    const nombreReal = localStorage.getItem('user_name') || 
+                       localStorage.getItem('active_user') || 
+                       sessionStorage.getItem('active_user') || 
+                       "Usuario";
 
-        // Cargar Nombre
-        document.getElementById('display-name').innerText = nombre;
+    const foto = localStorage.getItem('user_photo_base64');
 
-        // Cargar Foto o Inicial
-        if (foto) {
-            document.getElementById('user-display').innerHTML = `<img src="${foto}">`;
-        } else {
-            document.getElementById('user-display').innerText = nombre.charAt(0).toUpperCase();
-        }
+    // 2. ACTUALIZAR EL NOMBRE EN LA PANTALLA
+    // Esto quita el "Alonso" fijo y pone el nombre real
+    document.getElementById('display-name').innerText = nombreReal;
 
-        // Cargar Datos Extras
-        campos.forEach(campo => {
-            const guardado = localStorage.getItem('user_' + campo);
-            if (guardado && campo !== 'name') {
-                document.getElementById('val-' + campo).innerText = guardado;
-            }
-        });
-
-        // Rango de Fundador para Alonso
-        if(nombre.toLowerCase() === 'alonso') {
-            const badge = document.getElementById('user-role');
-            badge.innerText = "FUNDADOR ALONIXZ";
-            badge.style.background = "#fffbeb";
-            badge.style.color = "#b45309";
-            badge.style.border = "1px solid #fcd34d";
-        }
+    // 3. CARGAR FOTO O INICIAL
+    const userDisplay = document.getElementById('user-display');
+    if (foto && foto !== "null") {
+        userDisplay.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+    } else {
+        userDisplay.innerText = nombreReal.charAt(0).toUpperCase();
     }
 
-    function editarDato(campo, etiqueta) {
-        const actual = localStorage.getItem('user_' + campo) || "";
-        const nuevo = prompt(`Editar ${etiqueta}:`, actual);
-        
-        if (nuevo !== null) {
-            localStorage.setItem('user_' + campo, nuevo);
-            if (campo === 'name') localStorage.setItem('user_name', nuevo); // Caso especial para el nombre
-            location.reload();
+    // 4. CARGAR LOS DATOS EXTRAS (Email, Bio, etc.)
+    const camposExtras = ['email', 'bday', 'gender', 'bio'];
+    camposExtras.forEach(campo => {
+        const guardado = localStorage.getItem('user_' + campo);
+        const elemento = document.getElementById('val-' + campo);
+        if (guardado && elemento) {
+            elemento.innerText = guardado;
         }
+    });
+
+    // 5. RANGO ESPECIAL (Opcional)
+    const badge = document.getElementById('user-role');
+    if(nombreReal.toLowerCase() === 'alonso') {
+        badge.innerText = "FUNDADOR ALONIXZ";
+        badge.style.background = "#fffbeb";
+        badge.style.color = "#b45309";
+    } else {
+        badge.innerText = "MIEMBRO OFICIAL";
+        badge.style.background = "#f1f5f9";
+        badge.style.color = "#64748b";
     }
+}
+
+// Asegúrate de que se llame al cargar
+window.onload = cargarPerfil;
 
     function subirImagen(event) {
         const archivo = event.target.files[0];
