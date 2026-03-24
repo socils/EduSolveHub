@@ -1,0 +1,181 @@
+/* Variables de color de EduSolve */
+:root {
+    --primary: #2563eb;
+    --danger: #ef4444;
+    --bg-gradient: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg-gradient);
+    color: #1e293b;
+    min-height: 100vh;
+}
+
+/* Navbar con efecto de desenfoque */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-text {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+/* Saludo de Usuario */
+#user-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    background: white;
+    padding: 5px 15px;
+    border-radius: 50px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.btn-exit {
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+/* Contenedor Principal */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+/* Grid de Tarjetas */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+    margin: 15px 0 10px;
+    font-size: 1.3rem;
+}
+
+.card p {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Estilo especial para la tarjeta de Alertas */
+.alert-danger {
+    border: 2px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-danger:hover {
+    border-color: var(--danger);
+}
+
+.icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}:root {
+    --primary: #2563eb;
+    --accent: #6366f1;
+    --glass: rgba(255, 255, 255, 0.8);
+}
+
+body {
+    background: radial-gradient(circle at top right, #eef2ff, #f8fafc);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Animación de entrada para toda la página */
+.main-content {
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tarjetas con efecto Glass */
+.card-glass {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-glass:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(37, 99, 235, 0.1);
+}
+
+/* Estado Vacío (Empty State) */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#avatar-circle:hover {
+    transform: scale(1.05);
+}
