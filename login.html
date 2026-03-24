@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
+    <meta charset="UTF-8">
+    <title>EduSolve | Acceso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Contenedor con Animación de Entrada */
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Transición entre Login y Registro */
+        .fade-content {
+            transition: opacity 0.3s ease;
+        }
+
+        .fade-out { opacity: 0; }
+
+        h2 { font-weight: 800; margin-bottom: 5px; color: #1e293b; }
+        p { color: #64748b; font-size: 0.85rem; margin-bottom: 25px; }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        /* Alerta de Dispositivo Local */
+        .device-alert {
+            margin-top: 25px;
+            padding: 12px;
+            background: #fff7ed;
+            border: 1px solid #ffedd5;
+            border-radius: 10px;
+            color: #9a3412;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; margin: 0 auto 15px; }
+    </style>
+</head>
+<body>
+
+<div class="auth-card" id="card">
+    <div class="fade-content" id="form-content">
+        <div class="logo-dot"></div>
+        <h2 id="title">EduSolve ID</h2>
+        <p id="subtitle">Ingresa para ver tareas y exámenes</p>
+        
+        <input type="text" id="username" placeholder="Usuario">
+        <input type="password" id="password" placeholder="Contraseña">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; justify-content: flex-start; padding-left: 5px;">
+    <input type="checkbox" id="remember" style="width: auto; margin: 0; cursor: pointer;">
+    <label for="remember" style="font-size: 0.8rem; color: #64748b; cursor: pointer; user-select: none;">Mantener sesión iniciada</label>
+</div>
+        <button onclick="handleAuth()" id="main-btn">Entrar al Panel</button>
+        
+        <p style="margin-top: 20px;">
+            <span id="toggle-text">¿No tienes cuenta?</span> 
+            <a href="#" onclick="toggleMode()" style="color: var(--primary); text-decoration: none; font-weight: 700;">Hazlo aquí</a>
+        </p>
+
+        <div class="device-alert">
+            <span>⚠️</span>
+            <span>Las cuentas solo son válidas en este dispositivo (Almacenamiento Local).</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isLogin = true;
+
+    function toggleMode() {
+        const content = document.getElementById('form-content');
+        content.classList.add('fade-out');
+
+        setTimeout(() => {
+            isLogin = !isLogin;
+            document.getElementById('title').innerText = isLogin ? "EduSolve ID" : "Crear Usuario";
+            document.getElementById('subtitle').innerText = isLogin ? "Ingresa para ver tareas y exámenes" : "Regístrate en este dispositivo";
+            document.getElementById('main-btn').innerText = isLogin ? "Entrar al Panel" : "Registrar ahora";
+            document.getElementById('toggle-text').innerText = isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?";
+            
+            content.classList.remove('fade-out');
+        }, 300);
+    }
+
+    function handleAuth() {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value;
+    const remember = document.getElementById('remember').checked; 
+    
+    if(!user || !pass) return alert("Completa todos los campos.");
+
+    let db = JSON.parse(localStorage.getItem('edusolve_users')) || [];
+
+    if (isLogin) {
+        // --- LOGIC DE LOGIN ---
+        const found = db.find(u => u.n === user && u.p === pass);
+        
+        if (found || (user === "Alonso" && pass === "1234")) {
+            if (remember) {
+                localStorage.setItem('active_user', user);
+            } else {
+                sessionStorage.setItem('active_user', user);
+            }
+            window.location.href = 'index.html';
+        } else {
+            alert("Usuario o clave incorrecta.");
+        }
+    } else {
+        // --- LÓGICA DE REGISTRO CON CONDICIONES ---
+        
+        // 1. Condición de longitud (Mínimo 6)
+        if (pass.length < 6) {
+            return alert("Seguridad insuficiente: La contraseña debe tener al menos 6 caracteres.");
+        }
+
+        // 2. Condición opcional: Que no sea igual al nombre de usuario
+        if (pass.toLowerCase() === user.toLowerCase()) {
+            return alert("Error: La contraseña no puede ser igual al nombre de usuario.");
+        }
+
+        // 3. Verificar si el usuario ya existe
+        if(db.find(u => u.n === user)) {
+            return alert("Este nombre de usuario ya está registrado en este dispositivo.");
+        }
+        
+        // Si pasa todas las pruebas, guardamos
+        db.push({ n: user, p: pass });
+        localStorage.setItem('edusolve_users', JSON.stringify(db));
+        alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+        toggleMode();
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - EduSolve PRO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        /* FOTO DE PERFIL */
+        .profile-pic-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+        
+        #user-display {
+            width: 100%; height: 100%;
+            background: #2563eb;
+            color: white;
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #user-display img { width: 100%; height: 100%; object-fit: cover; }
+        #file-input { display: none; }
+
+        .edit-pic-label {
+            position: absolute;
+            bottom: 5px; right: 5px;
+            background: #1e293b;
+            color: white;
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* RANGOS */
+        .badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        /* SECCIÓN DE DATOS */
+        .data-section {
+            text-align: left;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-row:last-child { border: none; }
+
+        .label { font-size: 0.8rem; color: #64748b; font-weight: 600; }
+        .value { font-size: 0.9rem; color: #1e293b; font-weight: 700; cursor: pointer; }
+        .value:hover { color: #2563eb; text-decoration: underline; }
+
+        .bio-area {
+            font-size: 0.85rem;
+            color: #475569;
+            font-style: italic;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* BOTONES */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        .btn {
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-main { background: #2563eb; color: white; }
+        .btn-clear { background: #fee2e2; color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="profile-pic-container">
+        <div id="user-display">A</div>
+        <label for="file-input" class="edit-pic-label">📷</label>
+        <input type="file" id="file-input" accept="image/*" onchange="subirImagen(event)">
+    </div>
+
+    <h2 id="display-name" style="margin:0; color: #1e293b;">Alonso</h2>
+    <div class="badge" id="user-role">ESTUDIANTE 3° B</div>
+
+    <div class="data-section">
+        <div class="data-row">
+            <span class="label">Correo:</span>
+            <span class="value" id="val-email" onclick="editarDato('email', 'Correo')">Sin asignar</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Cumpleaños:</span>
+            <span class="value" id="val-bday" onclick="editarDato('bday', 'Cumpleaños (DD/MM)')">-- / --</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Género:</span>
+            <span class="value" id="val-gender" onclick="editarDato('gender', 'Género')">Prefiero no decir</span>
+        </div>
+        <div style="margin-top:15px">
+            <span class="label">Sobre mí:</span>
+            <span class="bio-area" id="val-bio" onclick="editarDato('bio', 'Biografía corta')">Haz clic para escribir algo sobre ti...</span>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a href="index.html" class="btn btn-main">Volver al Inicio</a>
+        <button class="btn btn-clear" onclick="borrarTodo()">Borrar todos los datos</button>
+    </div>
+</div>
+
+<script>
+    const campos = ['name', 'email', 'bday', 'gender', 'bio'];
+
+    function cargarPerfil() {
+        const nombre = localStorage.getItem('user_name') || "Alonso";
+        const foto = localStorage.getItem('user_photo_base64');
+
+        // Cargar Nombre
+        document.getElementById('display-name').innerText = nombre;
+
+        // Cargar Foto o Inicial
+        if (foto) {
+            document.getElementById('user-display').innerHTML = `<img src="${foto}">`;
+        } else {
+            document.getElementById('user-display').innerText = nombre.charAt(0).toUpperCase();
+        }
+
+        // Cargar Datos Extras
+        campos.forEach(campo => {
+            const guardado = localStorage.getItem('user_' + campo);
+            if (guardado && campo !== 'name') {
+                document.getElementById('val-' + campo).innerText = guardado;
+            }
+        });
+
+        // Rango de Fundador para Alonso
+        if(nombre.toLowerCase() === 'alonso') {
+            const badge = document.getElementById('user-role');
+            badge.innerText = "FUNDADOR ALONIXZ";
+            badge.style.background = "#fffbeb";
+            badge.style.color = "#b45309";
+            badge.style.border = "1px solid #fcd34d";
+        }
+    }
+
+    function editarDato(campo, etiqueta) {
+        const actual = localStorage.getItem('user_' + campo) || "";
+        const nuevo = prompt(`Editar ${etiqueta}:`, actual);
+        
+        if (nuevo !== null) {
+            localStorage.setItem('user_' + campo, nuevo);
+            if (campo === 'name') localStorage.setItem('user_name', nuevo); // Caso especial para el nombre
+            location.reload();
+        }
+    }
+
+    function subirImagen(event) {
+        const archivo = event.target.files[0];
+        if (archivo) {
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                localStorage.setItem('user_photo_base64', e.target.result);
+                location.reload();
+            };
+            lector.readAsDataURL(archivo);
+        }
+    }
+
+    function borrarTodo() {
+        if (confirm("¿Seguro que quieres borrar todos tus datos y la foto?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    window.onload = cargarPerfil;
+</script>
+
+</body>
+</html>
