@@ -28,10 +28,31 @@
 
         @media (max-width: 800px) {
             .grid-layout { grid-template-columns: 1fr; }
-        }
+        }/* --- ESTILO PARA LAPTOP (IGUAL QUE SIEMPRE) --- */
+.card {
+    width: 500px;
+    padding: 40px;
+}
+
+/* --- ESTILO SOLO PARA CELULARES --- */
+@media (max-width: 600px) {
+    .card {
+        width: 90%;   /* En celular la carta ocupa casi todo el ancho */
+        padding: 15px; /* Menos espacio interno para que quepa el texto */
+    }
+    
+    #welcome-name {
+        font-size: 1.5rem; /* Título más cómodo para el dedo */
+    }
+
+    /* El panel admin se hace más grande para tocarlo fácil */
+    #admin-panel div {
+        width: 95% !important;
+    }
+}
     </style>
 </head>
-<body>
+<body><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <div class="main-content container" style="max-width: 1000px; margin: auto; padding: 40px 20px;">
     
      <header style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; position: relative;">
