@@ -336,7 +336,26 @@ function limpiarTodo() {
         sessionStorage.clear();
         location.href = 'index.html'; // Te manda al nuevo Login
     }
+}function publicarNoticia() {
+    const titulo = document.getElementById('news-title').value.trim();
+    const tag = document.getElementById('news-tag').value;
+    
+    if(!titulo) return alert("Escribe el tema");
+
+    // Guardar en Firebase
+    const nuevaNoticiaRef = db.ref('noticias').push();
+    nuevaNoticiaRef.set({
+        titulo: titulo,
+        tag: tag,
+        fecha: new Date().toLocaleDateString(),
+        autor: sessionStorage.getItem('active_user') || "Admin",
+        timestamp: Date.now()
+    }).then(() => {
+        document.getElementById('news-title').value = "";
+        alert("¡Publicado en la nube para todos!");
+    }).catch(err => alert("Error: " + err.message));
 }
+
 </script>
 </script>
 </body>
