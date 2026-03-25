@@ -475,27 +475,40 @@ function escucharChat() {
     }, (error) => {
         console.error("❌ Error de Firebase:", error);
     });// --- FUNCIÓN DE RANGO (FUNDADOR) ---
-function verificarRango() {
-    // 1. Extraer nombre de cualquier fuente posible
+// --- SISTEMA DE CONTROL DE FUNDADOR ---
+
+window.verificarRango = function() {
+    console.log("Iniciando escaneo de rango...");
+    
+    // Extraer nombre de todas las fuentes posibles
     var n1 = localStorage.getItem('user_name');
     var n2 = localStorage.getItem('active_user');
     var n3 = sessionStorage.getItem('active_user');
     
-    var nombreFinal = (n1 || n2 || n3 || "").toLowerCase().trim();
-
-    console.log("Sistema de Rango: Detectado -> " + nombreFinal);
-
+    var nombreDetectado = (n1 || n2 || n3 || "").toLowerCase().trim();
     var botonAdmin = document.getElementById('admin-btn-auto');
 
     if (botonAdmin) {
-        if (nombreFinal === "alonso") {
+        if (nombreDetectado === "alonso") {
             botonAdmin.style.display = "block";
-            console.log("✅ Acceso de Fundador activado para Alonso");
+            console.log("✅ Acceso de Fundador detectado: Hola Alonso");
         } else {
             botonAdmin.style.display = "none";
+            console.log("Acceso denegado para: " + nombreDetectado);
         }
+    } else {
+        console.error("No se encontró el botón 'admin-btn-auto' en el HTML");
     }
-}
+};
+
+window.abrirPanelAdmin = function() {
+    var panel = document.getElementById('admin-panel');
+    if (panel) {
+        panel.style.display = 'flex';
+    } else {
+        alert("Error: El panel con ID 'admin-panel' no existe.");
+    }
+};
 
 // --- FUNCIÓN PARA EL CLIC DEL BOTÓN ---
 function abrirPanelAdmin() {
@@ -534,18 +547,19 @@ function enviarAnuncioSistema() {
         timestamp: Date.now()
     });
 }
-}window.onload = function() {
-    // Primero ejecutamos lo que ya funcionaba (Chat y Noticias)
+}window.addEventListener('load', function() {
+    // Ejecutar funciones básicas
     if (typeof actualizarHeader === 'function') actualizarHeader();
     if (typeof escucharNoticias === 'function') escucharNoticias();
     if (typeof escucharChat === 'function') escucharChat();
 
-    // Luego activamos tu botón de Fundador con un pequeño retraso
+    // Activar el rango de Alonso
     setTimeout(function() {
-        verificarRango();
-    }, 800);
-};
-
+        if (typeof window.verificarRango === 'function') {
+            window.verificarRango();
+        }
+    }, 1000);
+});
 // Función para abrir el panel que ya tenías antes
 
 </script>
