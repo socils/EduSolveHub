@@ -419,58 +419,58 @@ function enviarMensaje() {
 
 // --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
 function escucharChat() {
+    console.log("Intentando conectar al chat de Firebase...");
+
     db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
         const data = snapshot.val();
         const box = document.getElementById('chat-box');
-        if (!data) return;
 
+        if (!box) {
+            console.error("❌ ERROR: No se encontró el elemento 'chat-box' en el HTML");
+            return;
+        }
+
+        if (!data) {
+            console.log("☁️ Conectado, pero el chat está vacío.");
+            box.innerHTML = "<p style='text-align:center; color:gray;'>No hay mensajes aún.</p>";
+            return;
+        }
+
+        console.log("📩 Mensajes recibidos:", data); // Esto debe salir en F12
         box.innerHTML = ""; 
-        const miNombre = localStorage.getItem('user_name');
+
+        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
 
         Object.keys(data).forEach(id => {
             const m = data[id];
             const esMio = m.user === miNombre;
             
-            // Lógica para la imagen o inicial del mensaje
-            let avatarHtml = "";
-            if (m.photo && m.photo !== "null") {
-                avatarHtml = `<img src="${m.photo}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0;">`;
-            } else {
-                avatarHtml = `<div style="width: 30px; height: 30px; border-radius: 50%; background: #94a3b8; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">${m.user.charAt(0).toUpperCase()}</div>`;
-            }
+            // Lógica de Avatar
+            let avatarHtml = m.photo && m.photo !== "null" 
+                ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
+                : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user.charAt(0).toUpperCase()}</div>`;
 
-            // Construcción de la burbuja con Avatar
             box.innerHTML += `
-                <div style="display: flex; align-items: flex-end; gap: 8px; align-self: ${esMio ? 'flex-end' : 'flex-start'}; max-width: 85%; flex-direction: ${esMio ? 'row-reverse' : 'row'};">
-                    
-                    <div style="flex-shrink: 0; margin-bottom: 5px;">
-                        ${avatarHtml}
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; align-items: ${esMio ? 'flex-end' : 'flex-start'};">
-                        <small style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 2px;">${m.user}</small>
-                        <div style="background: ${esMio ? '#2563eb' : '#ffffff'}; 
-                                    color: ${esMio ? 'white' : '#1e293b'}; 
-                                    padding: 8px 12px; 
-                                    border-radius: ${esMio ? '15px 15px 2px 15px' : '15px 15px 15px 2px'}; 
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                                    font-size: 0.85rem;
-                                    border: ${esMio ? 'none' : '1px solid #e2e8f0'};">
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
+                    ${avatarHtml}
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
+                        <small style="font-size:10px; color:gray;">${m.user}</small>
+                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px;">
                             ${m.text}
-                            <span style="font-size: 0.55rem; opacity: 0.6; margin-left: 5px;">${m.time}</span>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
-        box.scrollTop = box.scrollHeight;
+        
+        box.scrollTop = box.scrollHeight; // Auto-bajar
+    }, (error) => {
+        console.error("❌ Error de Firebase:", error);
     });
-}function limpiarChat() {
-    if(confirm("¿Borrar todo el historial del chat?")) {
-        db.ref('mensajes').remove();
-        alert("Chat vaciado.");
-    }
-}
+}window.onload = function() {
+    actualizarHeader();  // Carga tu nombre y foto
+    escucharNoticias();  // Carga las novedades
+    escucharChat();      // <--- ASEGÚRATE DE QUE ESTO ESTÉ AQUÍ
+};
 </script>
 </script>
 </body>
