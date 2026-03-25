@@ -62,7 +62,9 @@
         </h1>
         <p style="color: #64748b; margin-top: 5px;">Panel de control de EduSolve PRO</p>
     </div>
-
+<button id="admin-btn-auto" onclick="abrirPanelAdmin()" style="display:none; background:#1e293b; color:white; border:none; padding:10px 15px; border-radius:12px; cursor:pointer; font-weight:bold; margin-top:10px; width:100%;">
+    🛠️ Panel de Fundador Alonixz
+</button>
     <div style="position: relative;">
         <div onclick="toggleUserMenu()" id="avatar-circle" style="width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 1.2rem; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; overflow: hidden;">
             <span id="user-initial">U</span>
@@ -472,11 +474,52 @@ function escucharChat() {
         box.scrollTop = box.scrollHeight; // Auto-bajar
     }, (error) => {
         console.error("❌ Error de Firebase:", error);
+    });function verificarRango() {
+    const nombre = localStorage.getItem('user_name') || 
+                   localStorage.getItem('active_user') || "";
+    
+    const botonAdmin = document.getElementById('admin-btn-auto');
+
+    // Si el nombre es Alonso (en minúsculas o mayúsculas)
+    if (nombre.toLowerCase() === "alonso") {
+        botonAdmin.style.display = "block"; // Se hace visible solo para ti
+        console.log("Acceso de Fundador detectado: Alonso");
+    }
+}
+
+// Función para abrir el panel que ya tenías
+function abrirPanelAdmin() {
+    document.getElementById('admin-panel').style.display = 'flex';
+}// NUEVA: Borrar el último mensaje del chat (por si alguien puso algo malo)
+function borrarUltimoMensaje() {
+    if(confirm("¿Borrar el último mensaje enviado al chat?")) {
+        db.ref('mensajes').limitToLast(1).once('value', snapshot => {
+            snapshot.forEach(child => {
+                child.ref.remove();
+            });
+            alert("Mensaje eliminado.");
+        });
+    }
+}
+
+// NUEVA: Mensaje de Sistema (Publicar como 'SISTEMA' en color rojo)
+function enviarAnuncioSistema() {
+    const anuncio = prompt("Escribe el anuncio global:");
+    if(!anuncio) return;
+
+    db.ref('mensajes').push({
+        user: "SISTEMA",
+        text: "⚠️ " + anuncio,
+        photo: "https://cdn-icons-png.flaticon.com/512/179/179386.png", // Icono de alerta
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
     });
+}
 }window.onload = function() {
     actualizarHeader();  // Carga tu nombre y foto
     escucharNoticias();  // Carga las novedades
     escucharChat();      // <--- ASEGÚRATE DE QUE ESTO ESTÉ AQUÍ
+    verificarRango();
 };
 </script>
 </script>
