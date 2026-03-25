@@ -130,7 +130,23 @@
         <p>Cargando novedades de la nube...</p>
     </div>
 </div>
+<div class="chat-section" style="margin-top: 30px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+    <h3 style="margin-bottom: 15px; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+        💬 Chat Grupal <span style="font-size: 0.7rem; background: #22c55e; color: white; padding: 2px 8px; border-radius: 10px;">En Vivo</span>
+    </h3>
+    
+    <div id="chat-box" style="height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 15px; margin-bottom: 15px; border: 1px dashed #cbd5e1;">
+        </div>
 
+    <div style="display: flex; gap: 8px;">
+        <input type="text" id="chat-input" placeholder="Escribe un mensaje..." 
+               style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; outline: none; font-size: 0.9rem;">
+        <button onclick="enviarMensaje()" 
+                style="background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; transition: 0.3s;">
+            🚀
+        </button>
+    </div>
+</div>
 </div><div id="admin-panel" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; justify-content: center; align-items: center;">
     <div class="card-glass" style="width: 95%; max-width: 500px; background: white; padding: 30px; border-radius: 24px; position: relative; max-height: 90vh; overflow-y: auto;">
         <button onclick="cerrarAdmin()" style="position: absolute; top: 20px; right: 20px; border: none; background: #f1f5f9; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: bold;">✕</button>
@@ -376,7 +392,85 @@ function limpiarTodo() {
         alert("¡Publicado en la nube para todos!");
     }).catch(err => alert("Error: " + err.message));
 }
+// --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
+function enviarMensaje() {
+    const input = document.getElementById('chat-input');
+    const mensaje = input.value.trim();
+    const usuario = localStorage.getItem('user_name') || "Invitado";
+    
+    // IMPORTANTE: Obtenemos la foto que el usuario tiene guardada en su perfil
+    const miFoto = localStorage.getItem('user_photo_base64') || null;
 
+    if (mensaje === "") return;
+
+    const chatRef = db.ref('mensajes').push();
+    chatRef.set({
+        user: usuario,
+        text: mensaje,
+        photo: miFoto, // <--- Guardamos la foto en la nube con el mensaje
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+    }).then(() => {
+        input.value = "";
+        const box = document.getElementById('chat-box');
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
+function escucharChat() {
+    db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
+        const data = snapshot.val();
+        const box = document.getElementById('chat-box');
+        if (!data) return;
+
+        box.innerHTML = ""; 
+        const miNombre = localStorage.getItem('user_name');
+
+        Object.keys(data).forEach(id => {
+            const m = data[id];
+            const esMio = m.user === miNombre;
+            
+            // Lógica para la imagen o inicial del mensaje
+            let avatarHtml = "";
+            if (m.photo && m.photo !== "null") {
+                avatarHtml = `<img src="${m.photo}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0;">`;
+            } else {
+                avatarHtml = `<div style="width: 30px; height: 30px; border-radius: 50%; background: #94a3b8; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">${m.user.charAt(0).toUpperCase()}</div>`;
+            }
+
+            // Construcción de la burbuja con Avatar
+            box.innerHTML += `
+                <div style="display: flex; align-items: flex-end; gap: 8px; align-self: ${esMio ? 'flex-end' : 'flex-start'}; max-width: 85%; flex-direction: ${esMio ? 'row-reverse' : 'row'};">
+                    
+                    <div style="flex-shrink: 0; margin-bottom: 5px;">
+                        ${avatarHtml}
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: ${esMio ? 'flex-end' : 'flex-start'};">
+                        <small style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 2px;">${m.user}</small>
+                        <div style="background: ${esMio ? '#2563eb' : '#ffffff'}; 
+                                    color: ${esMio ? 'white' : '#1e293b'}; 
+                                    padding: 8px 12px; 
+                                    border-radius: ${esMio ? '15px 15px 2px 15px' : '15px 15px 15px 2px'}; 
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                                    font-size: 0.85rem;
+                                    border: ${esMio ? 'none' : '1px solid #e2e8f0'};">
+                            ${m.text}
+                            <span style="font-size: 0.55rem; opacity: 0.6; margin-left: 5px;">${m.time}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}function limpiarChat() {
+    if(confirm("¿Borrar todo el historial del chat?")) {
+        db.ref('mensajes').remove();
+        alert("Chat vaciado.");
+    }
+}
 </script>
 </script>
 </body>
