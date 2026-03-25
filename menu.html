@@ -474,34 +474,38 @@ function escucharChat() {
         box.scrollTop = box.scrollHeight; // Auto-bajar
     }, (error) => {
         console.error("❌ Error de Firebase:", error);
-    });function verificarRango() {
-    // Buscamos el nombre en todas las "cajas" de memoria posibles
-    const nombreLocal = localStorage.getItem('user_name');
-    const nombreActivo = localStorage.getItem('active_user');
-    const nombreSession = sessionStorage.getItem('active_user');
+    });// --- FUNCIÓN DE RANGO (FUNDADOR) ---
+function verificarRango() {
+    // 1. Extraer nombre de cualquier fuente posible
+    var n1 = localStorage.getItem('user_name');
+    var n2 = localStorage.getItem('active_user');
+    var n3 = sessionStorage.getItem('active_user');
+    
+    var nombreFinal = (n1 || n2 || n3 || "").toLowerCase().trim();
 
-    // Consolidamos el nombre (usamos el primero que encontre)
-    const nombreFinal = nombreLocal || nombreActivo || nombreSession || "";
+    console.log("Sistema de Rango: Detectado -> " + nombreFinal);
 
-    console.log("Detectando usuario para rango: " + nombreFinal);
+    var botonAdmin = document.getElementById('admin-btn-auto');
 
-    const botonAdmin = document.getElementById('admin-btn-auto');
-
-    if (!botonAdmin) {
-        console.error("No se encontró el botón admin-btn-auto en el HTML");
-        return;
-    }
-
-    // SI EL NOMBRE ES ALONSO (sin importar mayúsculas)
-    if (nombreFinal.toLowerCase().trim() === "alonso") {
-        botonAdmin.style.display = "block";
-        console.log("✅ Acceso concedido a Alonso");
-    } else {
-        botonAdmin.style.display = "none";
-        console.log("❌ Acceso denegado: " + nombreFinal);
+    if (botonAdmin) {
+        if (nombreFinal === "alonso") {
+            botonAdmin.style.display = "block";
+            console.log("✅ Acceso de Fundador activado para Alonso");
+        } else {
+            botonAdmin.style.display = "none";
+        }
     }
 }
 
+// --- FUNCIÓN PARA EL CLIC DEL BOTÓN ---
+function abrirPanelAdmin() {
+    var panel = document.getElementById('admin-panel');
+    if (panel) {
+        panel.style.display = 'flex';
+    } else {
+        alert("Error: No se encontró el panel con ID 'admin-panel'");
+    }
+}
 // Función para abrir el panel que ya tenías
 function abrirPanelAdmin() {
     document.getElementById('admin-panel').style.display = 'flex';
@@ -531,24 +535,19 @@ function enviarAnuncioSistema() {
     });
 }
 }window.onload = function() {
-    // 1. Cargamos lo visual
-    actualizarHeader();
-    escucharNoticias();
-    escucharChat();
+    // Primero ejecutamos lo que ya funcionaba (Chat y Noticias)
+    if (typeof actualizarHeader === 'function') actualizarHeader();
+    if (typeof escucharNoticias === 'function') escucharNoticias();
+    if (typeof escucharChat === 'function') escucharChat();
 
-    // 2. Esperamos un poquito para activar el botón de Admin
-    setTimeout(verificarRango, 500); 
+    // Luego activamos tu botón de Fundador con un pequeño retraso
+    setTimeout(function() {
+        verificarRango();
+    }, 800);
 };
 
 // Función para abrir el panel que ya tenías antes
-function abrirPanelAdmin() {
-    const panel = document.getElementById('admin-panel');
-    if(panel) {
-        panel.style.display = 'flex';
-    } else {
-        alert("El panel admin no tiene el ID 'admin-panel'");
-    }
-}
+
 </script>
 </script>
 </body>
