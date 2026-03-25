@@ -62,9 +62,7 @@
         </h1>
         <p style="color: #64748b; margin-top: 5px;">Panel de control de EduSolve PRO</p>
     </div>
-<button id="admin-btn-auto" onclick="abrirPanelAdmin()" style="display:none; background:#1e293b; color:white; border:none; padding:10px 15px; border-radius:12px; cursor:pointer; font-weight:bold; margin-top:10px; width:100%;">
-    🛠️ Panel de Fundador Alonixz
-</button>
+
     <div style="position: relative;">
         <div onclick="toggleUserMenu()" id="avatar-circle" style="width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 1.2rem; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; overflow: hidden;">
             <span id="user-initial">U</span>
@@ -131,7 +129,9 @@
         <div class="empty-icon">⏳</div>
         <p>Cargando novedades de la nube...</p>
     </div>
-</div>
+</div><button id="admin-btn-auto" onclick="abrirPanelAdmin()" style="display:none; width:100%; background:linear-gradient(45deg, #1e293b, #334155); color:white; border:none; padding:12px; border-radius:15px; cursor:pointer; font-weight:800; margin-bottom:15px; border: 2px solid #fbbf24;">
+    🛠️ PANEL DE FUNDADOR (ALONSO)
+</button>
 <div  class="chat-section" style="margin-top: 30px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
     <h3 style="margin-bottom: 15px; color: #1e293b; display: flex; align-items: center; gap: 10px;">
         💬 Chat Grupal <span style="font-size: 0.7rem; background: #22c55e; color: white; padding: 2px 8px; border-radius: 10px;">En Vivo</span>
@@ -475,15 +475,30 @@ function escucharChat() {
     }, (error) => {
         console.error("❌ Error de Firebase:", error);
     });function verificarRango() {
-    const nombre = localStorage.getItem('user_name') || 
-                   localStorage.getItem('active_user') || "";
-    
+    // Buscamos el nombre en todas las "cajas" de memoria posibles
+    const nombreLocal = localStorage.getItem('user_name');
+    const nombreActivo = localStorage.getItem('active_user');
+    const nombreSession = sessionStorage.getItem('active_user');
+
+    // Consolidamos el nombre (usamos el primero que encontre)
+    const nombreFinal = nombreLocal || nombreActivo || nombreSession || "";
+
+    console.log("Detectando usuario para rango: " + nombreFinal);
+
     const botonAdmin = document.getElementById('admin-btn-auto');
 
-    // Si el nombre es Alonso (en minúsculas o mayúsculas)
-    if (nombre.toLowerCase() === "alonso") {
-        botonAdmin.style.display = "block"; // Se hace visible solo para ti
-        console.log("Acceso de Fundador detectado: Alonso");
+    if (!botonAdmin) {
+        console.error("No se encontró el botón admin-btn-auto en el HTML");
+        return;
+    }
+
+    // SI EL NOMBRE ES ALONSO (sin importar mayúsculas)
+    if (nombreFinal.toLowerCase().trim() === "alonso") {
+        botonAdmin.style.display = "block";
+        console.log("✅ Acceso concedido a Alonso");
+    } else {
+        botonAdmin.style.display = "none";
+        console.log("❌ Acceso denegado: " + nombreFinal);
     }
 }
 
@@ -516,11 +531,24 @@ function enviarAnuncioSistema() {
     });
 }
 }window.onload = function() {
-    actualizarHeader();  // Carga tu nombre y foto
-    escucharNoticias();  // Carga las novedades
-    escucharChat();      // <--- ASEGÚRATE DE QUE ESTO ESTÉ AQUÍ
-    verificarRango();
+    // 1. Cargamos lo visual
+    actualizarHeader();
+    escucharNoticias();
+    escucharChat();
+
+    // 2. Esperamos un poquito para activar el botón de Admin
+    setTimeout(verificarRango, 500); 
 };
+
+// Función para abrir el panel que ya tenías antes
+function abrirPanelAdmin() {
+    const panel = document.getElementById('admin-panel');
+    if(panel) {
+        panel.style.display = 'flex';
+    } else {
+        alert("El panel admin no tiene el ID 'admin-panel'");
+    }
+}
 </script>
 </script>
 </body>
