@@ -396,27 +396,34 @@ function limpiarTodo() {
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     const mensaje = input.value.trim();
-    const usuario = localStorage.getItem('user_name') || "Invitado";
-    
-    // IMPORTANTE: Obtenemos la foto que el usuario tiene guardada en su perfil
-    const miFoto = localStorage.getItem('user_photo_base64') || null;
 
+    // 1. BUSCAR EL NOMBRE REAL (Probamos todas las opciones)
+    const nombreReal = localStorage.getItem('user_name') || 
+                       localStorage.getItem('active_user') || 
+                       sessionStorage.getItem('active_user') || 
+                       "Invitado";
+
+    // 2. BUSCAR LA FOTO REAL
+    const fotoReal = localStorage.getItem('user_photo_base64') || null;
+
+    // Si no hay mensaje, no hacemos nada
     if (mensaje === "") return;
 
+    // 3. ENVIAR A FIREBASE
     const chatRef = db.ref('mensajes').push();
     chatRef.set({
-        user: usuario,
+        user: nombreReal,     // Aquí ya no dirá "Invitado" si el login funcionó
         text: mensaje,
-        photo: miFoto, // <--- Guardamos la foto en la nube con el mensaje
+        photo: fotoReal,     // Enviamos la foto guardada
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
     }).then(() => {
-        input.value = "";
-        const box = document.getElementById('chat-box');
-        box.scrollTop = box.scrollHeight;
+        input.value = ""; // Limpiar el cuadro
+        console.log("Mensaje enviado por: " + nombreReal);
+    }).catch((error) => {
+        console.error("Error al enviar:", error);
     });
 }
-
 // --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
 function escucharChat() {
     console.log("Intentando conectar al chat de Firebase...");
