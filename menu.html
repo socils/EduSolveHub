@@ -198,7 +198,36 @@
     </div>
 </div><div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
    
-        
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+
+<script>
+  // Configuración oficial de EduSolve PRO (vía Alonixz-Group)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thM--",
+    authDomain: "edusolve-947c1.firebaseapp.com",
+    databaseURL: "https://edusolve-947c1-default-rtdb.firebaseio.com",
+    projectId: "edusolve-947c1",
+    storageBucket: "edusolve-947c1.firebasestorage.app",
+    messagingSenderId: "1089784819674",
+    appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3",
+    measurementId: "G-8LG7RGQX9V"
+  };
+
+  // 🚀 Inicialización del Sistema
+  const app = firebase.initializeApp(firebaseConfig);
+  const analytics = firebase.analytics();
+
+  console.log("🔥 EduSolve PRO: Analytics sincronizado con el Nodo Arequipa.");
+
+  // EVENTO PERSONALIZADO: Rastreo de entrada al Panel de Soporte
+  if (window.location.pathname.includes('soporte.html')) {
+    analytics.logEvent('access_support', {
+      user_group: '3ro_Secundaria',
+      version: '2.2.5'
+    });
+  }
+</script>
        
 
 <style>
