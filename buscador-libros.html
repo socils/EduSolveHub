@@ -132,14 +132,17 @@
         </div>
     </nav>
 
-    <div id="admin-panel-hub">
-        <h3 style="color: var(--accent); margin-top: 0;">🛠️ Panel Maestro - Alonixz Group</h3>
-        <p style="font-size: 0.8rem; color: #94a3b8;">Habilitar secciones del HUB:</p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="desbloquearTodo()" style="background: #2563eb; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">🔓 Desbloquear Todo</button>
-            <button onclick="location.reload()" style="background: #ef4444; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">🔒 Re-Bloquear</button>
-        </div>
+<div id="admin-panel-hub">
+    <h3 style="color: var(--accent); margin-top: 0;">🛠️ Control Individual - Alonixz Group</h3>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onclick="desbloquearUno('comunicacion')" style="background:#2563eb; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔓 COMU</button>
+        <button onclick="desbloquearUno('sociales')" style="background:#2563eb; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔓 SOC</button>
+        <button onclick="desbloquearUno('religion')" style="background:#2563eb; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔓 REL</button>
+        <button onclick="desbloquearUno('studentbook')" style="background:#2563eb; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔓 STUD</button>
+        <button onclick="desbloquearUno('workbook')" style="background:#2563eb; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔓 WORK</button>
+        <button onclick="location.reload()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔒 RESET</button>
     </div>
+</div>
 
     <header class="hub-header">
         <h1 class="main-title">EDUSOLVE <span style="color: var(--primary);">HUB</span></h1>
@@ -188,22 +191,43 @@
     <p>Biología y Física 3°</p>
     <span class="btn-locked">BLOQUEADO</span>
 </div>
+<div class="menu-grid">
+    <a href="matematica.html" class="card-libro">
+        <span class="icon">📐</span>
+        <h3>Matemáticas 3°</h3>
+        <span class="btn-entrar">INGRESAR</span>
+    </a>
 
-<div class="card-libro locked" id="lib-dpcc">
-    <span class="icon">⚖️</span>
-    <h3>Desarrollo Personal</h3>
-    <p>DPCC - Cívica 3°</p>
-    <span class="btn-locked">BLOQUEADO</span>
-</div>
-
-<div class="card-libro locked" id="lib-arte">
-    <span class="icon">🎨</span>
-    <h3>Arte y Cultura</h3>
-    <p>Kirigami & Proyectos</p>
-    <span class="btn-locked">BLOQUEADO</span>
-</div>
+    <div class="card-libro locked" id="lib-comunicacion">
+        <span class="icon">✍️</span>
+        <h3>Comunicación 3°</h3>
+        <span class="btn-locked">BLOQUEADO</span>
     </div>
 
+    <div class="card-libro locked" id="lib-sociales">
+        <span class="icon">🌍</span>
+        <h3>Ciencias Sociales 3°</h3>
+        <span class="btn-locked">BLOQUEADO</span>
+    </div>
+
+    <div class="card-libro locked" id="lib-religion">
+        <span class="icon">⛪</span>
+        <h3>Religión</h3>
+        <span class="btn-locked">BLOQUEADO</span>
+    </div>
+
+    <div class="card-libro locked" id="lib-studentbook">
+        <span class="icon">📖</span>
+        <h3>English Studentbook</h3>
+        <span class="btn-locked">BLOQUEADO</span>
+    </div>
+
+    <div class="card-libro locked" id="lib-workbook">
+        <span class="icon">📝</span>
+        <h3>English Workbook</h3>
+        <span class="btn-locked">BLOQUEADO</span>
+    </div>
+</div>
     <script>
         // 1. RECONOCIMIENTO DE USUARIO
         function iniciarHub() {
