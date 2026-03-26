@@ -149,82 +149,53 @@
         <div style="font-size: 0.6rem; letter-spacing: 3px; color: #64748b; margin-top: 10px;">PROYECTO DESARROLLADO POR <span class="group-highlight">ALONIXZ-GROUP</span></div>
     </header>
 
-    <div class="menu-grid">
-        <a href="matematica.html" class="card-libro">
-            <span class="icon">📐</span>
-            <h3>Matemáticas 3°</h3>
-            <span class="btn-entrar">INGRESAR</span>
-        </a>
-
-        <div class="card-libro locked" id="lib-comunicacion">
-            <span class="icon">✍️</span>
-            <h3>Comunicación 3°</h3>
-            <span class="btn-locked">BLOQUEADO</span>
-        </div>
-
-        <div class="card-libro locked" id="lib-sociales">
-            <span class="icon">🌍</span>
-            <h3>Ciencias Sociales 3°</h3>
-            <span class="btn-locked">BLOQUEADO</span>
-        </div>
-
-        <div class="card-libro locked" id="lib-religion">
-            <span class="icon">⛪</span>
-            <h3>Religión</h3>
-            <span class="btn-locked">BLOQUEADO</span>
-        </div>
-
-        <div class="card-libro locked" id="lib-estudiante">
-            <span class="icon">📖</span>
-            <h3>English Studentbook</h3>
-            <span class="btn-locked">BLOQUEADO</span>
-        </div>
-
-        <div class="card-libro locked" id="lib-workbook">
-            <span class="icon">📝</span>
-            <h3>English Workbook</h3>
-            <span class="btn-locked">BLOQUEADO</span>
-        </div>
-        <div class="card-libro locked" id="lib-ciencia">
-    <span class="icon">🧬</span>
-    <h3>Ciencia y Tecnología</h3>
-    <p>Biología y Física 3°</p>
-    <span class="btn-locked">BLOQUEADO</span>
-</div>
-<div class="menu-grid">
+ <div class="menu-grid">
     <a href="matematica.html" class="card-libro">
         <span class="icon">📐</span>
         <h3>Matemáticas 3°</h3>
+        <p>Santillana - Full Data</p>
         <span class="btn-entrar">INGRESAR</span>
     </a>
 
     <div class="card-libro locked" id="lib-comunicacion">
         <span class="icon">✍️</span>
         <h3>Comunicación 3°</h3>
+        <p>Análisis de Textos</p>
         <span class="btn-locked">BLOQUEADO</span>
     </div>
 
     <div class="card-libro locked" id="lib-sociales">
         <span class="icon">🌍</span>
         <h3>Ciencias Sociales 3°</h3>
+        <p>Historia y Geografía</p>
+        <span class="btn-locked">BLOQUEADO</span>
+    </div>
+
+    <div class="card-libro locked" id="lib-ciencia">
+        <span class="icon">🧬</span>
+        <h3>Ciencia y Tecnología</h3>
+        <p>Biología y Física</p>
         <span class="btn-locked">BLOQUEADO</span>
     </div>
 
     <div class="card-libro locked" id="lib-religion">
         <span class="icon">⛪</span>
         <h3>Religión</h3>
+        <p>Módulo de Valores</p>
         <span class="btn-locked">BLOQUEADO</span>
     </div>
 
     <div class="card-libro locked" id="lib-studentbook">
         <span class="icon">📖</span>
         <h3>English Studentbook</h3>
+        <p>Grammar Focus</p>
         <span class="btn-locked">BLOQUEADO</span>
     </div>
 
     <div class="card-libro locked" id="lib-workbook">
         <span class="icon">📝</span>
         <h3>English Workbook</h3>
+        <p>Exercises & Key</p>
         <span class="btn-locked">BLOQUEADO</span>
     </div>
 </div>
@@ -247,39 +218,56 @@
         }
 
         // 2. FUNCIÓN DE DESBLOQUEO MAESTRO
-      function desbloquearTodo() {
-    // 1. Seleccionamos TODAS las tarjetas que tengan la clase 'locked'
-    const libros = document.querySelectorAll('.card-libro.locked');
+   function desbloquearUno(idCurso) {
+    // Buscamos la tarjeta por su ID (ejemplo: lib-comunicacion)
+    const card = document.getElementById('lib-' + idCurso);
     
-    libros.forEach(libro => {
-        // Quitamos el filtro gris y la opacidad
-        libro.classList.remove('locked');
-        libro.style.filter = "none";
-        libro.style.opacity = "1";
-        libro.style.cursor = "pointer";
-        libro.style.borderStyle = "solid";
-        libro.style.borderColor = "var(--primary)";
+    if (card) {
+        // 1. Quitar estados de bloqueo
+        card.classList.remove('locked');
+        card.style.filter = "none";
+        card.style.opacity = "1";
+        card.style.cursor = "pointer";
+        card.style.border = "2px solid var(--primary)";
 
-        // Cambiamos el botón visualmente
-        const btn = libro.querySelector('.btn-locked');
-        if(btn) {
+        // 2. Cambiar el botón interno
+        const btn = card.querySelector('.btn-locked');
+        if (btn) {
             btn.className = 'btn-entrar';
             btn.innerText = 'ACCESO CONCEDIDO';
-            btn.style.background = "#22c55e"; // Color verde de éxito
+            btn.style.background = "#22c55e"; 
         }
 
-        // Asignamos la ruta según el ID de la tarjeta
-        libro.onclick = function() {
-            const id = libro.id.replace('lib-', ''); // Quita el 'lib-' del nombre
-            alert("Sincronizando con la base de datos de " + id.toUpperCase() + "...");
-            window.location.href = id + ".html"; 
+        // 3. Asignar la función de clic para entrar
+        card.onclick = function() {
+            window.location.href = idCurso + ".html";
         };
-    });
 
-    console.log("🛠️ Alonixz-Group: Protocolo de acceso total ejecutado.");
+        console.log("Módulo desbloqueado: " + idCurso);
+    } else {
+        console.error("No se encontró el curso: " + idCurso);
+    }
 }
 
-        window.onload = iniciarHub;
+// Mantenemos la función de inicio que ya tenías
+function iniciarHub() {
+    const nombre = localStorage.getItem('user_name') || 
+                   localStorage.getItem('active_user') || "Invitado";
+    
+    const label = document.getElementById('user-name');
+    const panel = document.getElementById('admin-panel-hub');
+
+    if (nombre.toLowerCase().trim() === "alonso") {
+        label.innerHTML = "Fundador Alonso";
+        label.style.color = "#fbbf24";
+        panel.style.display = "block"; 
+    } else {
+        label.innerText = "@" + nombre;
+    }
+}
+
+window.onload = iniciarHub;
+        
     </script>
 </body>
 </html>
