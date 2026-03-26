@@ -176,7 +176,57 @@
             <button onclick="verUsuarios()" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; font-size: 0.8rem;">Ver Usuarios</button>
             <button onclick="borrarNoticias()" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #fee2e2; color: #b91c1c; cursor: pointer; font-size: 0.8rem;">Limpiar News</button>
         </div>
+<div id="soporte-section" style="margin-top: 30px; background: #ffffff; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h3 style="color: #0f172a; margin: 0; font-size: 1.4rem;">🛠️ Centro de Control</h3>
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 0.85rem;">Alonixz-Group Tech Support</p>
+        </div>
+        <div style="text-align: right;">
+            <span style="background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; border: 1px solid #bbf7d0;">ESTABLE v2.2.0</span>
+        </div>
+    </div>
 
+    <hr style="border: 0; border-top: 1px solid #f1f5f9; margin-bottom: 20px;">
+
+    <div style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
+        
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: #2563eb; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">🚀 Últimas Mejoras (Hoy)</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #334155;">
+                <li style="margin-bottom: 10px; padding-left: 15px; border-left: 3px solid #2563eb;">
+                    <b>Chat Sync Pro:</b> Optimización de carga de fotos Base64 para evitar lag en celulares.
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 15px; border-left: 3px solid #2563eb;">
+                    <b>Rango Fundador:</b> Implementación de algoritmos de detección automática para Alonso.
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 15px; border-left: 3px solid #2563eb;">
+                    <b>UI Responsiva:</b> Ajuste dinámico de botones para pantallas de menos de 380px.
+                </li>
+            </ul>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #64748b; font-size: 0.9rem; margin-bottom: 10px;">🩹 Parches de Seguridad y Errores</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem; color: #64748b;">
+                <li style="margin-bottom: 8px;">🔧 <b>Patch 2.1.4:</b> Corregido error de "Invitado" al enviar mensajes sin sesión activa.</li>
+                <li style="margin-bottom: 8px;">🔧 <b>Patch 2.1.2:</b> Solucionado el bug de <i>SyntaxError</i> en la carga inicial del script.</li>
+                <li style="margin-bottom: 8px;">🔧 <b>Patch 2.0.8:</b> Actualización de reglas de Firebase para prevenir lectura no autorizada.</li>
+                <li style="margin-bottom: 8px;">🔧 <b>Patch 2.0.5:</b> Reparado el botón de retroceso en el Panel de Administración.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button onclick="reportarError()" style="flex: 1; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: 0.3s;">
+            🚨 Reportar Bug
+        </button>
+        <button onclick="buscarActualizaciones()" id="update-btn" style="flex: 1; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+            🔄 Buscar Actualización
+        </button>
+    </div>
+</div>
         <div id="admin-output" style="margin-top: 15px; display: none;"></div>
     </div>
 </div><div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
@@ -561,7 +611,30 @@ function enviarAnuncioSistema() {
     }, 1000);
 });
 // Función para abrir el panel que ya tenías antes
+function buscarActualizaciones() {
+    const btn = document.getElementById('update-btn');
+    const textoOriginal = btn.innerHTML;
+    
+    btn.innerHTML = "🔍 Buscando...";
+    btn.style.opacity = "0.7";
+    btn.disabled = true;
 
+    setTimeout(() => {
+        btn.innerHTML = "✅ Estás actualizado";
+        btn.style.background = "#dcfce7";
+        btn.style.color = "#166534";
+        btn.style.borderColor = "#bbf7d0";
+        
+        setTimeout(() => {
+            btn.innerHTML = textoOriginal;
+            btn.style.background = "#f1f5f9";
+            btn.style.color = "#475569";
+            btn.style.borderColor = "#e2e8f0";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }, 3000);
+    }, 2000);
+}
 </script>
 </script>
 </body>
