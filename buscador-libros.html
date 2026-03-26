@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduSolve Hub | Alonixz-Group</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #38bdf8;
-            --error: #ef4444;
+            --accent: #fbbf24;
             --bg: #05070a;
             --card-bg: rgba(15, 23, 42, 0.7);
+            --border: rgba(56, 189, 248, 0.2);
         }
 
         body {
@@ -23,6 +23,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* Nav de Usuario */
@@ -30,68 +31,54 @@
             display: flex;
             justify-content: flex-end;
             padding: 15px 25px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            background: rgba(5, 7, 10, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1000;
         }
 
         #user-display {
             background: white;
             padding: 8px 20px;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* HUB Header */
-        .hub-header {
-            text-align: center;
-            padding: 40px 20px;
+        /* Panel Admin Exclusivo Alonso */
+        #admin-panel-hub {
+            display: none; /* Se activa con JS solo para Alonso */
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            margin: 20px auto;
+            width: 90%;
+            max-width: 900px;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
         }
 
-        .main-title {
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: -2px;
-        }
-
-        .hub-tag { color: var(--primary); }
-
-        .main-dev-signature {
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: #64748b;
-            margin-top: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        /* Grid de Libros */
+        /* Grid y Cards */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             width: 90%;
             max-width: 1000px;
-            margin: 20px auto;
-            padding-bottom: 50px;
+            margin: 40px auto;
         }
 
         .card-libro {
             background: var(--card-bg);
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            padding: 35px;
-            border-radius: 30px;
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 25px;
             text-align: center;
             text-decoration: none;
             color: white;
-            transition: 0.4s;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
         }
 
         .card-libro:hover:not(.locked) {
@@ -102,169 +89,141 @@
 
         .icon { font-size: 3rem; margin-bottom: 15px; display: block; }
 
+        /* Estilos de Bloqueo */
+        .locked {
+            filter: grayscale(1);
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+
         .btn-entrar {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 15px;
             background: var(--primary);
-            color: #000;
-            padding: 10px 25px;
+            color: black;
+            padding: 10px 20px;
             border-radius: 50px;
             font-weight: 800;
             font-size: 0.75rem;
         }
 
-        /* Estilos de Bloqueo */
-        .locked {
-            filter: grayscale(0.9);
-            opacity: 0.6;
-            cursor: not-allowed;
-            border-style: dashed;
-        }
-
         .btn-locked {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 15px;
             background: #1e293b;
             color: #64748b;
             padding: 8px 20px;
             border-radius: 50px;
             font-size: 0.7rem;
-            font-weight: 800;
         }
 
-        /* Panel Admin Secreto */
-        #admin-panel-hub {
-            display: none;
-            background: linear-gradient(45deg, #1e293b, #0f172a);
-            margin: 20px auto;
-            width: 90%;
-            max-width: 1000px;
-            padding: 20px;
-            border-radius: 20px;
-            border: 2px solid #fbbf24;
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
-        }
-
-        /* Footer */
-        .main-footer {
-            margin-top: auto;
-            padding: 30px;
-            text-align: center;
-            background: rgba(5, 7, 10, 0.8);
-        }
-
-        .group-highlight { color: var(--primary); font-weight: 800; }
+        .hub-header { text-align: center; padding: 40px 20px; }
+        .main-title { font-size: 3rem; margin: 0; font-weight: 800; }
+        .group-highlight { color: var(--primary); }
     </style>
 </head>
 <body>
 
     <nav class="user-nav">
         <div id="user-display">
-            <span style="color: #666; font-size: 0.9rem;">Hola,</span>
+            <span style="color: #666; font-size: 0.8rem;">Hola,</span>
             <b id="user-name" style="color: #2563eb;">@usuario</b>
         </div>
     </nav>
 
     <div id="admin-panel-hub">
-        <h3 style="color: #fbbf24; margin-top: 0;">🛠️ Panel de Fundador - Desbloqueo Maestro</h3>
-        <p style="font-size: 0.8rem; color: #94a3b8;">Haz clic en un curso para habilitarlo temporalmente en esta sesión:</p>
+        <h3 style="color: var(--accent); margin-top: 0;">🛠️ Panel Maestro - Alonixz Group</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8;">Habilitar secciones del HUB:</p>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="desbloquearCurso('COMUNICACIÓN 3°')" style="cursor:pointer; padding: 8px; border-radius: 5px; border:none; background:#2563eb; color:white;">Habilitar Comunicación</button>
-            <button onclick="desbloquearCurso('CIENCIAS SOCIALES 3°')" style="cursor:pointer; padding: 8px; border-radius: 5px; border:none; background:#2563eb; color:white;">Habilitar Sociales</button>
-            <button onclick="location.reload()" style="cursor:pointer; padding: 8px; border-radius: 5px; border:none; background:#ef4444; color:white;">Cerrar/Reset</button>
+            <button onclick="desbloquearTodo()" style="background: #2563eb; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">🔓 Desbloquear Todo</button>
+            <button onclick="location.reload()" style="background: #ef4444; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">🔒 Re-Bloquear</button>
         </div>
     </div>
 
     <header class="hub-header">
-        <h1 class="main-title">EDUSOLVE <span class="hub-tag">HUB</span></h1>
-        <div class="main-dev-signature">
-            PROYECTO DESARROLLADO POR <span class="group-highlight">ALONIXZ-GROUP</span>
-        </div>
+        <h1 class="main-title">EDUSOLVE <span style="color: var(--primary);">HUB</span></h1>
+        <div style="font-size: 0.6rem; letter-spacing: 3px; color: #64748b; margin-top: 10px;">PROYECTO DESARROLLADO POR <span class="group-highlight">ALONIXZ-GROUP</span></div>
     </header>
 
-    <div class="menu-grid" id="grid-libros">
+    <div class="menu-grid">
         <a href="matematica.html" class="card-libro">
             <span class="icon">📐</span>
             <h3>Matemáticas 3°</h3>
-            <p>Santillana - Full Data</p>
-            <span class="btn-entrar">INGRESAR AL MODO</span>
+            <span class="btn-entrar">INGRESAR</span>
         </a>
 
-        <div class="card-libro locked" id="card-comunicacion" onclick="intentarEntrar('COMUNICACIÓN 3°')">
+        <div class="card-libro locked" id="lib-comunicacion">
             <span class="icon">✍️</span>
             <h3>Comunicación 3°</h3>
-            <p>Analizando Textos...</p>
-            <span class="btn-locked">SISTEMA BLOQUEADO</span>
+            <span class="btn-locked">BLOQUEADO</span>
         </div>
 
-        <div class="card-libro locked" id="card-sociales" onclick="intentarEntrar('CIENCIAS SOCIALES 3°')">
+        <div class="card-libro locked" id="lib-sociales">
             <span class="icon">🌍</span>
             <h3>Ciencias Sociales 3°</h3>
-            <p>Historia y Geografía</p>
-            <span class="btn-locked">SISTEMA BLOQUEADO</span>
+            <span class="btn-locked">BLOQUEADO</span>
         </div>
 
-        <div class="card-libro locked" onclick="intentarEntrar('ENGLISH STUDENTBOOK')">
+        <div class="card-libro locked" id="lib-religion">
+            <span class="icon">⛪</span>
+            <h3>Religión</h3>
+            <span class="btn-locked">BLOQUEADO</span>
+        </div>
+
+        <div class="card-libro locked" id="lib-estudiante">
             <span class="icon">📖</span>
             <h3>English Studentbook</h3>
-            <p>Grammar Focus</p>
-            <span class="btn-locked">SISTEMA BLOQUEADO</span>
+            <span class="btn-locked">BLOQUEADO</span>
+        </div>
+
+        <div class="card-libro locked" id="lib-workbook">
+            <span class="icon">📝</span>
+            <h3>English Workbook</h3>
+            <span class="btn-locked">BLOQUEADO</span>
         </div>
     </div>
 
-    <footer class="main-footer">
-        <p>© 2026 <span class="group-highlight">Alonixz-Group</span> | Arequipa, Perú</p>
-        <button onclick="location.href='index.html'" style="margin-top:15px; background:none; border:1px solid #334155; color:#64748b; padding:8px 15px; border-radius:10px; cursor:pointer;">← Volver al Menú Principal</button>
-    </footer>
-
     <script>
-        // 1. IDENTIFICACIÓN Y RANGO
-        function verificarUsuario() {
+        // 1. RECONOCIMIENTO DE USUARIO
+        function iniciarHub() {
             const nombre = localStorage.getItem('user_name') || 
                            localStorage.getItem('active_user') || "Invitado";
             
             const label = document.getElementById('user-name');
-            const panelAdmin = document.getElementById('admin-panel-hub');
+            const panel = document.getElementById('admin-panel-hub');
 
             if (nombre.toLowerCase().trim() === "alonso") {
                 label.innerHTML = "Fundador Alonso";
                 label.style.color = "#fbbf24";
-                panelAdmin.style.display = "block"; // APARECE EL PANEL PARA TI
+                panel.style.display = "block"; // Solo tú ves esto
             } else {
                 label.innerText = "@" + nombre;
-                panelAdmin.style.display = "none";
             }
         }
 
-        // 2. LÓGICA DE BLOQUEO/DESBLOQUEO
-        function intentarEntrar(curso) {
-            // Si el curso ya no tiene la clase 'locked', permitir entrar
-            // (Aquí podrías redirigir a la página real)
-            alert("MÓDULO BLOQUEADO: El sistema de " + curso + " está encriptado. Solo el Fundador puede habilitar el acceso.");
+        // 2. FUNCIÓN DE DESBLOQUEO MAESTRO
+        function desbloquearTodo() {
+            const libros = document.querySelectorAll('.card-libro.locked');
+            
+            libros.forEach(libro => {
+                libro.classList.remove('locked');
+                const btn = libro.querySelector('.btn-locked');
+                if(btn) {
+                    btn.className = 'btn-entrar';
+                    btn.innerText = 'ACCESO LIBRE';
+                }
+                // Simular que ahora son links
+                libro.style.cursor = "pointer";
+                libro.onclick = function() {
+                    alert("Redirigiendo al servidor de datos...");
+                    // window.location.href = libro.id + ".html"; 
+                };
+            });
+            alert("⚠️ Alonixz-Group: Todos los módulos han sido habilitados.");
         }
 
-        function desbloquearCurso(nombreCurso) {
-            // Ejemplo: Desbloquear Comunicación
-            if(nombreCurso === 'COMUNICACIÓN 3°') {
-                const card = document.getElementById('card-comunicacion');
-                card.classList.remove('locked');
-                card.onclick = () => window.location.href = 'comunicacion.html';
-                card.querySelector('.btn-locked').className = 'btn-entrar';
-                card.querySelector('.btn-entrar').innerText = 'ACCESO CONCEDIDO';
-                alert("Módulo de Comunicación desbloqueado con éxito.");
-            }
-            if(nombreCurso === 'CIENCIAS SOCIALES 3°') {
-                const card = document.getElementById('card-sociales');
-                card.classList.remove('locked');
-                card.onclick = () => window.location.href = 'sociales.html';
-                card.querySelector('.btn-locked').className = 'btn-entrar';
-                card.querySelector('.btn-entrar').innerText = 'ACCESO CONCEDIDO';
-                alert("Módulo de Sociales desbloqueado.");
-            }
-        }
-
-        // Carga inicial
-        window.onload = verificarUsuario;
+        window.onload = iniciarHub;
     </script>
 </body>
 </html>
