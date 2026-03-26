@@ -213,6 +213,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
+    // Cargamos el sonido en la memoria
+const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 // 2. CONFIGURACIÓN DE TU PROYECTO
 const firebaseConfig = {
   apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
@@ -437,8 +439,29 @@ function enviarMensaje() {
         console.error("Error al enviar:", error);
     });
 }
-// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
-function escucharChat() {
+// 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
+const campoTexto = document.getElementById('message-input'); // Tu input de texto
+const botonEnviar = document.getElementById('send-btn');      // Tu botón de enviar
+
+// 2. Escuchamos cuando el usuario presiona una tecla en el cuadro de texto
+campoTexto.addEventListener('keydown', function(event) {
+    // Si la tecla es "Enter" (puedes usar event.key === 'Enter')
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Evita que se cree un espacio o salto de línea
+        botonEnviar.click();    // Simula que el usuario hizo clic en el botón real
+    }
+});// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
+function escucharChat() {// BUSCA ESTA PARTE EN TU CÓDIGO ACTUAL:
+db.ref('mensajes').on('child_added', (snapshot) => {
+    const datos = snapshot.val();
+    
+    // --- AQUÍ PEGAS LA MEJORA ---
+    sonidoMensaje.play().catch(e => console.log("Esperando interacción para sonar..."));
+    // ----------------------------
+
+    // Aquí sigue tu código normal para mostrar el mensaje en pantalla...
+    mostrarMensajeEnPantalla(datos);
+});
     console.log("Intentando conectar al chat de Firebase...");
 
     db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
