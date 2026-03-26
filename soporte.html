@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte & Parches | EduSolve PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #38bdf8;
+            --bg: #05070a;
+            --glass: rgba(15, 23, 42, 0.6);
+            --border: rgba(56, 189, 248, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #05070a 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header { text-align: center; margin-bottom: 40px; }
+        .version-badge {
+            background: var(--primary);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        h2 { font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
+        
+        /* Sección de Parches */
+        .patch-item {
+            border-left: 2px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+        .patch-date { font-size: 0.75rem; color: var(--primary); font-weight: 700; }
+        .patch-text { font-size: 0.9rem; color: #94a3b8; margin-top: 5px; }
+
+        /* Status */
+        .status-dot {
+            height: 8px; width: 8px; background: #22c55e;
+            border-radius: 50%; display: inline-block;
+            margin-right: 5px; box-shadow: 0 0 10px #22c55e;
+        }
+
+        /* Botón Volver */
+        .btn-back {
+            background: none; border: 1px solid var(--border);
+            color: #64748b; padding: 10px 20px; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; font-weight: 600;
+            display: block; width: 100%; text-align: center; text-decoration: none;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <span class="version-badge">Build v2.2.5</span>
+            <h2 style="font-size: 2rem; margin-top: 15px;">Soporte & <span style="color: var(--primary);">Parches</span></h2>
+            <p style="color: #64748b;">Panel de control técnico para el Alonixz-Group</p>
+        </div>
+
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700;">Estado de Red</span>
+                <span style="font-size: 0.8rem;"><span class="status-dot"></span> Sincronizado: Arequipa v3</span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin-top: 0; font-size: 1.1rem; margin-bottom: 25px;">🛠️ Registro de Cambios</h3>
+            
+            <div class="patch-item">
+                <div class="patch-date">MARZO 25, 2026</div>
+                <div class="patch-text">
+                    • <b>Security Patch:</b> Sistema de permisos para el Fundador Alonso activado.<br>
+                    • <b>New Feature:</b> HUB de Libros Santillana con desbloqueo individual.<br>
+                    • <b>Bug Fix:</b> Corregido error de duplicidad en etiquetas de menú.
+                </div>
+            </div>
+
+            <div class="patch-item">
+                <div class="patch-date">MARZO 10, 2026</div>
+                <div class="patch-text">
+                    • <b>UI/UX:</b> Implementación de efectos Glassmorphism en el buscador.<br>
+                    • <b>Database:</b> Carga optimizada de archivos PDF para libros de 3° Secundaria.
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card" style="text-align: center;">
+            <h3 style="margin-top: 0;">¿Necesitas ayuda?</h3>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px;">Si encuentras un error en las respuestas de Santillana, repórtalo aquí.</p>
+            <button onclick="alert('Conectando con el servidor de soporte Alonixz...')" style="background: var(--primary); color: #000; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; width: 100%;">
+                CONTACTAR SOPORTE TÉCNICO
+            </button>
+        </div>
+
+        <a href="menu.html" class="btn-back">← Volver al Menú Principal</a>
+    </div>
+
+</body>
+</html>
