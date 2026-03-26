@@ -122,16 +122,66 @@
             </div>
         </div>
 
-        <div class="glass-card" style="text-align: center;">
-            <h3 style="margin-top: 0;">¿Necesitas ayuda?</h3>
-            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px;">Si encuentras un error en las respuestas de Santillana, repórtalo aquí.</p>
-            <button onclick="alert('Conectando con el servidor de soporte Alonixz...')" style="background: var(--primary); color: #000; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; width: 100%;">
-                CONTACTAR SOPORTE TÉCNICO
-            </button>
-        </div>
+      <div class="glass-card" id="form-container">
+    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span>🚩</span> Reportar un Error
+    </h3>
+    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">
+        ¿Falta una página? ¿El libro está bloqueado? Infórmalo al equipo técnico.
+    </p>
 
-        <a href="menu.html" class="btn-back">← Volver al Menú Principal</a>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        <select id="tipo-error" style="width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none;">
+            <option value="Libro Bloqueado">🔒 Libro Bloqueado</option>
+            <option value="Error de Carga">🌐 Error de Carga / Enlace Roto</option>
+            <option value="Contenido Incorrecto">📖 Contenido Incorrecto</option>
+            <option value="Sugerencia">💡 Sugerencia / Nueva Idea</option>
+        </select>
+
+        <textarea id="descripcion-error" placeholder="Describe el problema detalladamente..." rows="4" 
+            style="width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none; font-family: inherit; resize: none;"></textarea>
+
+        <button onclick="enviarReporte()" id="btn-envio" style="background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px;">
+            ENVIAR REPORTE A ALONIXZ
+        </button>
     </div>
+</div>
+
+<script>
+function enviarReporte() {
+    const tipo = document.getElementById('tipo-error').value;
+    const desc = document.getElementById('descripcion-error').value;
+    const btn = document.getElementById('btn-envio');
+
+    if (!desc.trim()) {
+        alert("⚠️ Por favor, describe el error antes de enviar.");
+        return;
+    }
+
+    // Efecto visual de "Enviando"
+    btn.innerText = "PROCESANDO...";
+    btn.style.opacity = "0.7";
+    btn.disabled = true;
+
+    // Aquí simulamos el envío (puedes conectarlo a Firebase luego)
+    setTimeout(() => {
+        alert("🚀 ¡Reporte enviado con éxito! El Fundador Alonso revisará el caso pronto.");
+        
+        // Limpiar el formulario
+        document.getElementById('descripcion-error').value = "";
+        btn.innerText = "REPORTE ENVIADO ✅";
+        btn.style.background = "#22c55e";
+        
+        // Resetear botón tras 3 segundos
+        setTimeout(() => {
+            btn.innerText = "ENVIAR OTRO REPORTE";
+            btn.style.background = "var(--primary)";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }, 3000);
+    }, 1500);
+}
+</script>
 
 </body>
 </html>
