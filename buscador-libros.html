@@ -182,6 +182,26 @@
             <h3>English Workbook</h3>
             <span class="btn-locked">BLOQUEADO</span>
         </div>
+        <div class="card-libro locked" id="lib-ciencia">
+    <span class="icon">🧬</span>
+    <h3>Ciencia y Tecnología</h3>
+    <p>Biología y Física 3°</p>
+    <span class="btn-locked">BLOQUEADO</span>
+</div>
+
+<div class="card-libro locked" id="lib-dpcc">
+    <span class="icon">⚖️</span>
+    <h3>Desarrollo Personal</h3>
+    <p>DPCC - Cívica 3°</p>
+    <span class="btn-locked">BLOQUEADO</span>
+</div>
+
+<div class="card-libro locked" id="lib-arte">
+    <span class="icon">🎨</span>
+    <h3>Arte y Cultura</h3>
+    <p>Kirigami & Proyectos</p>
+    <span class="btn-locked">BLOQUEADO</span>
+</div>
     </div>
 
     <script>
@@ -203,25 +223,37 @@
         }
 
         // 2. FUNCIÓN DE DESBLOQUEO MAESTRO
-        function desbloquearTodo() {
-            const libros = document.querySelectorAll('.card-libro.locked');
-            
-            libros.forEach(libro => {
-                libro.classList.remove('locked');
-                const btn = libro.querySelector('.btn-locked');
-                if(btn) {
-                    btn.className = 'btn-entrar';
-                    btn.innerText = 'ACCESO LIBRE';
-                }
-                // Simular que ahora son links
-                libro.style.cursor = "pointer";
-                libro.onclick = function() {
-                    alert("Redirigiendo al servidor de datos...");
-                    // window.location.href = libro.id + ".html"; 
-                };
-            });
-            alert("⚠️ Alonixz-Group: Todos los módulos han sido habilitados.");
+      function desbloquearTodo() {
+    // 1. Seleccionamos TODAS las tarjetas que tengan la clase 'locked'
+    const libros = document.querySelectorAll('.card-libro.locked');
+    
+    libros.forEach(libro => {
+        // Quitamos el filtro gris y la opacidad
+        libro.classList.remove('locked');
+        libro.style.filter = "none";
+        libro.style.opacity = "1";
+        libro.style.cursor = "pointer";
+        libro.style.borderStyle = "solid";
+        libro.style.borderColor = "var(--primary)";
+
+        // Cambiamos el botón visualmente
+        const btn = libro.querySelector('.btn-locked');
+        if(btn) {
+            btn.className = 'btn-entrar';
+            btn.innerText = 'ACCESO CONCEDIDO';
+            btn.style.background = "#22c55e"; // Color verde de éxito
         }
+
+        // Asignamos la ruta según el ID de la tarjeta
+        libro.onclick = function() {
+            const id = libro.id.replace('lib-', ''); // Quita el 'lib-' del nombre
+            alert("Sincronizando con la base de datos de " + id.toUpperCase() + "...");
+            window.location.href = id + ".html"; 
+        };
+    });
+
+    console.log("🛠️ Alonixz-Group: Protocolo de acceso total ejecutado.");
+}
 
         window.onload = iniciarHub;
     </script>
