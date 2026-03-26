@@ -356,6 +356,36 @@ function mostrarErrorAcceso(curso) {
 
 function cerrarError() {
     document.getElementById('error-overlay').style.display = 'none';
+  <script>
+    function mostrarUsuarioEnBuscador() {
+        // 1. Buscamos el nombre en las llaves que ya conocemos
+        const nombreGuardado = localStorage.getItem('user_name') || 
+                               localStorage.getItem('active_user') || 
+                               "Invitado";
+
+        // 2. Buscamos el elemento donde queremos poner el nombre
+        const displayNombre = document.getElementById('user-name');
+
+        if (displayNombre) {
+            // 3. Si el nombre es Alonso, le damos un estilo especial de Fundador
+            if (nombreGuardado.toLowerCase().trim() === "alonso") {
+                displayNombre.innerHTML = "Fundador Alonso";
+                displayNombre.style.color = "#fbbf24"; // Color dorado
+                displayNombre.parentElement.style.border = "2px solid #fbbf24";
+            } else {
+                displayNombre.innerText = "@" + nombreGuardado;
+            }
+        }
+    }
+
+    // Ejecutar cuando la página termine de cargar
+    window.onload = function() {
+        mostrarUsuarioEnBuscador();
+        
+        // Si ya tienes otras funciones de búsqueda de libros, agrégalas aquí abajo:
+        // cargarLibros(); 
+    };
+</script>
 }</script>
 </body>
 </html>
