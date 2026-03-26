@@ -129,30 +129,52 @@
     </div>
 </div>
 
-      <div class="glass-card" id="form-container">
-    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
-        <span>🚩</span> Reportar un Error
+   <div class="glass-card">
+    <h3 style="margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+        <span>📩</span> Enviar Corrección / Aporte
     </h3>
-    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">
-        ¿Falta una página? ¿El libro está bloqueado? Infórmalo al equipo técnico.
+    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px;">
+        ¿Encontraste una respuesta o quieres colaborar? Envía los datos directamente al correo del Fundador.
     </p>
 
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-        <select id="tipo-error" style="width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none;">
-            <option value="Libro Bloqueado">🔒 Libro Bloqueado</option>
-            <option value="Error de Carga">🌐 Error de Carga / Enlace Roto</option>
-            <option value="Contenido Incorrecto">📖 Contenido Incorrecto</option>
-            <option value="Sugerencia">💡 Sugerencia / Nueva Idea</option>
-        </select>
+    <form action="https://formspree.io/f/xkoqeene" method="POST" id="contributeForm" style="display: flex; flex-direction: column; gap: 15px;">
+        
+        <div style="display: flex; gap: 10px;">
+            <input type="number" name="pagina" placeholder="Pág #" required 
+                   style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 12px; padding: 12px; outline: none;">
+            
+            <input type="text" name="ejercicio" placeholder="Ejerc. (Ej: 5)" required 
+                   style="flex: 2; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 12px; padding: 12px; outline: none;">
+        </div>
 
-        <textarea id="descripcion-error" placeholder="Describe el problema detalladamente..." rows="4" 
-            style="width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none; font-family: inherit; resize: none;"></textarea>
+        <input type="text" name="respuesta" placeholder="Respuesta (Ej: x = 30°)" required 
+               style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 12px; padding: 12px; outline: none; box-sizing: border-box;">
 
-        <button onclick="enviarReporte()" id="btn-envio" style="background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px;">
-            ENVIAR REPORTE A ALONIXZ
+        <textarea name="explicacion" rows="3" required
+                  style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 15px; padding: 15px; font-family: inherit; resize: none; box-sizing: border-box; outline: none;" 
+                  placeholder="Explica el procedimiento lógico..."></textarea>
+        
+        <button type="submit" class="btn-glow" 
+                style="width: 100%; background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);">
+            ENVIAR AL CORREO DEL FUNDADOR
         </button>
-    </div>
+    </form>
 </div>
+
+<style>
+    /* Estilo para que los campos resalten al hacer clic */
+    input:focus, textarea:focus {
+        border-color: var(--primary) !important;
+        background: rgba(56, 189, 248, 0.05) !important;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
+    }
+    
+    .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4);
+        filter: brightness(1.1);
+    }
+</style>
 
 <script>
 function enviarReporte() {
