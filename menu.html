@@ -215,27 +215,41 @@
 <script>
     // EL GUARDIÁN DE EDUSOLVE
 // EL GUARDIÁN CON TIEMPO DE GRACIA
-(function checkAccessDelayed() {
-    console.log("🛡️ EduSolve: Verificando credenciales...");
+// EL GUARDIÁN DE ACCESO DE EDUSOLVE (5 SEGUNDOS DE GRACIA)
+(function guardianUltraPaciente() {
+    console.log("🛡️ Alonixz-Group: Iniciando escaneo de seguridad...");
+    
+    // 1. Ocultamos el menú para que nadie vea nada sin permiso
+    document.body.style.display = "none";
 
-    // Esperamos 2 segundos (2000 milisegundos)
-    setTimeout(function() {
+    // 2. Iniciamos la espera de 5 segundos (5000 milisegundos)
+    setTimeout(() => {
         const sessionUser = localStorage.getItem("eduSolve_User");
         
-        // Verificamos si después de 2 segundos sigue siendo "Invitado" o está vacío
-        if (!sessionUser || sessionUser === "" || sessionUser === "Invitado") {
+        console.log("🔍 Verificando credenciales finales... Usuario hallado: " + sessionUser);
+
+        // 3. REGLA DE ORO: Si sigue vacío, es null o dice "Invitado"
+        if (!sessionUser || sessionUser === "" || sessionUser.toLowerCase() === "invitado") {
             
-            // Mensaje elegante estilo Flat
-            console.warn("Acceso denegado. Redirigiendo al Index...");
+            console.error("❌ Acceso denegado. El LocalStorage no tiene un usuario válido.");
+            alert("⚠️ Sesión no encontrada o expirada. Regresando al inicio...");
             
-            alert("⚠️ Sesión no encontrada. Por favor, identifícate en el inicio.");
-            
-            // Redirección forzosa al Index
+            // Redirección definitiva al Index
             window.location.href = "index.html"; 
+
         } else {
-            console.log("✅ Bienvenido, " + sessionUser + ". Acceso concedido.");
+            // ¡ÉXITO! El sistema encontró el nombre real
+            console.log("✅ ¡Acceso total concedido! Bienvenido, " + sessionUser);
+            
+            // Mostramos el menú con un efecto suave
+            document.body.style.display = "block";
+            document.body.style.opacity = "0";
+            setTimeout(() => {
+                document.body.style.opacity = "1";
+                document.body.style.transition = "opacity 0.8s ease";
+            }, 50);
         }
-    }, 2000); 
+    }, 5000); // <--- AQUÍ CAMBIAMOS A 5 SEGUNDOS
 })();
     // Cargamos el sonido en la memoria
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
