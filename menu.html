@@ -214,20 +214,28 @@
 
 <script>
     // EL GUARDIÁN DE EDUSOLVE
-(function checkAccess() {
-    // Revisamos si existe el nombre del usuario en el almacenamiento local
-    const sessionUser = localStorage.getItem("eduSolve_User");
+// EL GUARDIÁN CON TIEMPO DE GRACIA
+(function checkAccessDelayed() {
+    console.log("🛡️ EduSolve: Verificando credenciales...");
 
-    // Si no hay usuario, o es "Invitado" (si así lo decides), lo mandamos fuera
-    if (!sessionUser || sessionUser === "" || sessionUser === "Invitado") {
-        console.warn("Acceso no autorizado detectado. Redirigiendo al Index...");
+    // Esperamos 2 segundos (2000 milisegundos)
+    setTimeout(function() {
+        const sessionUser = localStorage.getItem("eduSolve_User");
         
-        // Alerta opcional para el usuario "curioso"
-        alert("⚠️ ¡Alto ahí, Guerrero! Necesitas identificarte en el Index para entrar aquí.");
-        
-        // Redirigir al archivo de inicio
-        window.location.href = "index.html"; 
-    }
+        // Verificamos si después de 2 segundos sigue siendo "Invitado" o está vacío
+        if (!sessionUser || sessionUser === "" || sessionUser === "Invitado") {
+            
+            // Mensaje elegante estilo Flat
+            console.warn("Acceso denegado. Redirigiendo al Index...");
+            
+            alert("⚠️ Sesión no encontrada. Por favor, identifícate en el inicio.");
+            
+            // Redirección forzosa al Index
+            window.location.href = "index.html"; 
+        } else {
+            console.log("✅ Bienvenido, " + sessionUser + ". Acceso concedido.");
+        }
+    }, 2000); 
 })();
     // Cargamos el sonido en la memoria
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
