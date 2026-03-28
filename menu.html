@@ -213,6 +213,22 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
+    // EL GUARDIÁN DE EDUSOLVE
+(function checkAccess() {
+    // Revisamos si existe el nombre del usuario en el almacenamiento local
+    const sessionUser = localStorage.getItem("eduSolve_User");
+
+    // Si no hay usuario, o es "Invitado" (si así lo decides), lo mandamos fuera
+    if (!sessionUser || sessionUser === "" || sessionUser === "Invitado") {
+        console.warn("Acceso no autorizado detectado. Redirigiendo al Index...");
+        
+        // Alerta opcional para el usuario "curioso"
+        alert("⚠️ ¡Alto ahí, Guerrero! Necesitas identificarte en el Index para entrar aquí.");
+        
+        // Redirigir al archivo de inicio
+        window.location.href = "index.html"; 
+    }
+})();
     // Cargamos el sonido en la memoria
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 // 2. CONFIGURACIÓN DE TU PROYECTO
