@@ -234,7 +234,16 @@
         } else {
             // 4. ¡Acceso concedido!
             console.log("✅ Bienvenido a EduSolve, " + user);
+// 1. Forzamos que el cuerpo sea visible
+    document.body.style.display = "block"; 
+    
+    // 2. Si usaste opacity: 0, actívalo con un efecto suave
+    document.body.style.opacity = "1";
+    document.body.style.transition = "opacity 0.5s ease-in";
 
+    // 3. OPCIONAL: Si tienes un contenedor principal (ej: <div id="app">)
+    const mainApp = document.getElementById('main-container');
+    if(mainApp) mainApp.style.visibility = "visible";
         }
     }, 5000); 
 })();
