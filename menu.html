@@ -213,43 +213,30 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-    // EL GUARDIÁN DE EDUSOLVE
-// EL GUARDIÁN CON TIEMPO DE GRACIA
-// EL GUARDIÁN DE ACCESO DE EDUSOLVE (5 SEGUNDOS DE GRACIA)
-(function guardianUltraPaciente() {
-    console.log("🛡️ Alonixz-Group: Iniciando escaneo de seguridad...");
-    
-    // 1. Ocultamos el menú para que nadie vea nada sin permiso
+(function guardianSincronizado() {
+    // 1. Ocultar el menú de inmediato (Estilo Flat)
     document.body.style.display = "none";
 
-    // 2. Iniciamos la espera de 5 segundos (5000 milisegundos)
+    console.log("🛡️ Alonixz-Group: Verificando identidad...");
+
+    // 2. Dar 5 segundos de gracia para que cargue la memoria
     setTimeout(() => {
-        const sessionUser = localStorage.getItem("eduSolve_User");
-        
-        console.log("🔍 Verificando credenciales finales... Usuario hallado: " + sessionUser);
+        // Buscamos en ambos almacenamientos
+        const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
 
-        // 3. REGLA DE ORO: Si sigue vacío, es null o dice "Invitado"
-        if (!sessionUser || sessionUser === "" || sessionUser.toLowerCase() === "invitado") {
-            
-            console.error("❌ Acceso denegado. El LocalStorage no tiene un usuario válido.");
-            alert("⚠️ Sesión no encontrada o expirada. Regresando al inicio...");
-            
-            // Redirección definitiva al Index
-            window.location.href = "index.html"; 
+        console.log("🔍 Usuario detectado:", user);
 
+        // 3. Si no existe o es el "Invitado" fantasma, fuera.
+        if (!user || user === "" || user.toLowerCase() === "invitado") {
+            console.error("❌ Acceso denegado.");
+            alert("⚠️ Sesión no válida. Regresando al Index...");
+            window.location.href = 'index.html';
         } else {
-            // ¡ÉXITO! El sistema encontró el nombre real
-            console.log("✅ ¡Acceso total concedido! Bienvenido, " + sessionUser);
-            
-            // Mostramos el menú con un efecto suave
+            // 4. ¡Acceso concedido!
+            console.log("✅ Bienvenido a EduSolve, " + user);
             document.body.style.display = "block";
-            document.body.style.opacity = "0";
-            setTimeout(() => {
-                document.body.style.opacity = "1";
-                document.body.style.transition = "opacity 0.8s ease";
-            }, 50);
         }
-    }, 5000); // <--- AQUÍ CAMBIAMOS A 5 SEGUNDOS
+    }, 5000); 
 })();
     // Cargamos el sonido en la memoria
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
