@@ -169,21 +169,27 @@
 
     let db = JSON.parse(localStorage.getItem('edusolve_users')) || [];
 
-    if (isLogin) {
-        // --- LOGIC DE LOGIN ---
+   if (isLogin) {
+        // --- LOGICA DE LOGIN ---
         const found = db.find(u => u.n === user && u.p === pass);
         
         if (found || (user === "Alonso" && pass === "1234")) {
-            if (remember) {
-                localStorage.setItem('eduSolve_User', user);
-            } else {
-                sessionStorage.setItem('eduSolve_User', user);
+            // Guardamos en AMBAS llaves para que el Menú no se confunda
+            localStorage.setItem('eduSolve_User', user);
+            localStorage.setItem('user_name', user); // <-- ESTA ES LA QUE TU MENÚ BUSCA PRIMERO
+            localStorage.setItem('active_user', user);
+
+            if (!remember) {
+                // Si no marcó "recordar", igual lo guardamos en sesión
+                sessionStorage.setItem('active_user', user);
             }
+
+            console.log("✅ Sesión lista para Alonixz-Group");
             window.location.href = 'menu.html';
         } else {
             alert("Usuario o clave incorrecta.");
         }
-    } else {
+    }
         // --- LÓGICA DE REGISTRO CON CONDICIONES ---
         
         // 1. Condición de longitud (Mínimo 6)
