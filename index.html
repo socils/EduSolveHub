@@ -160,7 +160,7 @@
         }, 300);
     }
 
-    function handleAuth() {
+ function handleAuth() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value;
     const remember = document.getElementById('remember').checked; 
@@ -169,45 +169,43 @@
 
     let db = JSON.parse(localStorage.getItem('edusolve_users')) || [];
 
-   if (isLogin) {
-        // --- LOGICA DE LOGIN ---
+    if (isLogin) {
+        // --- LÓGICA DE LOGIN ---
         const found = db.find(u => u.n === user && u.p === pass);
         
         if (found || (user === "Alonso" && pass === "1234")) {
-            // Guardamos en AMBAS llaves para que el Menú no se confunda
+            // Guardamos en TODAS las llaves para que el Menú lo encuentre sí o sí
+            localStorage.setItem('user_name', user); 
             localStorage.setItem('eduSolve_User', user);
-            localStorage.setItem('user_name', user); // <-- ESTA ES LA QUE TU MENÚ BUSCA PRIMERO
             localStorage.setItem('active_user', user);
 
-            if (!remember) {
-                // Si no marcó "recordar", igual lo guardamos en sesión
+            if (remember) {
+                localStorage.setItem('remember_me', 'true');
+            } else {
                 sessionStorage.setItem('active_user', user);
             }
 
             console.log("✅ Sesión lista para Alonixz-Group");
             window.location.href = 'menu.html';
+            return; // Importante para detener la función aquí
         } else {
-            alert("Usuario o clave incorrecta.");
+            return alert("Usuario o clave incorrecta.");
         }
-    }
-        // --- LÓGICA DE REGISTRO CON CONDICIONES ---
+    } else { 
+        // --- LÓGICA DE REGISTRO (Solo entra aquí si isLogin es false) ---
         
-        // 1. Condición de longitud (Mínimo 6)
         if (pass.length < 6) {
             return alert("Seguridad insuficiente: La contraseña debe tener al menos 6 caracteres.");
         }
 
-        // 2. Condición opcional: Que no sea igual al nombre de usuario
         if (pass.toLowerCase() === user.toLowerCase()) {
             return alert("Error: La contraseña no puede ser igual al nombre de usuario.");
         }
 
-        // 3. Verificar si el usuario ya existe
         if(db.find(u => u.n === user)) {
             return alert("Este nombre de usuario ya está registrado en este dispositivo.");
         }
         
-        // Si pasa todas las pruebas, guardamos
         db.push({ n: user, p: pass });
         localStorage.setItem('edusolve_users', JSON.stringify(db));
         alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
