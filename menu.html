@@ -272,6 +272,7 @@ function actualizarHeader() {
     const nombre = localStorage.getItem('user_name') || 
                    localStorage.getItem('active_user') || 
                    sessionStorage.getItem('active_user') || 
+                   localStorage.getItem('eduSolve_User') ||
                    "Usuario";
 
     // 2. Forzamos el nombre en el HTML
