@@ -175,9 +175,9 @@
         
         if (found || (user === "Alonso" && pass === "1234")) {
             if (remember) {
-                localStorage.setItem('active_user', user);
+                localStorage.setItem('eduSolve_User', user);
             } else {
-                sessionStorage.setItem('active_user', user);
+                sessionStorage.setItem('eduSolve_User', user);
             }
             window.location.href = 'menu.html';
         } else {
