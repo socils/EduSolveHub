@@ -266,22 +266,30 @@ const db = firebase.database();
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
 function actualizarHeader() {
-    // Buscamos el nombre en todas las llaves posibles
-    const nombre = localStorage.getItem('user_name') || 
+    // Buscamos en TODAS las posibilidades para que nunca falle
+    const nombre = localStorage.getItem('eduSolve_User') || 
+                   localStorage.getItem('user_name') || 
                    localStorage.getItem('active_user') || 
                    sessionStorage.getItem('active_user') || 
                    "Usuario";
 
-    document.getElementById('welcome-name').innerText = nombre;
-    document.getElementById('user-full-name').innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
+    // Actualizamos los textos
+    const welcomeName = document.getElementById('welcome-name');
+    const fullName = document.getElementById('user-full-name');
+    
+    if(welcomeName) welcomeName.innerText = nombre;
+    if(fullName) fullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
 
+    // Lógica del Avatar
     const foto = localStorage.getItem('user_photo_base64');
     const avatar = document.getElementById('avatar-circle');
 
-    if (foto && foto !== "null") {
-        avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover;">`;
-    } else {
-        avatar.innerHTML = `<span id="user-initial">${nombre.charAt(0).toUpperCase()}</span>`;
+    if (avatar) {
+        if (foto && foto !== "null") {
+            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        } else {
+            avatar.innerHTML = `<span id="user-initial">${nombre.charAt(0).toUpperCase()}</span>`;
+        }
     }
 }
 
