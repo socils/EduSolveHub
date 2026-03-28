@@ -440,17 +440,7 @@ function enviarMensaje() {
     });
 }
 // 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
-const campoTexto = document.getElementById('message-input'); // Tu input de texto
-const botonEnviar = document.getElementById('send-btn');      // Tu botón de enviar
-
-// 2. Escuchamos cuando el usuario presiona una tecla en el cuadro de texto
-campoTexto.addEventListener('keydown', function(event) {
-    // Si la tecla es "Enter" (puedes usar event.key === 'Enter')
-    if (event.key === 'Enter') {
-        event.preventDefault(); // Evita que se cree un espacio o salto de línea
-        botonEnviar.click();    // Simula que el usuario hizo clic en el botón real
-    }
-});// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
+;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
 function escucharChat() {// BUSCA ESTA PARTE EN TU CÓDIGO ACTUAL:
 db.ref('mensajes').on('child_added', (snapshot) => {
     const datos = snapshot.val();
