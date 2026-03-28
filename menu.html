@@ -571,18 +571,35 @@ function enviarAnuncioSistema() {
         timestamp: Date.now()
     });
 }
-}window.addEventListener('load', function() {
-    // Ejecutar funciones básicas
-    if (typeof actualizarHeader === 'function') actualizarHeader();
-    if (typeof escucharNoticias === 'function') escucharNoticias();
-    if (typeof escucharChat === 'function') escucharChat();
+}// --- VINCULAR TECLA ENTER (VERSIÓN ALONIXZ-GROUP) ---
+window.addEventListener('load', function() {
+    // 1. Buscamos el cuadro de texto (probamos ambos IDs comunes)
+    const inputChat = document.getElementById('chat-input') || document.getElementById('message-input');
+    const btnEnviar = document.getElementById('send-btn') || document.querySelector('[onclick="enviarMensaje()"]');
 
-    // Activar el rango de Alonso
-    setTimeout(function() {
-        if (typeof window.verificarRango === 'function') {
-            window.verificarRango();
-        }
-    }, 1000);
+    if (inputChat) {
+        inputChat.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Evita que se baje el cursor
+                
+                // Si existe el botón, le damos clic; si no, llamamos a la función directo
+                if (btnEnviar) {
+                    btnEnviar.click();
+                } else {
+                    enviarMensaje();
+                }
+            }
+        });
+        console.log("✅ Tecla Enter vinculada al elemento:", inputChat.id);
+    } else {
+        console.error("❌ No se encontró el cuadro de texto del chat. Revisa el ID en tu HTML.");
+    }
+    
+    // Ejecutar tus otras funciones originales
+    actualizarHeader();
+    escucharNoticias();
+    escucharChat();
+    setTimeout(() => { if(window.verificarRango) window.verificarRango(); }, 1000);
 });
 // Función para abrir el panel que ya tenías antes
 function buscarActualizaciones() {
