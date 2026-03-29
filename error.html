@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Ups! Un tropiezo técnico | EduSolve PRO</title>
+    <style>
+        /* --- ESTILOS RESPONSIVOS Y FLAT VIBRANTES --- */
+        
+        /* 1. Fondo de la página con el azul vibrante de Alonixz-Group */
+        body {
+            background-color: #3498db; /* Azul plano y vibrante */
+            color: #333;
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Asegura que el contenido esté centrado verticalmente en pantallas grandes */
+            min-height: 100vh; 
+            text-align: center;
+        }
+
+        /* 2. El contenedor estilo "Ventana Emergente" (Modal) - Adaptable */
+        .error-modal {
+            background-color: white; /* Fondo blanco para contraste */
+            /* ANCHO ADAPTABLE: Usa el 90% del ancho del celular, pero máximo 500px en PC */
+            width: 90%;
+            max-width: 500px;
+            /* Padding flexible para móviles */
+            padding: 30px 20px;
+            /* Borde flat y definido */
+            border: 4px solid #2980b9; /* Azul más oscuro, muy flat */
+            border-radius: 12px; /* Esquinas suavemente redondeadas */
+            box-sizing: border-box; /* Asegura que el padding esté DENTRO del ancho */
+            
+            /* Sombra muy sutil (flat) para separarlo del fondo */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            
+            /* Margen para que no se pegue arriba/abajo en pantallas muy pequeñas */
+            margin: 20px;
+        }
+
+        /* 3. El "Ups" - Título principal amigable y flat */
+        h1 {
+            /* TAMAÑO DE FUENTE FLUIDO: Se adapta a pantallas pequeñas */
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            color: #e67e22; /* Naranja plano y vibrante */
+            font-weight: 700;
+        }
+
+        /* 4. Contenedor del Icono/Mascota Desconectora */
+        .icono-container {
+            /* Tamaño adaptable para móviles */
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px auto;
+            
+            /* --- AQUÍ PONES TU ICONO MINIMALISTA --- */
+            /* background-image: url('images/mascota_icon.png'); */
+            /* background-size: contain; */
+            /* background-repeat: no-repeat; */
+            /* background-position: center; */
+            
+            /* Marcador de posición visual (Borrar si pones la imagen) */
+            background-color: #f1c40f; /* Amarillo plano */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            border-radius: 50%; /* Icono circular */
+            color: white;
+            opacity: 0.9;
+        }
+        
+        /* Icono temporal (un cable desenchufado sutil) */
+        .icono-temp::before { content: "🔌"; }
+
+        /* 5. Texto de error general y contacto - Adaptable */
+        .mensaje-texto {
+            /* Fuente fluida para móviles */
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* "Si este error persiste..." - Resaltado vibrante */
+        .contacto-resaltado {
+            display: block;
+            color: #e74c3c; /* Rojo plano y vibrante */
+            font-weight: bold;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        /* 6. Botón Flat de retorno vibrante y adaptable */
+        .btn-retorno {
+            display: inline-block;
+            background-color: #2ecc71; /* Verde plano y vibrante */
+            color: white;
+            /* Padding adaptable para pulsar en móvil */
+            padding: 14px 28px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer;
+            
+            /* Hace que el botón ocupe casi todo el ancho en móviles */
+            width: 80%;
+            max-width: 250px;
+        }
+
+        .btn-retorno:hover {
+            background-color: #27ae60; /* Verde más oscuro al pasar el mouse */
+        }
+
+        /* 7. Mensaje técnico oculto (muy sutil al fondo) */
+        #detalle-tecnico {
+            margin-top: 35px;
+            font-size: 0.7rem;
+            color: #bdc3c7;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            width: 100%;
+        }
+        
+        /* --- MEDIA QUERIES PARA PANTALLAS GRANDES --- */
+        @media (min-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .icono-container { width: 150px; height: 150px; }
+            .mensaje-texto { font-size: 1.1rem; }
+            .error-modal { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-modal">
+        
+        <h1>¡Ups! Algo inesperado sucedió...</h1>
+
+        <div class="icono-container">
+            <div class="icono-temp"></div>
+        </div>
+
+        <p class="mensaje-texto">Parece que nuestro sistema ha tenido un pequeño tropiezo al cargar la información.</p>
+        <p class="mensaje-texto">O quizás nuestra pata mecánica del soporte técnico... bueno, quizás se posó sobre un cable importante.</p>
+
+        <span class="contacto-resaltado">Si este error persiste, contáctate con nuestro soporte técnico de Alonixz-Group.</span>
+        
+        <a href="index.html" class="btn-retorno">Volver a intentarlo</a>
+
+        <div id="detalle-tecnico"><strong>Reporte técnico (tras 5.2s):</strong> <span id="error-content"><em>Cargando reporte...</em></span></div>
+    </div>
+
+    <script>
+      // Recuperamos el detalle del sessionStorage que el analizador guardó
+      const errorGuardado = sessionStorage.getItem('error_final');
+      const containerDetalle = document.getElementById('error-content');
+
+      if (errorGuardado) {
+        containerDetalle.innerText = errorGuardado;
+        // sessionStorage.removeItem('error_final'); // Opcional
+      } else {
+        containerDetalle.innerText = "Error no clasificado (posible validación de seguridad de 5.1s exitosa).";
+      }
+    </script>
+</body>
+</html>
