@@ -238,7 +238,7 @@
 
         <div id="admin-output" style="margin-top: 15px; display: none;"></div>
     </div>
-</div><div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
+</div><div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;"></div>
    
 
 
@@ -248,512 +248,225 @@
     70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
     100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
-</style><script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</style>
+  <script>// =================================================ing
+// 🛡️ ALONIXZ-GROUP - SISTEMA INTEGRAL V4.0
+// DESARROLLADOR: Alonso (Fundador y Líder)
+// PROYECTO: EduSolve PRO - Santillana 3°
+// =================================================
 
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+// --- 1. CONFIGURACIÓN Y VARIABLES GLOBALES ---
+const firebaseConfig = {
+    apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+    authDomain: "edusolve-947c1.firebaseapp.com",
+    projectId: "edusolve-947c1",
+    storageBucket: "edusolve-947c1.firebasestorage.app",
+    messagingSenderId: "1089784819674",
+    appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+};
 
-<script>
-(function guardianSincronizado() {
-    // 1. Ocultar el menú de inmediato (Estilo Flat)
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+const db = firebase.database();
+const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+let errorDetectado = null;
+
+// --- 2. GUARDIÁN DE ACCESO Y SEGURIDAD (PARCHE 5.2s) ---
+(function iniciarGuardian() {
     document.body.style.display = "none";
+    console.log("🛡️ Alonixz-Group: Verificando integridad del sistema...");
 
-    console.log("🛡️ Alonixz-Group: Verificando identidad...");
-
-    // 2. Dar 5 segundos de gracia para que cargue la memoria
+    // Analizador de Errores (Si falla algo en 5.2s, abortar)
     setTimeout(() => {
-        // Buscamos en ambos almacenamientos
+        if (errorDetectado) {
+            console.error("🚨 Error crítico detectado por el Analizador:", errorDetectado);
+            window.location.href = "error.html";
+        }
+    }, 5200);
+
+    // Validador de Sesión Local
+    setTimeout(() => {
         const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
-
-        console.log("🔍 Usuario detectado:", user);
-
-        // 3. Si no existe o es el "Invitado" fantasma, fuera.
-        if (!user || user === "" || user.toLowerCase() === "invitado") {
-            console.error("❌ Acceso denegado.");
-            alert("⚠️ Sesión no válida. Regresando al Index...");
+        if (!user || user.toLowerCase() === "invitado") {
             window.location.href = 'index.html';
         } else {
-            // 4. ¡Acceso concedido!
-            console.log("✅ Bienvenido a EduSolve, " + user);
-// 1. Forzamos que el cuerpo sea visible
-    document.body.style.display = "block"; 
-    
-    // 2. Si usaste opacity: 0, actívalo con un efecto suave
-    document.body.style.opacity = "1";
-    document.body.style.transition = "opacity 0.5s ease-in";
-
-    // 3. OPCIONAL: Si tienes un contenedor principal (ej: <div id="app">)
-    const mainApp = document.getElementById('main-container');
-    if(mainApp) mainApp.style.visibility = "visible";
+            document.body.style.display = "block";
+            document.body.style.opacity = "1";
+            actualizarHeader();
+            registrarLog("Inicio de Sesión");
         }
-    }, 5000); 
+    }, 4500);
 })();
-    // Cargamos el sonido en la memoria
-const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-// 2. CONFIGURACIÓN DE TU PROYECTO
-const firebaseConfig = {
-  apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
-  authDomain: "edusolve-947c1.firebaseapp.com",
-  projectId: "edusolve-947c1",
-  storageBucket: "edusolve-947c1.firebasestorage.app",
-  messagingSenderId: "1089784819674",
-  appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
-};
 
-// 3. INICIALIZAR (Sin usar 'import')
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+window.onerror = (m) => { errorDetectado = m; return false; };
 
-// --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
-
+// --- 3. MÓDULO DE INTERFAZ (UI & UX) ---
 function actualizarHeader() {
-    // 1. Buscamos el nombre real en la memoria del navegador
-    const nombre = localStorage.getItem('user_name') || 
-                   localStorage.getItem('eduSolve_User') || 
-                   localStorage.getItem('active_user') || 
-                   "Usuario"; // Si no encuentra nada, usa "Usuario"
-
-    console.log("👤 Cargando perfil para: " + nombre);
-
-    // 2. Actualizamos el nombre principal
-    const welcomeName = document.getElementById('welcome-name');
-    if (welcomeName) {
-        welcomeName.innerText = nombre;
-    } else {
-        console.error("❌ No encontré el ID 'welcome-name'");
-    }
-
-    // 3. Actualizamos el @ (quitando espacios y poniendo minúsculas)
-    const userFullName = document.getElementById('user-full-name');
-    if (userFullName) {
-        const arroba = "@" + nombre.toLowerCase().replace(/\s/g, '');
-        userFullName.innerText = arroba;
-    } else {
-        console.error("❌ No encontré el ID 'user-full-name'");
-    }
-
-    // 4. Actualizamos el Avatar (Foto o Inicial)
+    const nombre = localStorage.getItem('eduSolve_User') || "Usuario";
     const foto = localStorage.getItem('user_photo_base64');
-    const avatar = document.getElementById('avatar-circle');
+    
+    const welcomeName = document.getElementById('welcome-name');
+    if (welcomeName) welcomeName.innerText = nombre;
+    
+    const userFullName = document.getElementById('user-full-name');
+    if (userFullName) userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
 
+    const avatar = document.getElementById('avatar-circle');
     if (avatar) {
         if (foto && foto !== "null" && foto !== "") {
-            // Si hay foto, la mostramos
-            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
         } else {
-            // Si NO hay foto, mostramos la primera inicial en mayúscula
-            const inicial = nombre.charAt(0).toUpperCase();
-            avatar.innerHTML = `<span id="user-initial">${inicial}</span>`;
+            avatar.innerHTML = `<span>${nombre.charAt(0).toUpperCase()}</span>`;
         }
-    } else {
-        console.error("❌ No encontré el ID 'avatar-circle'");
     }
+    verificarRango();
 }
 
-// ¡IMPORTANTE! Forzamos la actualización al cargar la página
-window.addEventListener('load', () => {
-    actualizarHeader();
-});
-
-// ¡IMPORTANTE! Llama a la función apenas cargue la página
-window.onload = actualizarHeader;
-// Función para el menú
-function toggleUserMenu() {
-    const menu = document.getElementById('user-menu');
-    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-}
-
-// Función de Cerrar Sesión
-function logout() {
-    if(confirm("¿Cerrar sesión en EduSolve PRO?")) {
-        localStorage.removeItem('user_name');
-        localStorage.removeItem('active_user');
-        sessionStorage.removeItem('active_user');
-        location.href = 'index.html';
-    }
-}
-
-// --- PANEL ADMIN (10 CLICS) ---
-let contadorAdmin = 0;
-let tiempoEspera;
-
-function activacionSecreta() {
-    clearTimeout(tiempoEspera);
-    contadorAdmin++;
-    if (contadorAdmin === 10) {
-        document.getElementById('admin-panel').style.display = 'flex';
-        contadorAdmin = 0;
-        alert("🛠️ Modo Administrador Activado");
-    }
-    tiempoEspera = setTimeout(() => { contadorAdmin = 0; }, 2000);
-}
-
-// --- FUNCIONES DE FIREBASE (NOTICIAS) ---
-
-function escucharNoticias() {
-    db.ref('noticias').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const contenedor = document.getElementById('news-container');
-        if (!data) return;
-
-        contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
-        const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
-
-        lista.forEach(n => {
-            contenedor.innerHTML += `
-                <div style="display:flex; justify-content:space-between; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                    <div style="text-align:left;">
-                        <b style="color:#1e293b; display:block;">${n.titulo}</b>
-                        <small style="color:#94a3b8;">${n.autor} • ${n.fecha}</small>
-                    </div>
-                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
-                </div>`;
-        });
-    });
-}
-
-// --- EJECUCIÓN AL CARGAR LA PÁGINA ---
-window.onload = function() {
-    actualizarHeader();
-    escucharNoticias();
-    // Vinculamos el clic secreto al avatar
-    document.getElementById('avatar-circle').addEventListener('click', activacionSecreta);
-};
-
-// Cerrar menú al hacer clic fuera
-window.onclick = function(event) {
-    if (!event.target.closest('#avatar-circle') && !event.target.closest('#user-menu')) {
-        const menu = document.getElementById('user-menu');
-        if(menu) menu.style.display = 'none';
-    }
-}// --- FUNCIONES DEL PANEL ADMINISTRADOR ---
-
-// 1. Cerrar el panel
-function cerrarAdmin() {
-    document.getElementById('admin-panel').style.display = 'none';
-    document.getElementById('admin-output').style.display = 'none';
-}
-
-// 2. Ver usuarios registrados en este navegador
-function verUsuarios() {
-    const usuarios = JSON.parse(localStorage.getItem('edusolve_users')) || [];
-    const output = document.getElementById('admin-output');
-    output.style.display = 'block';
-    
-    if (usuarios.length === 0) {
-        output.innerHTML = "> No hay usuarios locales.";
-    } else {
-        output.innerHTML = "<b>Usuarios Locales:</b><br>" + 
-            usuarios.map(u => `• ${u.n} (Pass: ${u.p})`).join("<br>");
-    }
-}
-
-// 3. Ver y borrar noticias de la NUBE (Firebase)
-function verNoticiasEnConsola() {
-    const output = document.getElementById('admin-output');
-    output.style.display = 'block';
-    output.innerHTML = "Conectando a Firebase...";
-
-    // Usamos la variable 'db' que ya inicializaste arriba
-    db.ref('noticias').once('value', (snapshot) => {
-        const data = snapshot.val();
-        if (!data) {
-            output.innerHTML = "> La nube está vacía.";
-            return;
-        }
-
-        let html = "<b>Editor de Nube (Firebase):</b><br>";
-        Object.keys(data).reverse().forEach(id => {
-            const n = data[id];
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:8px; border-radius:8px; margin-top:5px; border:1px solid #334155;">
-                    <span style="font-size:10px; color:#94a3b8;">${n.titulo.substring(0,15)}...</span>
-                    <button onclick="eliminarNoticia('${id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:5px; cursor:pointer; font-size:10px;">BORRAR</button>
-                </div>`;
-        });
-        output.innerHTML = html;
-    });
-}
-
-// 4. Función para borrar físicamente de Firebase
-function eliminarNoticia(id) {
-    if(confirm("¿Eliminar esta noticia de la nube para todos?")) {
-        db.ref('noticias/' + id).remove()
-        .then(() => {
-            alert("Noticia eliminada.");
-            verNoticiasEnConsola(); // Refrescar la lista
-        })
-        .catch(err => alert("Error: " + err.message));
-    }
-}
-
-// 5. Reset total del dispositivo
-function limpiarTodo() {
-    if(confirm("⚠️ ADVERTENCIA: Se borrarán todos tus datos locales (incluyendo tu sesión). ¿Continuar?")) {
-        localStorage.clear();
-        sessionStorage.clear();
-        location.href = 'index.html'; // Te manda al nuevo Login
-    }
-}function publicarNoticia() {
-    const titulo = document.getElementById('news-title').value.trim();
-    const tag = document.getElementById('news-tag').value;
-    
-    if(!titulo) return alert("Escribe el tema");
-
-    // Guardar en Firebase
-    const nuevaNoticiaRef = db.ref('noticias').push();
-    nuevaNoticiaRef.set({
-        titulo: titulo,
-        tag: tag,
-        fecha: new Date().toLocaleDateString(),
-        autor: sessionStorage.getItem('active_user') || "Admin",
-        timestamp: Date.now()
-    }).then(() => {
-        document.getElementById('news-title').value = "";
-        alert("¡Publicado en la nube para todos!");
-    }).catch(err => alert("Error: " + err.message));
-}
-// --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
+// --- 4. MOTOR DE CHAT MULTIMEDIA ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
-    const mensaje = input.value.trim();
+    const msg = input.value.trim();
+    if (!msg) return;
 
-    // 1. BUSCAR EL NOMBRE REAL (Probamos todas las opciones)
-    const nombreReal = localStorage.getItem('user_name') || 
-                       localStorage.getItem('active_user') || 
-                       sessionStorage.getItem('active_user') || 
-                       "Invitado";
-
-    // 2. BUSCAR LA FOTO REAL
-    const fotoReal = localStorage.getItem('user_photo_base64') || null;
-
-    // Si no hay mensaje, no hacemos nada
-    if (mensaje === "") return;
-
-    // 3. ENVIAR A FIREBASE
-    const chatRef = db.ref('mensajes').push();
-    chatRef.set({
-        user: nombreReal,     // Aquí ya no dirá "Invitado" si el login funcionó
-        text: mensaje,
-        photo: fotoReal,     // Enviamos la foto guardada
+    db.ref('mensajes').push({
+        user: localStorage.getItem('eduSolve_User'),
+        text: msg,
+        photo: localStorage.getItem('user_photo_base64') || null,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
-    }).then(() => {
-        input.value = ""; // Limpiar el cuadro
-        console.log("Mensaje enviado por: " + nombreReal);
-    }).catch((error) => {
-        console.error("Error al enviar:", error);
-    });
+    }).then(() => { input.value = ""; });
 }
-// 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
-;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
-// --- ESCUCHAR CHAT PRO (VERSIÓN ALONIXZ-GROUP) ---
+
 function escucharChat() {
-    console.log("📡 Intentando conectar al chat de Firebase...");
     const box = document.getElementById('chat-box');
-    
-    if (!box) {
-        console.error("❌ ERROR: No se encontró el elemento 'chat-box' en el HTML");
-        return;
-    }
+    if (!box) return;
 
-    // --- 1. AUDIO INTELIGENTE (Solo suena si el mensaje NO es mío) ---
-    db.ref('mensajes').limitToLast(1).on('child_added', (snapshot) => {
-        const m = snapshot.val();
-        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
-
-        // Solo suena si el mensaje es de OTRO y es nuevo (máximo 5 segundos de antigüedad)
-        if (m.user !== miNombre && m.timestamp > Date.now() - 5000) {
-            sonidoMensaje.play().catch(e => console.warn("🔇 Audio bloqueado por el navegador. Haz clic en la página."));
+    // Notificaciones Audibles
+    db.ref('mensajes').limitToLast(1).on('child_added', (snap) => {
+        const m = snap.val();
+        if (m.user !== localStorage.getItem('eduSolve_User') && m.timestamp > Date.now() - 5000) {
+            sonidoMensaje.play().catch(() => {});
         }
     });
 
-    // --- 2. RENDERIZADO Y FOTOS (Value) ---
-    db.ref('mensajes').limitToLast(25).on('value', (snapshot) => {
+    // Renderizado de Burbujas
+    db.ref('mensajes').limitToLast(30).on('value', (snapshot) => {
         const data = snapshot.val();
-        
-        if (!data) {
-            box.innerHTML = "<p style='text-align:center; color:#94a3b8; margin-top:20px;'>☁️ El chat está despejado. ¡Escribe algo!</p>";
-            return;
-        }
-
-        console.log("📩 Mensajes recibidos:", Object.keys(data).length);
-        box.innerHTML = ""; // Limpiar para actualizar
-
-        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user') || "Invitado";
+        box.innerHTML = "";
+        if (!data) return;
 
         Object.keys(data).forEach(id => {
             const m = data[id];
-            const esMio = m.user === miNombre;
+            const esMio = m.user === localStorage.getItem('eduSolve_User');
             
-            // Lógica de Avatar (Imagen de Firebase o Inicial)
-            let avatarHtml = m.photo && m.photo !== "null" && m.photo !== ""
-                ? `<img src="${m.photo}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`
-                : `<div style="width:32px; height:32px; border-radius:50%; background:#64748b; color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${m.user ? m.user.charAt(0).toUpperCase() : "?"}</div>`;
-
-            // Estructura del Mensaje Flat
             box.innerHTML += `
-                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:10px; margin-bottom:15px; animation: slideUp 0.3s ease;">
-                    ${avatarHtml}
-                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'}; max-width: 75%;">
-                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:3px; margin-${esMio ? 'right' : 'left'}:5px;">
-                            <span style="font-size:11px; font-weight:700; color:#475569;">${m.user}</span>
-                            <span style="font-size:9px; color:#94a3b8;">${m.time || ""}</span>
-                        </div>
-                        <div style="background:${esMio ? '#2563eb' : '#ffffff'}; 
-                                    color:${esMio ? 'white' : '#1e293b'}; 
-                                    padding:10px 14px; 
-                                    border-radius:${esMio ? '18px 18px 4px 18px' : '18px 18px 18px 4px'}; 
-                                    border:1px solid ${esMio ? '#2563eb' : '#e2e8f0'}; 
-                                    font-size:14px; 
-                                    box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
-                                    line-height: 1.4;
-                                    word-wrap: break-word;">
-                            ${m.text}
-                        </div>
+                <div class="chat-row ${esMio ? 'right' : 'left'}">
+                    <div class="chat-bubble">
+                        <small>${m.user}</small>
+                        <p>${m.text}</p>
+                        <time>${m.time}</time>
                     </div>
                 </div>`;
         });
-        
-        // --- 3. SCROLL AUTOMÁTICO INTELIGENTE ---
-        // Solo baja si el usuario está cerca del fondo (para no interrumpir lectura)
-        const isAtBottom = box.scrollHeight - box.clientHeight <= box.scrollTop + 100;
-        if (isAtBottom) {
-            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-        }
-    }, (error) => {
-        console.error("🚨 Error crítico de Firebase en Alonixz-Group:", error);
+        box.scrollTop = box.scrollHeight;
     });
-};// --- FUNCIÓN DE RANGO (FUNDADOR) ---
-// --- SISTEMA DE CONTROL DE FUNDADOR ---
-
-window.verificarRango = function() {
-    console.log("Iniciando escaneo de rango...");
-    
-    // Extraer nombre de todas las fuentes posibles
-    var n1 = localStorage.getItem('user_name');
-    var n2 = localStorage.getItem('active_user');
-    var n3 = sessionStorage.getItem('active_user');
-    
-    var nombreDetectado = (n1 || n2 || n3 || "").toLowerCase().trim();
-    var botonAdmin = document.getElementById('admin-btn-auto');
-
-    if (botonAdmin) {
-        if (nombreDetectado === "alonso") {
-            botonAdmin.style.display = "block";
-            console.log("✅ Acceso de Fundador detectado: Hola Alonso");
-        } else {
-            botonAdmin.style.display = "none";
-            console.log("Acceso denegado para: " + nombreDetectado);
-        }
-    } else {
-        console.error("No se encontró el botón 'admin-btn-auto' en el HTML");
-    }
-};
-
-window.abrirPanelAdmin = function() {
-    var panel = document.getElementById('admin-panel');
-    if (panel) {
-        panel.style.display = 'flex';
-    } else {
-        alert("Error: El panel con ID 'admin-panel' no existe.");
-    }
-};
-
-// --- FUNCIÓN PARA EL CLIC DEL BOTÓN ---
-function abrirPanelAdmin() {
-    var panel = document.getElementById('admin-panel');
-    if (panel) {
-        panel.style.display = 'flex';
-    } else {
-        alert("Error: No se encontró el panel con ID 'admin-panel'");
-    }
 }
-// Función para abrir el panel que ya tenías
-function abrirPanelAdmin() {
-    document.getElementById('admin-panel').style.display = 'flex';
-}// NUEVA: Borrar el último mensaje del chat (por si alguien puso algo malo)
-function borrarUltimoMensaje() {
-    if(confirm("¿Borrar el último mensaje enviado al chat?")) {
-        db.ref('mensajes').limitToLast(1).once('value', snapshot => {
-            snapshot.forEach(child => {
-                child.ref.remove();
-            });
-            alert("Mensaje eliminado.");
-        });
+
+// --- 5. PANEL DE ADMINISTRACIÓN Y CONTROL DE NUBE ---
+let clicksAdmin = 0;
+function activacionSecreta() {
+    clicksAdmin++;
+    if (clicksAdmin === 10) {
+        document.getElementById('admin-panel').style.display = 'flex';
+        clicksAdmin = 0;
+    }
+    setTimeout(() => { clicksAdmin = 0; }, 2500);
+}
+
+function verificarRango() {
+    const user = (localStorage.getItem('eduSolve_User') || "").toLowerCase();
+    const btnAdmin = document.getElementById('admin-btn-auto');
+    if (user === "alonso" && btnAdmin) {
+        btnAdmin.style.display = "block";
+        document.body.classList.add('rank-founder');
     }
 }
 
-// NUEVA: Mensaje de Sistema (Publicar como 'SISTEMA' en color rojo)
-function enviarAnuncioSistema() {
-    const anuncio = prompt("Escribe el anuncio global:");
-    if(!anuncio) return;
+// Funciones de Moderación
+function banearUsuario() {
+    const target = prompt("Nombre del usuario a bloquear:");
+    if (target) {
+        db.ref('blacklist').push({ user: target, date: new Date().toLocaleDateString() });
+        alert("Usuario enviado a la lista negra.");
+    }
+}
 
-    db.ref('mensajes').push({
-        user: "SISTEMA",
-        text: "⚠️ " + anuncio,
-        photo: "https://cdn-icons-png.flaticon.com/512/179/179386.png", // Icono de alerta
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+function limpiarChatGlobal() {
+    if (confirm("¿Limpiar todo el historial del chat?")) {
+        db.ref('mensajes').remove();
+    }
+}
+
+// --- 6. MÓDULO DE NOTICIAS Y NOVEDADES ---
+function publicarNoticia() {
+    const t = document.getElementById('news-title').value;
+    const g = document.getElementById('news-tag').value;
+    if(!t) return;
+
+    db.ref('noticias').push({
+        titulo: t,
+        tag: g,
+        fecha: new Date().toLocaleDateString(),
+        autor: localStorage.getItem('eduSolve_User'),
+        timestamp: Date.now()
+    }).then(() => {
+        document.getElementById('news-title').value = "";
+        alert("📢 Noticia publicada en la red.");
+    });
+}
+
+// --- 7. SISTEMA DE LOGS Y AUDITORÍA ---
+function registrarLog(accion) {
+    const user = localStorage.getItem('eduSolve_User');
+    db.ref('logs').push({
+        usuario: user,
+        accion: accion,
+        fecha: new Date().toLocaleString(),
         timestamp: Date.now()
     });
 }
-}// --- VINCULAR TECLA ENTER (VERSIÓN ALONIXZ-GROUP) ---
-window.addEventListener('load', function() {
-    // 1. Buscamos el cuadro de texto (probamos ambos IDs comunes)
-    const inputChat = document.getElementById('chat-input') || document.getElementById('message-input');
-    const btnEnviar = document.getElementById('send-btn') || document.querySelector('[onclick="enviarMensaje()"]');
 
-    if (inputChat) {
-        inputChat.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Evita que se baje el cursor
-                
-                // Si existe el botón, le damos clic; si no, llamamos a la función directo
-                if (btnEnviar) {
-                    btnEnviar.click();
-                } else {
-                    enviarMensaje();
-                }
-            }
-        });
-        console.log("✅ Tecla Enter vinculada al elemento:", inputChat.id);
-    } else {
-        console.error("❌ No se encontró el cuadro de texto del chat. Revisa el ID en tu HTML.");
-    }
-    
-    // Ejecutar tus otras funciones originales
-    actualizarHeader();
-    escucharNoticias();
+// --- 8. VÍNCULOS DE EVENTOS Y ARRANQUE ---
+window.addEventListener('load', () => {
+    // Inicializar Escuchadores
     escucharChat();
-    setTimeout(() => { if(window.verificarRango) window.verificarRango(); }, 1000);
-});
-// Función para abrir el panel que ya tenías antes
-function buscarActualizaciones() {
-    const btn = document.getElementById('update-btn');
-    const textoOriginal = btn.innerHTML;
-    
-    btn.innerHTML = "🔍 Buscando...";
-    btn.style.opacity = "0.7";
-    btn.disabled = true;
+    db.ref('noticias').on('value', snap => {
+        const cont = document.getElementById('news-container');
+        if(!cont || !snap.val()) return;
+        cont.innerHTML = "<h3>📢 Novedades</h3>";
+        Object.values(snap.val()).reverse().forEach(n => {
+            cont.innerHTML += `<div class="news-item"><b>${n.titulo}</b><span>${n.tag}</span></div>`;
+        });
+    });
 
-    setTimeout(() => {
-        btn.innerHTML = "✅ Estás actualizado";
-        btn.style.background = "#dcfce7";
-        btn.style.color = "#166534";
-        btn.style.borderColor = "#bbf7d0";
-        
-        setTimeout(() => {
-            btn.innerHTML = textoOriginal;
-            btn.style.background = "#f1f5f9";
-            btn.style.color = "#475569";
-            btn.style.borderColor = "#e2e8f0";
-            btn.disabled = false;
-            btn.style.opacity = "1";
-        }, 3000);
-    }, 2000);
+    // Tecla Enter
+    const inputChat = document.getElementById('chat-input');
+    if (inputChat) {
+        inputChat.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') enviarMensaje();
+        });
     }
-</script>
 
+    // Avatar Secret
+    const avatar = document.getElementById('avatar-circle');
+    if (avatar) avatar.addEventListener('click', activacionSecreta);
+});
+
+// Función de Mantenimiento Alonixz
+function optimizarCache() {
+    console.log("🧹 Optimizando memoria local...");
+    const logs = localStorage.length;
+    if (logs > 50) localStorage.clear();
+}
+</script>
 </body>
 </html>
