@@ -249,13 +249,31 @@
     100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 </style>
-  <script>// =================================================ing
-// 🛡️ ALONIXZ-GROUP - SISTEMA INTEGRAL V4.0
-// DESARROLLADOR: Alonso (Fundador y Líder)
-// PROYECTO: EduSolve PRO - Santillana 3°
-// =================================================
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-// --- 1. CONFIGURACIÓN Y VARIABLES GLOBALES ---
+<script>
+// --- [MÓDULO 1: GUARDIÁN DE IDENTIDAD] ---
+(function guardianSincronizado() {
+    document.body.style.display = "none";
+    console.log("🛡️ Alonixz-Group: Verificando identidad...");
+
+    setTimeout(() => {
+        const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User') || localStorage.getItem('user_name');
+        
+        if (!user || user === "" || user.toLowerCase() === "invitado") {
+            window.location.href = 'index.html';
+        } else {
+            document.body.style.display = "block"; 
+            document.body.style.opacity = "1";
+            document.body.style.transition = "opacity 0.5s ease-in";
+            actualizarHeader();
+        }
+    }, 3000); // Bajamos a 3s para que no sea tan lenta la espera
+})();
+
+// --- [MÓDULO 2: CONFIGURACIÓN FIREBASE] ---
+const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 const firebaseConfig = {
     apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
     authDomain: "edusolve-947c1.firebaseapp.com",
@@ -267,70 +285,41 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.database();
-const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-let errorDetectado = null;
 
-// --- 2. GUARDIÁN DE ACCESO Y SEGURIDAD (PARCHE 5.2s) ---
-(function iniciarGuardian() {
-    document.body.style.display = "none";
-    console.log("🛡️ Alonixz-Group: Verificando integridad del sistema...");
-
-    // Analizador de Errores (Si falla algo en 5.2s, abortar)
-    setTimeout(() => {
-        if (errorDetectado) {
-            console.error("🚨 Error crítico detectado por el Analizador:", errorDetectado);
-            window.location.href = "error.html";
-        }
-    }, 5200);
-
-    // Validador de Sesión Local
-    setTimeout(() => {
-        const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
-        if (!user || user.toLowerCase() === "invitado") {
-            window.location.href = 'index.html';
-        } else {
-            document.body.style.display = "block";
-            document.body.style.opacity = "1";
-            actualizarHeader();
-            registrarLog("Inicio de Sesión");
-        }
-    }, 4500);
-})();
-
-window.onerror = (m) => { errorDetectado = m; return false; };
-
-// --- 3. MÓDULO DE INTERFAZ (UI & UX) ---
+// --- [MÓDULO 3: PERFIL Y CABECERA] ---
 function actualizarHeader() {
-    const nombre = localStorage.getItem('eduSolve_User') || "Usuario";
+    const nombre = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || localStorage.getItem('active_user') || "Usuario";
     const foto = localStorage.getItem('user_photo_base64');
     
     const welcomeName = document.getElementById('welcome-name');
     if (welcomeName) welcomeName.innerText = nombre;
-    
+
     const userFullName = document.getElementById('user-full-name');
     if (userFullName) userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
 
     const avatar = document.getElementById('avatar-circle');
     if (avatar) {
         if (foto && foto !== "null" && foto !== "") {
-            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
         } else {
-            avatar.innerHTML = `<span>${nombre.charAt(0).toUpperCase()}</span>`;
+            avatar.innerHTML = `<span id="user-initial">${nombre.charAt(0).toUpperCase()}</span>`;
         }
     }
-    verificarRango();
 }
 
-// --- 4. MOTOR DE CHAT MULTIMEDIA ---
+// --- [MÓDULO 4: MOTOR DEL CHAT] ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
-    const msg = input.value.trim();
-    if (!msg) return;
+    const mensaje = input.value.trim();
+    if (mensaje === "") return;
+
+    const nombreReal = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || "Invitado";
+    const fotoReal = localStorage.getItem('user_photo_base64') || null;
 
     db.ref('mensajes').push({
-        user: localStorage.getItem('eduSolve_User'),
-        text: msg,
-        photo: localStorage.getItem('user_photo_base64') || null,
+        user: nombreReal,
+        text: mensaje,
+        photo: fotoReal,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
     }).then(() => { input.value = ""; });
@@ -340,133 +329,109 @@ function escucharChat() {
     const box = document.getElementById('chat-box');
     if (!box) return;
 
-    // Notificaciones Audibles
-    db.ref('mensajes').limitToLast(1).on('child_added', (snap) => {
-        const m = snap.val();
-        if (m.user !== localStorage.getItem('eduSolve_User') && m.timestamp > Date.now() - 5000) {
-            sonidoMensaje.play().catch(() => {});
-        }
-    });
-
-    // Renderizado de Burbujas
-    db.ref('mensajes').limitToLast(30).on('value', (snapshot) => {
+    db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
         const data = snapshot.val();
         box.innerHTML = "";
         if (!data) return;
 
+        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User');
+
         Object.keys(data).forEach(id => {
             const m = data[id];
-            const esMio = m.user === localStorage.getItem('eduSolve_User');
-            
+            const esMio = m.user === miNombre;
+            let avatarHtml = m.photo && m.photo !== "null" 
+                ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
+                : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user.charAt(0).toUpperCase()}</div>`;
+
             box.innerHTML += `
-                <div class="chat-row ${esMio ? 'right' : 'left'}">
-                    <div class="chat-bubble">
-                        <small>${m.user}</small>
-                        <p>${m.text}</p>
-                        <time>${m.time}</time>
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
+                    ${avatarHtml}
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
+                        <small style="font-size:10px; color:gray;">${m.user}</small>
+                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px;">
+                            ${m.text}
+                        </div>
                     </div>
                 </div>`;
         });
         box.scrollTop = box.scrollHeight;
+        sonidoMensaje.play().catch(e => {});
     });
 }
 
-// --- 5. PANEL DE ADMINISTRACIÓN Y CONTROL DE NUBE ---
-let clicksAdmin = 0;
-function activacionSecreta() {
-    clicksAdmin++;
-    if (clicksAdmin === 10) {
-        document.getElementById('admin-panel').style.display = 'flex';
-        clicksAdmin = 0;
-    }
-    setTimeout(() => { clicksAdmin = 0; }, 2500);
-}
+// --- [MÓDULO 5: NOTICIAS Y ADMIN] ---
+function escucharNoticias() {
+    db.ref('noticias').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const contenedor = document.getElementById('news-container');
+        if (!data || !contenedor) return;
 
-function verificarRango() {
-    const user = (localStorage.getItem('eduSolve_User') || "").toLowerCase();
-    const btnAdmin = document.getElementById('admin-btn-auto');
-    if (user === "alonso" && btnAdmin) {
-        btnAdmin.style.display = "block";
-        document.body.classList.add('rank-founder');
-    }
-}
-
-// Funciones de Moderación
-function banearUsuario() {
-    const target = prompt("Nombre del usuario a bloquear:");
-    if (target) {
-        db.ref('blacklist').push({ user: target, date: new Date().toLocaleDateString() });
-        alert("Usuario enviado a la lista negra.");
-    }
-}
-
-function limpiarChatGlobal() {
-    if (confirm("¿Limpiar todo el historial del chat?")) {
-        db.ref('mensajes').remove();
-    }
-}
-
-// --- 6. MÓDULO DE NOTICIAS Y NOVEDADES ---
-function publicarNoticia() {
-    const t = document.getElementById('news-title').value;
-    const g = document.getElementById('news-tag').value;
-    if(!t) return;
-
-    db.ref('noticias').push({
-        titulo: t,
-        tag: g,
-        fecha: new Date().toLocaleDateString(),
-        autor: localStorage.getItem('eduSolve_User'),
-        timestamp: Date.now()
-    }).then(() => {
-        document.getElementById('news-title').value = "";
-        alert("📢 Noticia publicada en la red.");
-    });
-}
-
-// --- 7. SISTEMA DE LOGS Y AUDITORÍA ---
-function registrarLog(accion) {
-    const user = localStorage.getItem('eduSolve_User');
-    db.ref('logs').push({
-        usuario: user,
-        accion: accion,
-        fecha: new Date().toLocaleString(),
-        timestamp: Date.now()
-    });
-}
-
-// --- 8. VÍNCULOS DE EVENTOS Y ARRANQUE ---
-window.addEventListener('load', () => {
-    // Inicializar Escuchadores
-    escucharChat();
-    db.ref('noticias').on('value', snap => {
-        const cont = document.getElementById('news-container');
-        if(!cont || !snap.val()) return;
-        cont.innerHTML = "<h3>📢 Novedades</h3>";
-        Object.values(snap.val()).reverse().forEach(n => {
-            cont.innerHTML += `<div class="news-item"><b>${n.titulo}</b><span>${n.tag}</span></div>`;
+        contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
+        Object.keys(data).reverse().forEach(key => {
+            const n = data[key];
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9;">
+                    <div style="text-align:left;">
+                        <b style="color:#1e293b; display:block;">${n.titulo}</b>
+                        <small style="color:#94a3b8;">${n.autor} • ${n.fecha}</small>
+                    </div>
+                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem;">${n.tag}</span>
+                </div>`;
         });
     });
+}
 
-    // Tecla Enter
+// --- [MÓDULO 6: CONTROL DE FUNDADOR (ALONSO)] ---
+window.verificarRango = function() {
+    const n1 = localStorage.getItem('user_name');
+    const n2 = localStorage.getItem('eduSolve_User');
+    const nombre = (n1 || n2 || "").toLowerCase().trim();
+    const botonAdmin = document.getElementById('admin-btn-auto');
+
+    if (botonAdmin && nombre === "alonso") {
+        botonAdmin.style.display = "block";
+        console.log("✅ Hola Fundador Alonso");
+    }
+};
+
+// --- [VÍNCULO FINAL Y EVENTOS] ---
+window.addEventListener('load', function() {
+    actualizarHeader();
+    escucharNoticias();
+    escucharChat();
+    verificarRango();
+
     const inputChat = document.getElementById('chat-input');
     if (inputChat) {
         inputChat.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') enviarMensaje();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                enviarMensaje();
+            }
         });
     }
 
-    // Avatar Secret
-    const avatar = document.getElementById('avatar-circle');
-    if (avatar) avatar.addEventListener('click', activacionSecreta);
+    const ava = document.getElementById('avatar-circle');
+    if (ava) {
+        let clicks = 0;
+        ava.addEventListener('click', () => {
+            clicks++;
+            if (clicks === 10) {
+                document.getElementById('admin-panel').style.display = 'flex';
+                clicks = 0;
+            }
+            setTimeout(() => { clicks = 0; }, 2000);
+        });
+    }
 });
 
-// Función de Mantenimiento Alonixz
-function optimizarCache() {
-    console.log("🧹 Optimizando memoria local...");
-    const logs = localStorage.length;
-    if (logs > 50) localStorage.clear();
+// Funciones Auxiliares
+function toggleUserMenu() { 
+    const m = document.getElementById('user-menu');
+    if(m) m.style.display = (m.style.display === 'block') ? 'none' : 'block';
 }
+function cerrarAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+function logout() { localStorage.clear(); location.href = 'index.html'; }
 </script>
 </body>
 </html>
