@@ -22,7 +22,7 @@
   setTimeout(function() {
     console.log("Limpiador: Fase de 5.1s completada. Despejando errores conocidos...");
     // Aquí el limpiador "barre" la memoria de errores si el usuario es válido
-  }, 5500);
+  }, 10500);
 
   // --- FASE 3: EL ANALIZADOR (5.2 Segundos) ---
   // Entra 100ms después del limpiador para tomar la decisión final
@@ -34,7 +34,7 @@
     } else {
         console.log("Analizador: Sistema estable. No se requiere redirección.");
     }
-  }, 5700);
+  }, 10700);
 
   // Capturador global para errores que detienen el hilo (window.onerror)
   window.onerror = function(message) {
