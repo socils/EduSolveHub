@@ -209,7 +209,43 @@
 </style>
 
 
+<div id="evento-santillana" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20, 25, 30, 0.9); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
+    
+    <div style="background:#ffffff; width:90%; max-width:420px; border-radius:8px; overflow:hidden; border:1px solid #dfe6e9; box-shadow: 0 15px 35px rgba(0,0,0,0.3); font-family: 'Segoe UI', Roboto, sans-serif;">
+        
+        <div style="background:#3498db; padding:15px; text-align:center;">
+            <h2 style="color:white; margin:0; font-size:18px; letter-spacing:1px; text-transform:uppercase;">📚 Actualización Académica</h2>
+        </div>
 
+        <div style="background:#f1f2f6; width:100%; height:180px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #eee;">
+            <img src="" alt="Imagen del Evento" style="max-width:100%; max-height:100%; object-fit:contain;"></img>
+        </div>
+
+        <div style="padding:20px;">
+            <h3 style="color:#2d3436; margin:0 0 10px 0; font-size:16px;">Nuevas Guías de Santillana 3°</h3>
+            <p style="color:#636e72; font-size:13px; line-height:1.6; margin-bottom:15px;">
+                Se han añadido las soluciones dinámicas para el módulo de <b>Ciencia y Tecnología</b>. Además, ya está disponible la plantilla digital del elemento <b>Silicio (Si)</b> en la sección de proyectos.
+            </p>
+
+            <div style="background:#edf2f7; padding:10px; border-radius:5px; margin-bottom:20px;">
+                <ul style="margin:0; padding-left:20px; color:#2c3e50; font-size:12px; list-style-type: square;">
+                    <li>Respuestas verificadas Pág. 80-95</li>
+                    <li>Guía de Kirigami Educativo (Si)</li>
+                    <li>Optimización de búsqueda en Firebase</li>
+                </ul>
+            </div>
+            
+            <button onclick="document.getElementById('evento-santillana').style.display='none'" 
+                    style="background:#3498db; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:bold; border-radius:4px; font-size:14px; transition: 0.2s;">
+                ENTENDIDO, EXPLORAR AHORA
+            </button>
+            
+            <div style="text-align:center; margin-top:10px;">
+                <span style="font-size:10px; color:#b2bec3; font-weight:bold;">SISTEMA ALONIXZ V3.2 • AREQUIPA</span>
+            </div>
+        </div>
+    </div>
+</div>
    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -1173,7 +1209,20 @@ function buscarActualizaciones() {
     }, 2000);
 
     }
-
+// Retraso de seguridad: 6 segundos (Espera a que la validación expulse a intrusos)
+window.addEventListener('load', () => {
+    console.log("🛡️ Validación de Alonixz en curso... Esperando 6s para mostrar eventos.");
+    
+    setTimeout(() => {
+        const modal = document.getElementById('evento-santillana');
+        
+        // Verificamos si el modal existe antes de intentar mostrarlo
+        if (modal) {
+            modal.style.display = 'flex';
+            console.log("✅ Sistema despejado. Evento de Santillana 3° visible.");
+        }
+    }, 6000); // 6 segundos exactos para estar fuera del rango de expulsión
+});
 </script>
 </body>
 </html>
