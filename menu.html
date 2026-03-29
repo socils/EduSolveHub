@@ -1213,19 +1213,45 @@ function buscarActualizaciones() {
     </div>
 </div>
     <script>
+
+        
 window.addEventListener('load', () => {
-    console.log("🛡️ Esperando validación de Alonixz...");
-    
+    // Esperamos 8 segundos para estar TOTALMENTE fuera de la validación
     setTimeout(() => {
-        const modal = document.getElementById('evento-santillana');
-        if (modal) {
-            modal.style.display = 'flex'; // Cambiamos de none a flex
-            console.log("✅ Evento de Santillana 3° visible.");
-        } else {
-            console.log("❌ Error: No se encontró el ID evento-santillana");
-        }
-    }, 7000); // Lo subí a 7s para dar un segundo extra después de tu validación
+        console.log("🚀 Creando ventana de evento post-validación...");
+
+        // 1. Creamos el contenedor principal
+        const modal = document.createElement('div');
+        modal.id = 'evento-santillana';
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20, 25, 30, 0.9); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px);";
+
+        // 2. Metemos todo el diseño Flat adentro
+        modal.innerHTML = `
+            <div style="background:#ffffff; width:90%; max-width:420px; border-radius:8px; overflow:hidden; border:1px solid #dfe6e9; box-shadow: 0 15px 35px rgba(0,0,0,0.3); font-family: sans-serif;">
+                <div style="background:#3498db; padding:15px; text-align:center;">
+                    <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">📚 Actualización Académica</h2>
+                </div>
+                <div style="background:#f1f2f6; width:100%; height:180px; display:flex; align-items:center; justify-content:center;">
+                    <img src="actualizacion.png" style="max-width:100%; max-height:100%; object-fit:contain;">
+                </div>
+                <div style="padding:20px;">
+                    <h3 style="color:#2d3436; margin:0 0 10px 0; font-size:16px;">Nuevas Guías de Santillana 3°</h3>
+                    <p style="color:#636e72; font-size:13px; line-height:1.6;">Se han añadido las soluciones para Ciencia y Tecnología y el Kirigami del Silicio (Si).</p>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                            style="background:#3498db; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:bold; border-radius:4px; margin-top:10px;">
+                        ENTENDIDO, EXPLORAR
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 3. Lo inyectamos al final del body actual
+        document.body.appendChild(modal);
+        console.log("✅ Evento inyectado con éxito.");
+
+    }, 8000); // 8 segundos para asegurar que el menú ya cargó
 });
 </script>
+
 </body>
 </html>
