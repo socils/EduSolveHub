@@ -548,64 +548,84 @@ function enviarMensaje() {
 }
 // 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
 ;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
-function escucharChat() {// BUSCA ESTA PARTE EN TU CÓDIGO ACTUAL:
-db.ref('mensajes').on('child_added', (snapshot) => {
-    const datos = snapshot.val();
+// --- ESCUCHAR CHAT PRO (VERSIÓN ALONIXZ-GROUP) ---
+function escucharChat() {
+    console.log("📡 Intentando conectar al chat de Firebase...");
+    const box = document.getElementById('chat-box');
     
-    // --- AQUÍ PEGAS LA MEJORA ---
-    sonidoMensaje.play().catch(e => console.log("Esperando interacción para sonar..."));
-    // ----------------------------
+    if (!box) {
+        console.error("❌ ERROR: No se encontró el elemento 'chat-box' en el HTML");
+        return;
+    }
 
-    // Aquí sigue tu código normal para mostrar el mensaje en pantalla...
-    mostrarMensajeEnPantalla(datos);
-});
-    console.log("Intentando conectar al chat de Firebase...");
-
-    db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
-        const data = snapshot.val();
-        const box = document.getElementById('chat-box');
-
-        if (!box) {
-            console.error("❌ ERROR: No se encontró el elemento 'chat-box' en el HTML");
-            return;
-        }
-
-        if (!data) {
-            console.log("☁️ Conectado, pero el chat está vacío.");
-            box.innerHTML = "<p style='text-align:center; color:gray;'>No hay mensajes aún.</p>";
-            return;
-        }
-
-        console.log("📩 Mensajes recibidos:", data); // Esto debe salir en F12
-        box.innerHTML = ""; 
-
+    // --- 1. AUDIO INTELIGENTE (Solo suena si el mensaje NO es mío) ---
+    db.ref('mensajes').limitToLast(1).on('child_added', (snapshot) => {
+        const m = snapshot.val();
         const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
+
+        // Solo suena si el mensaje es de OTRO y es nuevo (máximo 5 segundos de antigüedad)
+        if (m.user !== miNombre && m.timestamp > Date.now() - 5000) {
+            sonidoMensaje.play().catch(e => console.warn("🔇 Audio bloqueado por el navegador. Haz clic en la página."));
+        }
+    });
+
+    // --- 2. RENDERIZADO Y FOTOS (Value) ---
+    db.ref('mensajes').limitToLast(25).on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if (!data) {
+            box.innerHTML = "<p style='text-align:center; color:#94a3b8; margin-top:20px;'>☁️ El chat está despejado. ¡Escribe algo!</p>";
+            return;
+        }
+
+        console.log("📩 Mensajes recibidos:", Object.keys(data).length);
+        box.innerHTML = ""; // Limpiar para actualizar
+
+        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user') || "Invitado";
 
         Object.keys(data).forEach(id => {
             const m = data[id];
             const esMio = m.user === miNombre;
             
-            // Lógica de Avatar
-            let avatarHtml = m.photo && m.photo !== "null" 
-                ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
-                : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user.charAt(0).toUpperCase()}</div>`;
+            // Lógica de Avatar (Imagen de Firebase o Inicial)
+            let avatarHtml = m.photo && m.photo !== "null" && m.photo !== ""
+                ? `<img src="${m.photo}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`
+                : `<div style="width:32px; height:32px; border-radius:50%; background:#64748b; color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${m.user ? m.user.charAt(0).toUpperCase() : "?"}</div>`;
 
+            // Estructura del Mensaje Flat
             box.innerHTML += `
-                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:10px; margin-bottom:15px; animation: slideUp 0.3s ease;">
                     ${avatarHtml}
-                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
-                        <small style="font-size:10px; color:gray;">${m.user}</small>
-                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px;">
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'}; max-width: 75%;">
+                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:3px; margin-${esMio ? 'right' : 'left'}:5px;">
+                            <span style="font-size:11px; font-weight:700; color:#475569;">${m.user}</span>
+                            <span style="font-size:9px; color:#94a3b8;">${m.time || ""}</span>
+                        </div>
+                        <div style="background:${esMio ? '#2563eb' : '#ffffff'}; 
+                                    color:${esMio ? 'white' : '#1e293b'}; 
+                                    padding:10px 14px; 
+                                    border-radius:${esMio ? '18px 18px 4px 18px' : '18px 18px 18px 4px'}; 
+                                    border:1px solid ${esMio ? '#2563eb' : '#e2e8f0'}; 
+                                    font-size:14px; 
+                                    box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
+                                    line-height: 1.4;
+                                    word-wrap: break-word;">
                             ${m.text}
                         </div>
                     </div>
                 </div>`;
         });
         
-        box.scrollTop = box.scrollHeight; // Auto-bajar
+        // --- 3. SCROLL AUTOMÁTICO INTELIGENTE ---
+        // Solo baja si el usuario está cerca del fondo (para no interrumpir lectura)
+        const isAtBottom = box.scrollHeight - box.clientHeight <= box.scrollTop + 100;
+        if (isAtBottom) {
+            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+        }
     }, (error) => {
-        console.error("❌ Error de Firebase:", error);
-    });// --- FUNCIÓN DE RANGO (FUNDADOR) ---
+        console.error("🚨 Error crítico de Firebase en Alonixz-Group:", error);
+    });
+};// --- FUNCIÓN DE RANGO (FUNDADOR) ---
 // --- SISTEMA DE CONTROL DE FUNDADOR ---
 
 window.verificarRango = function() {
