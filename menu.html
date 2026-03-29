@@ -1,49 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="es">
-<head><script>
-  // --- FASE 1: CAPTURA INMEDIATA ---
-  const originalLog = console.error;
-  let errorPendiente = null;
-
-  console.error = function(msg) {
-    const errorTexto = msg.toString();
-    
-    // Filtro inmediato de "ruido" conocido (Firebase/Sintaxis)
-    if (errorTexto.includes("Firebase") || errorTexto.includes("SyntaxError")) {
-        originalLog.apply(console, arguments); // Solo lo deja en consola
-    } else {
-        errorPendiente = errorTexto; // Guarda el error real para las siguientes fases
-    }
-  };
-
-  // --- FASE 2: EL LIMPIADOR (5.1 Segundos) ---
-  // Espera 5.1s para dejar que los scripts de validación de usuario trabajen
-  setTimeout(function() {
-    console.log("Limpiador: Fase de 5.1s completada. Despejando errores conocidos...");
-    // Aquí el limpiador "barre" la memoria de errores si el usuario es válido
-  }, 10500);
-
-  // --- FASE 3: EL ANALIZADOR (5.2 Segundos) ---
-  // Entra 100ms después del limpiador para tomar la decisión final
-  setTimeout(function() {
-    if (errorPendiente) {
-        console.warn("Analizador: Error crítico validado a los 5.2s. Redirigiendo...");
-        sessionStorage.setItem('error_final', errorPendiente);
-        window.location.href = "error.html";
-    } else {
-        console.log("Analizador: Sistema estable. No se requiere redirección.");
-    }
-  }, 10700);
-
-  // Capturador global para errores que detienen el hilo (window.onerror)
-  window.onerror = function(message) {
-    if (!message.includes("Firebase")) {
-        errorPendiente = message;
-    }
-    return true; // Mantiene la estética limpia (Flat) sin rojos en consola
-  };
-</script><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
+<head><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
     <meta charset="UTF-8">
     <title>EduSolve PRO | Dashboard</title>
     <link rel="stylesheet" href="style.css">
