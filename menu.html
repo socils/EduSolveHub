@@ -1173,20 +1173,7 @@ function buscarActualizaciones() {
     }, 2000);
 
     }
-// Retraso de seguridad: 6 segundos (Espera a que la validación expulse a intrusos)
-window.addEventListener('load', () => {
-    console.log("🛡️ Validación de Alonixz en curso... Esperando 6s para mostrar eventos.");
-    
-    setTimeout(() => {
-        const modal = document.getElementById('evento-santillana');
-        
-        // Verificamos si el modal existe antes de intentar mostrarlo
-        if (modal) {
-            modal.style.display = 'flex';
-            console.log("✅ Sistema despejado. Evento de Santillana 3° visible.");
-        }
-    }, 6000); // 6 segundos exactos para estar fuera del rango de expulsión
-});
+
 </script>
     <div id="evento-santillana" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20, 25, 30, 0.9); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
     
@@ -1225,5 +1212,20 @@ window.addEventListener('load', () => {
         </div>
     </div>
 </div>
+    <script>
+window.addEventListener('load', () => {
+    console.log("🛡️ Esperando validación de Alonixz...");
+    
+    setTimeout(() => {
+        const modal = document.getElementById('evento-santillana');
+        if (modal) {
+            modal.style.display = 'flex'; // Cambiamos de none a flex
+            console.log("✅ Evento de Santillana 3° visible.");
+        } else {
+            console.log("❌ Error: No se encontró el ID evento-santillana");
+        }
+    }, 7000); // Lo subí a 7s para dar un segundo extra después de tu validación
+});
+</script>
 </body>
 </html>
