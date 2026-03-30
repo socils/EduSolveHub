@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alonixz-Group | Solucionarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --primary: #6366f1;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        header {
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            text-align: center;
+        }
+
+        h1 { font-weight: 800; letter-spacing: -1px; margin-bottom: 5px; }
+        p { color: var(--text-light); margin-top: 0; }
+
+        /* Buscador */
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            display: block;
+            margin: 0 auto 30px auto;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: 0.3s;
+        }
+
+        .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+
+        /* Contenedor de Respuestas */
+        #contenedor-respuestas {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card-respuesta {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .card-respuesta:hover { transform: translateY(-2px); }
+
+        .materia-tag {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            align-self: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .tema-titulo { font-size: 1.1rem; font-weight: 600; margin: 0 0 10px 0; }
+
+        .meta-info {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .btn-ver {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-ver:hover { background: #4f46e5; }
+
+        /* Loader */
+        #loader { text-align: center; color: var(--text-light); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📚 Solucionarios</h1>
+        <p>Banco de respuestas oficial de Alonixz-Group</p>
+    </header>
+
+    <input type="text" id="buscador" class="search-box" placeholder="Buscar por materia o tema..." onkeyup="filtrarRespuestas()">
+
+    <div id="loader">Cargando base de datos...</div>
+    <div id="contenedor-respuestas"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+    authDomain: "edusolve-947c1.firebaseapp.com",
+    projectId: "edusolve-947c1",
+    storageBucket: "edusolve-947c1.firebasestorage.app",
+    messagingSenderId: "1089784819674",
+    appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let todasLasRespuestas = []; 
+
+  // 1. CARGAR DATOS
+  db.ref('soluciones').on('value', (snapshot) => {
+      const loader = document.getElementById('loader');
+      if(loader) loader.style.display = 'none';
+      
+      todasLasRespuestas = [];
+      snapshot.forEach((child) => {
+          todasLasRespuestas.push({ id: child.key, ...child.val() });
+      });
+
+      mostrarRespuestas(todasLasRespuestas.reverse());
+  });
+
+  // 2. RENDERIZAR TARJETAS (Unificado)
+  function mostrarRespuestas(lista) {
+      const contenedor = document.getElementById('contenedor-respuestas');
+      contenedor.innerHTML = "";
+
+      if (lista.length === 0) {
+          contenedor.innerHTML = "<p style='text-align:center;'>No se encontraron resultados.</p>";
+          return;
+      }
+
+      lista.forEach((res, index) => {
+          // Usamos 'descripcion' o 'textoRespuesta' según cómo lo guardes en el panel
+          const textoAMostrar = res.descripcion || res.textoRespuesta || "Sin descripción disponible.";
+
+          contenedor.innerHTML += `
+              <div class="card" style="background:white; padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); text-align:left;">
+                  <span class="materia-badge" style="background:#e0e7ff; color:#4338ca; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; text-transform:uppercase;">
+                    ${res.materia}
+                  </span>
+                  
+                  <div style="font-weight:600; margin:10px 0; color:#1e293b; font-size:1.1rem;">${res.tema}</div>
+                  
+                  <div id="solucion-${index}" style="display:none; background:#f8fafc; padding:15px; border-radius:10px; margin:10px 0; border-left:4px solid #6366f1; white-space: pre-wrap; color:#475569;">
+                      ${textoAMostrar}
+                  </div>
+
+                  <button onclick="toggleSolucion('${index}')" id="btn-${index}" style="width:100%; background:#6366f1; color:white; border:none; padding:10px; border-radius:8px; font-weight:600; cursor:pointer; transition:0.3s;">
+                      VER RESPUESTA ↓
+                  </button>
+                  
+                  <div style="font-size:0.7rem; color:#94a3b8; margin-top:10px;">
+                    Subido el ${res.fecha} • Alonixz-Group
+                  </div>
+              </div>
+          `;
+      });
+  }
+
+  // 3. FUNCIÓN MOSTRAR/OCULTAR
+  function toggleSolucion(index) {
+      const div = document.getElementById(`solucion-${index}`);
+      const btn = document.getElementById(`btn-${index}`);
+      
+      if (div.style.display === "none") {
+          div.style.display = "block";
+          btn.innerText = "CERRAR RESPUESTA ↑";
+          btn.style.background = "#64748b"; 
+      } else {
+          div.style.display = "none";
+          btn.innerText = "VER RESPUESTA ↓";
+          btn.style.background = "#6366f1";
+      }
+  }
+
+  // 4. BUSCADOR
+  function filtrarRespuestas() {
+      const query = document.getElementById('buscador').value.toLowerCase();
+      const filtradas = todasLasRespuestas.filter(res => 
+          res.materia.toLowerCase().includes(query) || 
+          res.tema.toLowerCase().includes(query)
+      );
+      mostrarRespuestas(filtradas);
+  }
+    </script>
+</body>
+</html>
