@@ -9,6 +9,62 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
+        .btn-solucionario {
+    background: #6366f1; /* Color Indigo moderno */
+    color: white;
+    padding: 18px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.btn-solucionario:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+    background: #4f46e5;
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.btn-texts {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.btn-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.5px;
+}
+
+.btn-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.btn-arrow {
+    font-size: 1.2rem;
+    font-weight: bold;
+    opacity: 0.7;
+}
         .grid-layout {
             display: grid;
             grid-template-columns: 1.5fr 1fr;
@@ -125,6 +181,16 @@
 <div class="card-glass" style="padding: 15px; text-align: center; cursor: pointer; border-bottom: 3px solid #38bdf8;" onclick="location.href='soporte.html'">
     <span style="font-size: 1.5rem;">🛠️</span>
     <p style="margin: 8px 0 0; font-size: 0.8rem; font-weight: 700; color: #1e293b;">Soporte/Apps</p>
+</div>
+    <div onclick="window.location.href='respuestas.html'" class="btn-solucionario">
+    <div class="btn-content">
+        <span class="btn-icon">📚</span>
+        <div class="btn-texts">
+            <span class="btn-title">Solucionario Oficial</span>
+            <span class="btn-subtitle">Explora las respuestas de Santillana</span>
+        </div>
+    </div>
+    <span class="btn-arrow">→</span>
 </div>
 </div>
    <div id="news-container" class="card-glass" style="min-height: 200px;">
