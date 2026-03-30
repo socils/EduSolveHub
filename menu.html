@@ -490,46 +490,38 @@ function activacionSecreta() {
 
 
 
-function escucharNoticias() {
+// --- FUNCIÓN PARA EL MENÚ DE ALUMNOS ---
 
+function escucharNoticias() {
     db.ref('noticias').on('value', (snapshot) => {
+        const contenedor = document.getElementById('news-container');
+        if (!contenedor) return; 
 
         const data = snapshot.val();
-
-        const contenedor = document.getElementById('news-container');
-
-        if (!data) return;
-
-
+        if (!data) {
+            contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3><p>No hay novedades.</p>';
+            return;
+        }
 
         contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
-
+        
+        // Invertir lista para ver lo más nuevo arriba
         const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
 
-
-
         lista.forEach(n => {
+            // Lógica del Check: Si 'completado' es true, añade el ✅
+            const checkFinal = n.completado ? '<span style="color:#22c55e; margin-left:8px;">✅</span>' : '';
 
             contenedor.innerHTML += `
-
-                <div style="display:flex; justify-content:space-between; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <div style="text-align:left;">
-
-                        <b style="color:#1e293b; display:block;">${n.titulo}</b>
-
-                        <small style="color:#94a3b8;">${n.autor} • ${n.fecha}</small>
-
+                        <b style="color:#1e293b; display:inline-block; font-size:0.9rem;">${n.titulo} ${checkFinal}</b>
+                        <small style="color:#94a3b8; display:block;">${n.autor} • ${n.fecha}</small>
                     </div>
-
-                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
-
+                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800; text-transform:uppercase;">${n.tag}</span>
                 </div>`;
-
         });
-
     });
-
 }
 
 
