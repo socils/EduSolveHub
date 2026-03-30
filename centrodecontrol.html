@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel v 3.3 | Alonixz-Group</title>
+    <style>
+        /* Estilos Base */
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Barra Superior (El Tablero) */
+        #timer-bar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-sizing: border-box;
+            border-bottom: 4px solid #2ecc71;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .info-sesion { font-size: 0.9rem; letter-spacing: 0.5px; }
+        .info-sesion b { color: #2ecc71; text-transform: uppercase; }
+
+        #reloj {
+            background: #1a252f;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            border: 1px solid #34495e;
+            transition: 0.3s;
+        }
+
+        /* Contenido del Panel */
+        .contenedor {
+            margin-top: 100px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .tarjeta-admin {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #dcdde1;
+        }
+
+        /* Botones Flat */
+        .btn-accion {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-accion:active { transform: scale(0.95); }
+        .btn-panic { background: #e74c3c; }
+
+        /* Animación de Alerta */
+        .alerta-roja {
+            color: #e74c3c !important;
+            border-color: #e74c3c !important;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            50% { opacity: 0.6; }
+        }
+        .noticia-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    border-left: 5px solid #3498db;
+    font-size: 0.9rem;
+}
+
+.tag {
+    font-size: 0.7rem;
+    padding: 3px 7px;
+    border-radius: 3px;
+    color: white;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.tag-urgente { background: #e74c3c; }
+.tag-update { background: #f1c40f; }
+.tag-aviso { background: #34495e; }
+    </style>
+</head><body style="background: #f1f5f9;">
+
+    <div>
+        
+        <header style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>🛠️ Centro de Control</h2>
+            <button onclick="sessionStorage.clear(); location.reload();" style="background:#64748b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
+        </header>
+
+        </div>
+        <div id="panel-principal" >
+
+    <div id="timer-bar">
+        <div class="info-sesion">
+            SESI&Oacute;N: <b id="display-user">Cargando...</b> | 
+            AUTORIZADO POR: <span id="display-boss">...</span>
+        </div>
+        <div id="reloj">15:00</div>
+    </div>
+
+    <div class="contenedor">    
+        <div class="tarjeta-admin">
+            <h2 style="color: #2c3e50; margin-top: 0;">Centro de Control v 3.3</h2>
+            <p style="color: #7f8c8d;">Bienvenido al sistema de gesti&oacute;n de Alonixz-Group.</p>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+
+            <div id="acciones-firebase">
+                <button class="btn-accion">Subir Tarea Santillana</button>
+                <button class="btn-accion">Modificar Respuestas</button>
+                <button class="btn-accion btn-panic">ACTIVAR MODO ERROR</button>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+<div style="background:#1e293b; color:white; padding:10px 20px; border-radius:10px; margin-bottom:20px;">
+    <span id="saludo-admin" style="font-weight:800; font-size:0.9rem;">Cargando administrador...</span>
+</div>
+<div id="seccion-novedades">
+    <h3 style="color: #2c3e50;">Panel de Novedades v 3.3</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <input type="text" id="novedad-texto" placeholder="¿Qué hay de nuevo en Alonixz-Group?" style="padding: 12px; border: 2px solid #3498db; border-radius: 8px; outline: none;">
+        
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+            <select id="novedad-tag" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                <option value="URGENTE">🚨 URGENTE</option>
+                <option value="FILTRACION">📂 FILTRACIÓN</option>
+                <option value="INFO">ℹ️ INFO</option>
+                <option value="TAREA">📝 TAREA</option>
+                <option value="ACTUALIZACION">⚙️ ACTUALIZACIÓN</option>
+            </select>
+            <button class="btn-accion" onclick="publicarNovedad()" style="flex: 1; background: #2ecc71; margin: 0;">PUBLICAR YA</button>
+        </div>
+    </div>
+
+    <div id="lista-novedades" style="text-align: left; background: #2c3e50; padding: 15px; border-radius: 12px; color: white;">
+        <p style="font-size: 0.8rem; color: #bdc3c7; margin-bottom: 10px; font-family: monospace;">LOG DE NOVEDADES ACTIVAS:</p>
+        <div id="contenedor-novedades">
+            </div>
+        <button class="btn-accion btn-panic" onclick="limpiarNovedades()" style="width: 100%; font-size: 0.7rem; margin-top: 15px; opacity: 0.8;">BORRAR TODO EL LOG</button>
+    </div>
+</div>
+        </div>
+        <div id="panel-respuestas" style="background: #ffffff; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <h3 style="color: #1e293b; margin-top: 0;">📚 Subir Nueva Respuesta (Solucionario)</h3>
+    
+    <div style="display: grid; gap: 10px;">
+        <select id="res-materia" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <option value="">Seleccionar Materia...</option>
+            <option value="Matemáticas">Matemáticas</option>
+            <option value="Comunicación">Comunicación</option>
+            <option value="Ciencia y Tecnología">Ciencia y Tecnología</option>
+            <option value="Inglés">Inglés</option>
+            <option value="Personal Social">Personal Social</option>
+        </select>
+
+        <input type="text" id="res-tema" placeholder="Tema (Ej: Página 54 - Santillana)" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+        
+        <input type="text" id="res-link" placeholder="Link de la imagen o texto de respuesta" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+        
+        <button onclick="subirRespuesta()" style="background: #6366f1; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Publicar Respuesta ✅
+        </button>
+    </div>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+    <h4 style="color: #64748b;">Respuestas Publicadas</h4>
+    <div id="lista-admin-respuestas" style="max-height: 200px; overflow-y: auto;">
+        </div>
+</div>
+    </div> </div><script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script> <script>
+ // --- 1. CONFIGURACIÓN E INICIALIZACIÓN (DEBE IR PRIMERO) ---
+// 1. Al cargar la página, verificamos quién es// --- SISTEMA DE ACCESO PRIVADO v 3.3 ---
+const CLAVE_MAESTRA = "alonixz2026"; // <--- CAMBIA TU CONTRASEÑA AQUÍ
+
+function verificarAcceso() {
+    // 1. Miramos si ya entró antes en esta sesión
+    let accesoConcedido = sessionStorage.getItem('admin_auth');
+
+    if (accesoConcedido !== "true") {
+        // 2. Si no ha entrado, pedimos la clave
+        let pass = prompt("🔐 Acceso Restringido - Alonixz-Group\nIntroduce la contraseña de Administrador:");
+
+        if (pass === CLAVE_MAESTRA) {
+            alert("✅ Bienvenido, Alonso.");
+            sessionStorage.setItem('admin_auth', "true");
+            sessionStorage.setItem('moderador_nombre', "Alonso"); // Guardamos tu nombre automáticamente
+            mostrarPanel();
+        } else {
+            alert("❌ Contraseña incorrecta. Acceso denegado.");
+            document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:red;'>🔒 Área Restringida</h1>";
+        }
+    } else {
+        mostrarPanel();
+    }
+}
+
+function mostrarPanel() {
+    // Esta función se asegura de que el panel sea visible
+    const panel = document.getElementById('panel-principal');
+    if(panel) panel.style.display = 'block';
+}
+
+// Ejecutar al cargar la página
+window.onload = verificarAcceso;
+window.onload = function() {
+    let nombreAdmin = sessionStorage.getItem('moderador_nombre');
+    
+    // Si no hay nombre, preguntamos uno (solo la primera vez)
+    if (!nombreAdmin) {
+        nombreAdmin = prompt("Introduce tu nombre de Administrador:", "Alonso");
+        sessionStorage.setItem('moderador_nombre', nombreAdmin);
+    }
+    
+    // Mostramos un saludo en el panel
+    const saludo = document.getElementById('saludo-admin');
+    if(saludo) saludo.innerText = "Bienvenido, Lider " + nombreAdmin;
+};
+
+// 2. Modificamos la función de subir para que use ese nombre
+function subirRespuesta() {
+    const materia = document.getElementById('res-materia').value;
+    const tema = document.getElementById('res-tema').value;
+    const contenido = document.getElementById('res-link').value;
+    
+    // Usamos el nombre guardado en el paso 1
+    const autorReal = sessionStorage.getItem('moderador_nombre') || "Alonso";
+
+    db.ref('soluciones').push({
+        materia: materia,
+        tema: tema,
+        descripcion: contenido,
+        autor: autorReal, // <--- Aquí ya no dirá Invitado
+        fecha: new Date().toLocaleDateString()
+    }).then(() => {
+        alert("Publicado por " + autorReal);
+    });
+}const firebaseConfig = {
+  apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+  authDomain: "edusolve-947c1.firebaseapp.com",
+  projectId: "edusolve-947c1",
+  storageBucket: "edusolve-947c1.firebasestorage.app",
+  messagingSenderId: "1089784819674",
+  appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+};  
+
+// Inicializamos Firebase Globalmente
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database(); // Ahora 'db' siempre estará disponible para las funciones
+
+// --- 2. IDENTIDAD Y TEMPORIZADOR ---
+const nombreUser = sessionStorage.getItem('moderador_nombre') || "Invitado";
+const autorizadoPor = sessionStorage.getItem('autorizado_por') || "Sistema";
+
+// Inyectar info en la barra superior
+document.getElementById('display-user').innerText = nombreUser;
+document.getElementById('display-boss').innerText = autorizadoPor;
+
+// Reloj de 15 minutos
+let tiempoRestante = 15 * 60;
+const displayReloj = document.getElementById('reloj');
+
+const contador = setInterval(() => {
+    let mins = Math.floor(tiempoRestante / 60);
+    let segs = tiempoRestante % 60;
+    displayReloj.innerText = `${mins}:${segs < 10 ? '0' + segs : segs}`;
+
+    if (tiempoRestante <= 120) displayReloj.classList.add('alerta-roja');
+
+    if (tiempoRestante <= 0) {
+        clearInterval(contador);
+        alert("SESIÓN EXPIRADA.");
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    }
+    tiempoRestante--;
+}, 1000);
+
+// --- 3. FUNCIONES DE NOVEDADES (RAMA: noticias) ---
+// --- FUNCIONES DEL PANEL DE CONTROL v 3.3 ---
+
+// A. PUBLICAR CON CAMPO DE COMPLETADO
+function publicarNovedad() {
+    const texto = document.getElementById('novedad-texto').value;
+    const tagSelec = document.getElementById('novedad-tag').value;
+    const autorLog = sessionStorage.getItem('moderador_nombre') || "Alonso";
+
+    if (texto.trim() === "") return alert("Escribe el contenido.");
+
+    db.ref('noticias').push({
+        titulo: texto,
+        tag: tagSelec,
+        autor: autorLog,
+        fecha: new Date().toLocaleDateString(),
+        completado: false // Por defecto empieza sin check
+    })
+    .then(() => {
+        document.getElementById('novedad-texto').value = "";
+        console.log("Publicado en Alonixz-Group");
+    });
+}
+
+// B. ESCUCHAR Y MOSTRAR (Con botón de Check para el moderador)
+db.ref('noticias').on('value', (snapshot) => {
+    const contenedor = document.getElementById('contenedor-novedades');
+    if (!contenedor) return;
+    contenedor.innerHTML = ""; 
+
+    snapshot.forEach((childSnapshot) => {
+        const id = childSnapshot.key;
+        const data = childSnapshot.val();
+        
+        // Si está completado, ponemos el icono
+        const statusIcon = data.completado ? "✅" : "⭕";
+
+        contenedor.innerHTML += `
+            <div class="novedad-item" style="border-bottom:1px solid #eee; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <span style="font-size:1.2rem; margin-right:10px;">${statusIcon}</span>
+                    <b>[${data.tag}]</b> ${data.titulo}
+                </div>
+                <div>
+                    <button onclick="toggleCheck('${id}', ${data.completado})" style="background:#2ecc71; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">Check</button>
+                    <button onclick="eliminarNovedad('${id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">X</button>
+                </div>
+            </div>
+        `;
+    });
+});
+
+// C. FUNCIÓN PARA ACTIVAR/DESACTIVAR EL CHECK
+function toggleCheck(id, estadoActual) {
+    db.ref('noticias/' + id).update({
+        completado: !estadoActual
+    });
+}
+
+function eliminarNovedad(id) {
+    if(confirm("¿Eliminar?")) db.ref('noticias/' + id).remove();
+}   
+function marcarCompletado(id, estadoActual) {
+    // Cambia al estado opuesto (si era false, pasa a true)
+    db.ref('noticias/' + id).update({
+        completado: !estadoActual
+    });
+}
+// ELIMINAR UNA SOLA
+function eliminarNovedad(id) {
+    if(confirm("¿Seguro que quieres borrar esta noticia?")) {
+        db.ref('noticias/' + id).remove();
+    }
+}
+
+// BORRAR TODO (BOTÓN DE PÁNICO)
+function limpiarNovedades() {
+    if(confirm("¿BORRAR TODAS LAS NOTICIAS?")) {
+        db.ref('noticias').remove();
+    }
+}// --- FUNCIONES PARA EL BANCO DE RESPUESTAS ---
+
+// --- FUNCIÓN PARA SUBIR RESPUESTAS ACTUALIZADA ---
+function subirRespuesta() {
+    const materia = document.getElementById('res-materia').value;
+    const tema = document.getElementById('res-tema').value;
+    const contenido = document.getElementById('res-link').value; // Aquí va el texto descriptivo
+
+    if (materia === "" || tema === "" || contenido === "") {
+        alert("Completa todos los campos para Alonixz-Group");
+        return;
+    }
+
+    db.ref('soluciones').push({
+        materia: materia,
+        tema: tema,
+        descripcion: contenido, // Guardamos el texto como descripción
+        autor: "Alonso",
+        fecha: new Date().toLocaleDateString()
+    }).then(() => {
+        alert("✅ Descripción publicada");
+        document.getElementById('res-tema').value = "";
+        document.getElementById('res-link').value = "";
+    });
+}
+// --- FUNCIÓN PARA VER LA LISTA Y PODER BORRAR ---
+db.ref('soluciones').on('value', (snapshot) => {
+    const lista = document.getElementById('lista-admin-respuestas');
+    if (!lista) return;
+    lista.innerHTML = "";
+
+    snapshot.forEach((child) => {
+        const d = child.val();
+        lista.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#f8fafc; border-radius:8px; margin-bottom:5px; border:1px solid #eee;">
+                <span style="font-size:0.85rem;"><b>${d.materia}:</b> ${d.tema}</span>
+                <button onclick="eliminarRespuesta('${child.key}')" style="background:#ff4757; color:white; border:none; padding:4px 8px; border-radius:5px; cursor:pointer;">Borrar</button>
+            </div>
+        `;
+    });
+});
+
+function eliminarRespuesta(id) {
+    if (confirm("¿Seguro que quieres borrar esta respuesta?")) {
+        db.ref('soluciones/' + id).remove();
+    }
+}
+// 2. MOSTRAR LISTA EN EL PANEL (Para que puedas borrar)
+db.ref('soluciones').on('value', (snapshot) => {
+    const lista = document.getElementById('lista-admin-respuestas');
+    if (!lista) return;
+    
+    lista.innerHTML = "";
+    
+    snapshot.forEach((child) => {
+        const d = child.val();
+        lista.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8fafc; border-radius:8px; margin-bottom:5px; font-size:0.85rem;">
+                <span><b>${d.materia}:</b> ${d.tema}</span>
+                <button onclick="eliminarRespuesta('${child.key}')" style="background:#ff4757; color:white; border:none; padding:3px 7px; border-radius:4px; cursor:pointer;">X</button>
+            </div>
+        `;
+    });
+});
+
+// 3. ELIMINAR RESPUESTA
+function eliminarRespuesta(id) {
+    if (confirm("¿Seguro que quieres eliminar esta respuesta del banco de datos?")) {
+        db.ref('soluciones/' + id).remove();
+    }
+} </script>
+</body>
+</html>
