@@ -492,6 +492,8 @@ function activacionSecreta() {
 
 // --- FUNCIÓN PARA EL MENÚ DE ALUMNOS ---
 
+// --- FUNCIÓN PARA EL MENÚ DE ALUMNOS ---
+
 function escucharNoticias() {
     db.ref('noticias').on('value', (snapshot) => {
         const contenedor = document.getElementById('news-container');
@@ -499,30 +501,28 @@ function escucharNoticias() {
 
         const data = snapshot.val();
         if (!data) {
-            contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3><p>No hay novedades.</p>';
+            contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3><p>Sin novedades.</p>';
             return;
         }
 
         contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
-        
-        // Invertir lista para ver lo más nuevo arriba
         const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
 
         lista.forEach(n => {
-            // Lógica del Check: Si 'completado' es true, añade el ✅
-            const checkFinal = n.completado ? '<span style="color:#22c55e; margin-left:8px;">✅</span>' : '';
+            // Si está completado, guardamos el check en una variable
+            const checkIcon = n.completado ? '<span style="color:#22c55e; margin-left:5px;">✅</span>' : '';
 
             contenedor.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
                     <div style="text-align:left;">
-                        <b style="color:#1e293b; display:inline-block; font-size:0.9rem;">${n.titulo} ${checkFinal}</b>
+                        <b style="color:#1e293b; font-size:0.9rem;">${n.titulo} ${checkIcon}</b>
                         <small style="color:#94a3b8; display:block;">${n.autor} • ${n.fecha}</small>
                     </div>
-                    <span style="background:#dbeafe; color:#2563eb; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800; text-transform:uppercase;">${n.tag}</span>
+                    <span style="background:${n.completado ? '#dcfce7' : '#dbeafe'}; color:${n.completado ? '#15803d' : '#2563eb'}; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
                 </div>`;
         });
     });
-}
+};
 
 
 
