@@ -1386,33 +1386,37 @@ function cerrarYGuardarPreferencias() {
 }
 </script>
 <script>
-    window.addEventListener('load', () => {
-        // Obtenemos el nombre guardado en perfil.html
-        const nombre = localStorage.getItem('alonixz_user_name') || 'Estudiante';
-        const display = document.getElementById('nav-user-name');
-        
-        if(display && nombre !== 'Estudiante') {
-            display.innerText = nombre; // Cambia "Mi Perfil" por el nombre real del alumno
-        }
-    });document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 Alonixz-Group v3.5: Menú Principal Cargado");
-
-    // --- 1. PERSONALIZACIÓN DE BIENVENIDA ---
-    const nombreGuardado = localStorage.getItem('alonixz_user_name');
-    const displayNombre = document.getElementById('nav-user-name'); // El ID del texto en tu DIV de perfil
-
-    if (nombreGuardado && displayNombre) {
-        displayNombre.innerText = nombreGuardado;
-    }
-
-    // --- 2. APLICAR MODO OSCURO AUTOMÁTICO ---
+    document.addEventListener('DOMContentLoaded', () => {
     const esModoOscuro = localStorage.getItem('alonixz_dark_mode') === 'true';
     
     if (esModoOscuro) {
+        // 1. Aplicamos la clase al body
         document.body.classList.add('dark-mode');
-        // Opcional: Si quieres que el logo o iconos cambien de color al estar en modo oscuro
-        console.log("🌙 Modo Oscuro Activado por el usuario");
+
+        // 2. FORZAMOS el cambio en los elementos con estilo en línea
+        // Buscamos todos los DIVs que tengan fondo blanco manual
+        const elementos = document.querySelectorAll('div[style*="background: #ffffff"], div[style*="background:#ffffff"], div[style*="background: white"]');
+        
+        elementos.forEach(el => {
+            el.style.backgroundColor = '#1e293b'; // Azul oscuro de EduSolve
+            el.style.color = '#f1f5f9';           // Texto blanco
+            el.style.borderColor = '#334155';     // Borde suave
+        });
+
+        // 3. Forzamos los textos (p y h3) que tengan colores grises manuales
+        const textos = document.querySelectorAll('p[style*="color"], h3[style*="color"], span[style*="color"]');
+        textos.forEach(txt => {
+            txt.style.setProperty('color', '#f1f5f9', 'important');
+        });
+
+        console.log("🌙 Modo Oscuro forzado en elementos con style manual.");
     }
+    
+    // Cargar nombre del perfil
+    const nombre = localStorage.getItem('alonixz_user_name') || 'Estudiante';
+    const display = document.getElementById('nav-user-name');
+    if(display) display.innerText = nombre;
+});
 
     // --- 3. GESTIÓN DE NOTIFICACIONES (Punto Rojo) ---
     // Si hay un examen o comunicado nuevo, podemos mostrar un aviso en el botón de Agenda
