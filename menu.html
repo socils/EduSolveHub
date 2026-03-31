@@ -1270,135 +1270,16 @@ function buscarActualizaciones() {
 
     }
 
-</script>
-    <div id="evento-santillana" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20, 25, 30, 0.9); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
-    
-    <div style="background:#ffffff; width:90%; max-width:420px; border-radius:8px; overflow:hidden; border:1px solid #dfe6e9; box-shadow: 0 15px 35px rgba(0,0,0,0.3); font-family: 'Segoe UI', Roboto, sans-serif;">
-        
-        <div style="background:#3498db; padding:15px; text-align:center;">
-            <h2 style="color:white; margin:0; font-size:18px; letter-spacing:1px; text-transform:uppercase;">📚 Actualización Académica</h2>
-        </div>
+;window.addEventListener('load', () => {
+    // 1. Verificamos si el usuario ya pidió no ver este aviso de la v3.4
+    const ocultarAviso = localStorage.getItem('alonixz_v34_ocultar');
 
-        <div style="background:#f1f2f6; width:100%; height:180px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #eee;">
-            <img src="actualizacion.png" alt="Imagen del Evento" style="max-width:100%; max-height:100%; object-fit:contain;"></img>
-        </div>
+    if (ocultarAviso === 'true') {
+        console.log("🙈 El usuario eligió no volver a ver el anuncio de la v3.4");
+        return; // Detenemos todo, el modal no se crea
+    }
 
-        <div style="padding:20px;">
-            <h3 style="color:#2d3436; margin:0 0 10px 0; font-size:16px;">Nuevas Guías de Santillana 3°</h3>
-            <p style="color:#636e72; font-size:13px; line-height:1.6; margin-bottom:15px;">
-                Se han añadido las soluciones dinámicas para el módulo de <b>Ciencia y Tecnología</b>. Además, ya está disponible la plantilla digital del elemento <b>Silicio (Si)</b> en la sección de proyectos.
-            </p>
-
-            <div style="background:#edf2f7; padding:10px; border-radius:5px; margin-bottom:20px;">
-                <ul style="margin:0; padding-left:20px; color:#2c3e50; font-size:12px; list-style-type: square;">
-                    <li>Respuestas verificadas Pág. 80-95</li>
-                    <li>Guía de Kirigami Educativo (Si)</li>
-                    <li>Optimización de búsqueda en Firebase</li>
-                </ul>
-            </div>
-            
-            <button onclick="document.getElementById('evento-santillana').style.display='none'" 
-                    style="background:#3498db; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:bold; border-radius:4px; font-size:14px; transition: 0.2s;">
-                ENTENDIDO, EXPLORAR AHORA
-            </button>
-            
-            <div style="text-align:center; margin-top:10px;">
-                <span style="font-size:10px; color:#b2bec3; font-weight:bold;">SISTEMA ALONIXZ V3.2 • AREQUIPA</span>
-            </div>
-        </div>
-    </div>
-</div>
-    <script>
-
-        
-window.addEventListener('load', () => {
-    // Esperamos 8 segundos para estar TOTALMENTE fuera de la validación
-    setTimeout(() => {
-        console.log("🚀 Creando ventana de evento post-validación...");
-
-        // 1. Creamos el contenedor principal
-        const modal = document.createElement('div');
-        modal.id = 'evento-santillana';
-        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20, 25, 30, 0.9); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px);";
-
-        // 2. Metemos todo el diseño Flat adentro
-        modal.innerHTML = `
-            <div style="background:#ffffff; width:90%; max-width:420px; border-radius:8px; overflow:hidden; border:1px solid #dfe6e9; box-shadow: 0 15px 35px rgba(0,0,0,0.3); font-family: sans-serif;">
-                <div style="background:#3498db; padding:15px; text-align:center;">
-                    <h2 style="color:white; margin:0; font-size:18px; text-transform:uppercase;">📚 Actualización Académica</h2>
-                </div>
-                <div style="background:#f1f2f6; width:100%; height:180px; display:flex; align-items:center; justify-content:center;">
-                    <img src="actualizacion.png" style="max-width:100%; max-height:100%; object-fit:contain;">
-                </div>
-                <div style="padding:20px;">
-                    <h3 style="color:#2d3436; margin:0 0 10px 0; font-size:16px;">Nuevas Guías de Santillana 3°</h3>
-                    <p style="color:#636e72; font-size:13px; line-height:1.6;">Se han añadido las soluciones para Ciencia y Tecnología y el Kirigami del Silicio (Si).</p>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                            style="background:#3498db; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:bold; border-radius:4px; margin-top:10px;">
-                        ENTENDIDO, EXPLORAR
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // 3. Lo inyectamos al final del body actual
-        document.body.appendChild(modal);
-        console.log("✅ Evento inyectado con éxito.");
-
-    }, 8000); // 8 segundos para asegurar que el menú ya cargó
-});
-        window.addEventListener('load', () => {
-    // Espera de 8 segundos para no saturar el inicio
-    setTimeout(() => {
-        console.log("🚀 Lanzando Notificación Alonixz v3.3...");
-
-        const modal = document.createElement('div');
-        modal.id = 'evento-actualizacion-v33';
-        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px);";
-
-        modal.innerHTML = `
-            <div style="background:#ffffff; width:92%; max-width:430px; border-radius:15px; overflow:hidden; border:1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); font-family: 'Segoe UI', system-ui, sans-serif;">
-                
-                <div style="background:#6366f1; padding:20px; text-align:center;">
-                    <h2 style="color:white; margin:0; font-size:14px; letter-spacing:2px; text-transform:uppercase; font-weight:900;">⚡ SYSTEM UPDATE • V3.3</h2>
-                </div>
-
-                <div style="background:#f8fafc; width:100%; height:200px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #f1f5f9;">
-                    <img src="actualizacion2.png" alt="Update Alonixz 3.3" style="max-width:100%; max-height:100%; object-fit:contain;">
-                </div>
-
-                <div style="padding:25px;">
-                    <h3 style="color:#1e293b; margin:0 0 8px 0; font-size:20px; font-weight:800;">¡Solucionario y Moderación!</h3>
-                    <p style="color:#64748b; font-size:13px; line-height:1.6; margin-bottom:18px;">
-                        Hemos desplegado la infraestructura para el <b>Banco de Respuestas</b>. Ahora puedes consultar guías directamente y contamos con un sistema de <b>Moderadores Identificados</b> para mayor seguridad.
-                    </p>
-
-                    <div style="background:#eff6ff; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #dbeafe;">
-                        <ul style="margin:0; padding-left:15px; color:#1e40af; font-size:12px; list-style-type: '✔'; line-height:2;">
-                            <li style="padding-left:10px;"><b>Nuevo:</b> Sección Independiente de Respuestas.</li>
-                            <li style="padding-left:10px;"><b>Admin:</b> Sistema de acceso con contraseña.</li>
-                            <li style="padding-left:10px;"><b>Identidad:</b> Adiós al nombre "Invitado".</li>
-                        </ul>
-                    </div>
-                    
-                    <button onclick="document.getElementById('evento-actualizacion-v33').remove()" 
-                            style="background:#6366f1; color:white; border:none; width:100%; padding:16px; cursor:pointer; font-weight:800; border-radius:12px; font-size:14px; transition: 0.2s; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);">
-                        ENTENDIDO, EXPLORAR V3.3
-                    </button>
-                    
-                    <div style="text-align:center; margin-top:15px; opacity: 0.5;">
-                        <span style="font-size:9px; color:#94a3b8; font-weight:bold; letter-spacing:1px;">ALONIXZ-GROUP • AREQUIPA 2026</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-        console.log("✅ Ventana v3.3 desplegada con éxito.");
-
-    }, 8000); 
-});window.addEventListener('load', () => {
-    // Espera de 8 segundos para asegurar que el menú cargó
+    // 2. Si no lo ha ocultado, esperamos los 8 segundos
     setTimeout(() => {
         console.log("🚀 Lanzando Notificación: v3.4 YA ESTÁ AQUÍ...");
 
@@ -1413,41 +1294,56 @@ window.addEventListener('load', () => {
                     <h2 style="color:white; margin:0; font-size:14px; letter-spacing:2px; text-transform:uppercase; font-weight:900;">✅ ACTUALIZACIÓN INSTALADA • V3.4</h2>
                 </div>
 
-                <div style="background:#fffcf5; width:100%; height:200px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #f9f0da;">
+                <div style="background:#fffcf5; width:100%; height:180px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #f9f0da;">
                     <img src="actualizacion4.png" alt="Update Alonixz 3.4" style="max-width:100%; max-height:100%; object-fit:contain;">
                 </div>
 
                 <div style="padding:25px;">
-                    <h3 style="color:#2c3e50; margin:0 0 8px 0; font-size:20px; font-weight:800;">¡Agenda Escolar Activada!</h3>
-                    <p style="color:#7f8c8d; font-size:13px; line-height:1.6; margin-bottom:18px;">
-                        La **v3.4** ha llegado oficialmente. Ya puedes usar la **Agenda Escolar Digital** para revisar comunicados, fechas de exámenes y gestionar tus notas. ¡Tu organización ahora es de otro nivel!
-                    </p>
-
-                    <div style="background:#f0fdf4; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #dcfce7;">
-                        <ul style="margin:0; padding-left:15px; color:#166534; font-size:12px; list-style-type: '⚡'; line-height:2;">
-                            <li style="padding-left:10px;"><b>Agenda Digital:</b> Nueva sección en el menú principal.</li>
-                            <li style="padding-left:10px;"><b>Notas Personales:</b> Escribe tus apuntes privados.</li>
-                            <li style="padding-left:10px;"><b>Comunicados:</b> Recibe avisos oficiales al instante.</li>
+                    <h3 style="color:#2c3e50; margin:0 0 8px 0; font-size:18px; font-weight:800;">¡Agenda Escolar Activada!</h3>
+                    
+                    <div style="background:#f0fdf4; padding:12px; border-radius:12px; margin-bottom:15px; border:1px solid #dcfce7;">
+                        <ul style="margin:0; padding-left:15px; color:#166534; font-size:12px; list-style-type: '⚡'; line-height:1.8;">
+                            <li><b>Agenda Digital:</b> Gestión de tareas y exámenes.</li>
+                            <li><b>Notas Personales:</b> Espacio privado de apuntes.</li>
+                            <li><b>Comunicados:</b> Avisos oficiales en tiempo real.</li>
                         </ul>
                     </div>
                     
-                    <button onclick="document.getElementById('evento-actualizacion-v34').remove()" 
-                            style="background:#27ae60; color:white; border:none; width:100%; padding:16px; cursor:pointer; font-weight:800; border-radius:12px; font-size:14px; transition: 0.2s; box-shadow: 0 10px 15px -3px rgba(39, 174, 96, 0.3);">
+                    <button onclick="cerrarYGuardarPreferencias()" 
+                            style="background:#27ae60; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:800; border-radius:10px; font-size:14px; transition: 0.2s;">
                         ¡ENTENDIDO, PROBAR AGENDA! 🚀
                     </button>
+
+                    <div style="text-align:center; margin-top:15px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <input type="checkbox" id="check-no-mostrar" style="cursor:pointer;">
+                        <label for="check-no-mostrar" style="font-size:11px; color:#94a3b8; cursor:pointer; font-weight:bold;">No volver a mostrar este aviso</label>
+                    </div>
                     
-                    <div style="text-align:center; margin-top:15px; opacity: 0.5;">
-                        <span style="font-size:9px; color:#94a3b8; font-weight:bold; letter-spacing:1px;">ALONIXZ-GROUP • AREQUIPA 2026</span>
+                    <div style="text-align:center; margin-top:10px; opacity: 0.4;">
+                        <span style="font-size:8px; color:#94a3b8; font-weight:bold; letter-spacing:1px;">ALONIXZ-GROUP • AREQUIPA 2026</span>
                     </div>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
-        console.log("✅ Ventana de lanzamiento v3.4 completada.");
 
     }, 8000); 
 });
+
+// Función para cerrar y guardar la decisión del usuario
+function cerrarYGuardarPreferencias() {
+    const checkbox = document.getElementById('check-no-mostrar');
+    
+    // Si el checkbox está marcado, guardamos en el navegador
+    if (checkbox && checkbox.checked) {
+        localStorage.setItem('alonixz_v34_ocultar', 'true');
+    }
+
+    // Cerramos el modal
+    const modal = document.getElementById('evento-actualizacion-v34');
+    if (modal) modal.remove();
+}
 </script>
 
 </body>
