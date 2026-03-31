@@ -130,10 +130,20 @@
                 <b id="user-full-name" style="font-size: 1rem; color: #1e293b;">@usuario</b>
             </div>
             
-            <div onclick="location.href='perfil.html'" style="display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer; border-radius: 10px; transition: 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                <span style="font-size: 1.2rem;">⚙️</span>
-                <p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #475569;">Configuración</p>
-            </div>
+         <div onclick="location.href='perfil.html'" 
+     style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9;" 
+     onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
+     onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
+    
+    <span style="font-size: 1.3rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👤</span>
+    
+    <div style="display: flex; flex-direction: column;">
+        <p id="nav-user-name" style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #1e293b;">Mi Perfil</p>
+        <span style="font-size: 10px; color: #94a3b8; font-weight: 600;">Ver configuración</span>
+    </div>
+</div>
+
+
             
             <button onclick="logout()" style="width: 100%; text-align: left; padding: 10px; background: #fff1f2; border: none; border-radius: 10px; cursor: pointer; font-size: 0.85rem; color: #e11d48; display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: bold;">
                 <span>🚪</span> Cerrar Sesión
@@ -1345,6 +1355,16 @@ function cerrarYGuardarPreferencias() {
     if (modal) modal.remove();
 }
 </script>
-
+<script>
+    window.addEventListener('load', () => {
+        // Obtenemos el nombre guardado en perfil.html
+        const nombre = localStorage.getItem('alonixz_user_name') || 'Estudiante';
+        const display = document.getElementById('nav-user-name');
+        
+        if(display && nombre !== 'Estudiante') {
+            display.innerText = nombre; // Cambia "Mi Perfil" por el nombre real del alumno
+        }
+    });
+</script>
 </body>
 </html>
