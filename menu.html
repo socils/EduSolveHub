@@ -192,6 +192,44 @@
     </div>
     <span class="btn-arrow">→</span>
 </div>
+    <div onclick="window.location.href='agenda.html'" 
+     style="background: #ffffff; 
+            padding: 20px; 
+            border-radius: 16px; 
+            border: 2px solid #f39c12; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin: 15px auto; 
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;">
+
+    <div style="background: #fef5e7; padding: 12px; border-radius: 12px;">
+        <span style="font-size: 24px;">📓</span>
+    </div>
+
+    <div style="flex-grow: 1;">
+        <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 800;">Agenda Escolar</h3>
+        <p style="margin: 2px 0 0 0; color: #7f8c8d; font-size: 11px;">Tareas, Exámenes y Notas</p>
+    </div>
+
+    <div style="background: #e67e22; color: white; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+        v3.4
+    </div>
+
+</div>
+
+<style>
+    div[onclick*='agenda.html']:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(230, 126, 34, 0.15);
+        border-color: #e67e22;
+        background: #fffcf9;
+    }
+</style>
 </div>
    <div id="news-container" class="card-glass" style="min-height: 200px;">
     <div class="empty-state">
