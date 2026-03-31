@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Escolar v3.4 - Alonixz-Group</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary: #e67e22;
+            --paper: #ffffff;
+            --lines: #e2e8f0;
+            --margin-line: #fecaca;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #cbd5e1; /* Fondo gris para resaltar la agenda */
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* DISEÑO DE AGENDA FÍSICA */
+        .notebook {
+            background: var(--paper);
+            width: 100%;
+            max-width: 500px;
+            min-height: 90vh;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.1), 0 20px 25px -5px rgba(0,0,0,0.2);
+            border-left: 40px solid #334155; /* El "lomo" de la agenda */
+            padding: 20px 20px 20px 30px;
+            background-image: linear-gradient(var(--lines) 1px, transparent 1px);
+            background-size: 100% 28px; /* Líneas de cuaderno */
+        }
+
+        /* Anillas de la agenda */
+        .notebook::before {
+            content: "";
+            position: absolute;
+            left: -25px;
+            top: 20px;
+            width: 15px;
+            height: 90%;
+            background-image: radial-gradient(#94a3b8 5px, transparent 5px);
+            background-size: 100% 40px;
+        }
+
+        .header {
+            text-align: right;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .header h1 { margin: 0; color: var(--primary); font-size: 22px; text-transform: uppercase; }
+
+        .section-title {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            display: inline-block;
+            border-radius: 0 15px 15px 0;
+            margin-left: -30px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+        }
+
+        .content-box { margin-top: 10px; }
+
+        /* Estilo para los ítems */
+        .entry {
+            padding: 8px 0;
+            border-bottom: 1px dashed #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .comunicado-card {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .examen-tag { background: #fee2e2; color: #991b1b; }
+        .firma-tag { background: #dcfce7; color: #166534; }
+        .info-tag { background: #e0e7ff; color: #4338ca; }
+
+        .footer-note {
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notebook">
+        <div class="header">
+            <h1>Agenda 2026</h1>
+            <span style="font-size: 12px; font-weight: bold;">ALONIXZ-GROUP V3.4</span>
+        </div>
+
+        <div class="section-title">📢 COMUNICADOS ESCOLARES</div>
+        <div id="lista-comunicados" class="content-box">
+            <div class="comunicado-card">
+                <div style="font-weight: bold; font-size: 14px; color: #b45309;">Reunión de Padres</div>
+                <p style="margin: 5px 0; font-size: 12px; color: #78350f;">Se les recuerda que mañana hay salida temprano por capacitación docente.</p>
+                <span class="badge info-tag">Dirección</span>
+            </div>
+        </div>
+
+        <div class="section-title">📅 PRÓXIMOS EXÁMENES</div>
+        <div id="lista-examenes" class="content-box">
+            </div>
+
+        <div class="section-title">✍️ CONTROL DE FIRMAS</div>
+        <div id="lista-firmas" class="content-box">
+            </div>
+
+        <div class="footer-note">
+            "Organización es la clave del éxito" - Alonso • Arequipa, Perú
+        </div>
+        <div class="section-title" style="background: #27ae60;">📝 MIS ANOTACIONES PROPIAS</div>
+<div class="content-box">
+    <textarea id="notas-personales" oninput="guardarNotasLocales()" 
+        placeholder="Escribe aquí tus recordatorios, tareas extras o notas privadas... (Se guardan solas)" 
+        style="width: 100%; height: 150px; background: transparent; border: none; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 28px; resize: none; outline: none; padding-top: 5px;">
+    </textarea>
+</div>
+    </div>
+
+    <a href="index.html" style="margin-top: 20px; color: #475569; text-decoration: none; font-weight: bold; font-size: 14px;">← VOLVER AL MENÚ</a>
+
+    <script>
+        // CONFIGURACIÓN FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+            authDomain: "edusolve-947c1.firebaseapp.com",
+            projectId: "edusolve-947c1",
+            storageBucket: "edusolve-947c1.firebasestorage.app",
+            messagingSenderId: "1089784819674",
+            appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+// 1. CARGAR COMUNICADOS (Se borra si no hay nada en Firebase)
+db.ref('agenda/comunicados').on('value', (snapshot) => {
+    const div = document.getElementById('lista-comunicados');
+    const tituloSeccion = div.previousElementSibling; // El título "COMUNICADOS ESCOLARES"
+
+    if (!snapshot.exists()) {
+        // Si no hay datos, borramos el contenido y ocultamos el título de la sección
+        div.innerHTML = "";
+        if (tituloSeccion) tituloSeccion.style.display = 'none';
+        return;
+    }
+
+    // Si hay datos, mostramos el título y cargamos los comunicados
+    if (tituloSeccion) tituloSeccion.style.display = 'inline-block';
+    div.innerHTML = "";
+    
+    snapshot.forEach(child => {
+        const val = child.val();
+        div.innerHTML += `
+            <div class="comunicado-card">
+                <div style="font-weight: bold; font-size: 14px; color: #b45309;">${val.titulo}</div>
+                <p style="margin: 5px 0; font-size: 12px;">${val.mensaje}</p>
+                <span class="badge info-tag">${val.emisor || 'General'}</span>
+            </div>
+        `;
+    });
+});
+
+        // 2. CARGAR EXÁMENES
+        db.ref('agenda/examenes').on('value', (snapshot) => {
+            const div = document.getElementById('lista-examenes');
+            div.innerHTML = "";
+            snapshot.forEach(child => {
+                const val = child.val();
+                div.innerHTML += `
+                    <div class="entry">
+                        <span style="font-size: 13px;"><b>${val.materia}:</b> ${val.tema}</span>
+                        <span class="badge examen-tag">${val.fecha}</span>
+                    </div>
+                `;
+            });
+        });
+
+        // 3. CARGAR FIRMAS
+        db.ref('agenda/firmas').on('value', (snapshot) => {
+            const div = document.getElementById('lista-firmas');
+            div.innerHTML = "";
+            snapshot.forEach(child => {
+                const val = child.val();
+                div.innerHTML += `
+                    <div class="entry">
+                        <span style="font-size: 13px;">${val.titulo} (Nota: ${val.calificacion})</span>
+                        <span class="badge firma-tag">${val.estado}</span>
+                    </div>
+                `;
+            });
+        });
+        // --- FUNCIÓN PARA GUARDAR NOTAS EN EL DISPOSITIVO DEL ALUMNO ---
+function guardarNotasLocales() {
+    const nota = document.getElementById('notas-personales').value;
+    localStorage.setItem('alonixz_notas_personales', nota);
+}
+
+// --- CARGAR LAS NOTAS AL ABRIR LA AGENDA ---
+window.addEventListener('load', () => {
+    const notasGuardadas = localStorage.getItem('alonixz_notas_personales');
+    if (notasGuardadas) {
+        document.getElementById('notas-personales').value = notasGuardadas;
+    }
+});
+    </script>
+</body>
+</html>
