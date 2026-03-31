@@ -9,124 +9,123 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-        .btn-solucionario {
-    background: #6366f1; /* Color Indigo moderno */
-    color: white;
-    padding: 18px;
-    border-radius: 20px;
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: none;
-    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-}
-/* Colores normales (Modo Claro) */
-body {
-    background-color: #f8fafc;
-    color: #1e293b;
-    transition: background-color 0.3s, color 0.3s;
-}
+  
+    /* --- VARIABLES Y BASE --- */
+    :root {
+        --primary: #6366f1;
+        --bg-light: #f8fafc;
+        --text-light: #1e293b;
+        --bg-dark: #0f172a;
+        --text-dark: #f1f5f9;
+        --card-dark: #1e293b;
+    }
 
-/* Colores cuando el Script activa 'dark-mode' */
-body.dark-mode {
-    background-color: #0f172a; /* Azul noche profundo */
-    color: #f1f5f9;
-}
+    body {
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        transition: background-color 0.3s, color 0.3s;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: 0;
+    }
 
-body.dark-mode .card-menu {
-    background-color: #1e293b; /* Color de las tarjetas en oscuro */
-    border-color: #334155;
-}
+    /* --- MODO OSCURO GLOBAL --- */
+    body.dark-mode {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+    }
 
-body.dark-mode p, body.dark-mode h3 {
-    color: #f1f5f9 !important;
-}
-.btn-solucionario:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
-    background: #4f46e5;
-}
+    body.dark-mode .card, 
+    body.dark-mode .card-menu,
+    body.dark-mode .config-container {
+        background-color: var(--card-dark) !important;
+        border-color: #334155 !important;
+        color: var(--text-dark);
+    }
 
-.btn-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+    /* Ajuste de textos en modo oscuro */
+    body.dark-mode p, 
+    body.dark-mode h3, 
+    body.dark-mode h1,
+    body.dark-mode .btn-title {
+        color: var(--text-dark) !important;
+    }
 
-.btn-icon {
-    font-size: 1.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
-    border-radius: 12px;
-}
+    /* --- BOTÓN SOLUCIONARIO (ESTILO ALONIXZ) --- */
+    .btn-solucionario {
+        background: var(--primary);
+        color: white;
+        padding: 18px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+    }
 
-.btn-texts {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
+    .btn-solucionario:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+        background: #4f46e5;
+    }
 
-.btn-title {
-    font-weight: 800;
-    font-size: 1.1rem;
-    letter-spacing: -0.5px;
-}
+    .btn-content { display: flex; align-items: center; gap: 15px; }
+    .btn-icon { font-size: 1.5rem; background: rgba(255, 255, 255, 0.2); padding: 10px; border-radius: 12px; }
+    .btn-texts { display: flex; flex-direction: column; text-align: left; }
+    .btn-title { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
+    .btn-subtitle { font-size: 0.8rem; opacity: 0.8; }
+    .btn-arrow { font-size: 1.2rem; font-weight: bold; opacity: 0.7; }
 
-.btn-subtitle {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
+    /* --- TAGS DE ESTADO (MODO OSCURO ADAPTADO) --- */
+    .status-tag {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-weight: 800;
+        margin-left: 10px;
+    }
+    .tag-confirm { background: #dcfce7; color: #15803d; }
+    .tag-maybe { background: #fef3c7; color: #b45309; }
+    .tag-alert { background: #fee2e2; color: #b91c1c; }
 
-.btn-arrow {
-    font-size: 1.2rem;
-    font-weight: bold;
-    opacity: 0.7;
-}
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 25px;
-            margin-top: 30px;
-        }
-        .status-tag {
-            font-size: 0.7rem;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: 800;
-            margin-left: 10px;
-        }
-        .tag-confirm { background: #dcfce7; color: #15803d; }
-        .tag-maybe { background: #fef3c7; color: #b45309; }
-        .tag-alert { background: #fee2e2; color: #b91c1c; }
+    /* Ajuste de tags en Modo Oscuro para que no deslumbren */
+    body.dark-mode .tag-confirm { background: #065f46; color: #ecfdf5; }
+    body.dark-mode .tag-maybe { background: #92400e; color: #fffbeb; }
+    body.dark-mode .tag-alert { background: #991b1b; color: #fef2f2; }
 
-        @media (max-width: 800px) {
-            .grid-layout { grid-template-columns: 1fr; }
-        }/* --- ESTILO PARA LAPTOP (IGUAL QUE SIEMPRE) --- */
-.card {
-    width: 500px;
-    padding: 40px;
-}
+    /* --- LAYOUT Y RESPONSIVE --- */
+    .grid-layout {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 25px;
+        margin-top: 30px;
+    }
 
-/* --- ESTILO SOLO PARA CELULARES --- */
-@media (max-width: 600px) {
+    @media (max-width: 800px) {
+        .grid-layout { grid-template-columns: 1fr; }
+    }
+
+    /* --- CARDS Y CELULAR --- */
     .card {
-        width: 90%;   /* En celular la carta ocupa casi todo el ancho */
-        padding: 15px; /* Menos espacio interno para que quepa el texto */
-    }
-    
-    #welcome-name {
-        font-size: 1.5rem; /* Título más cómodo para el dedo */
+        width: 500px;
+        padding: 40px;
+        background: white;
+        border-radius: 20px;
     }
 
-    /* El panel admin se hace más grande para tocarlo fácil */
-    #admin-panel div {
-        width: 95% !important;
+    @media (max-width: 600px) {
+        .card {
+            width: 90%;
+            padding: 15px;
+        }
+        #welcome-name { font-size: 1.5rem; }
+        #admin-panel div { width: 95% !important; }
     }
-}
-    </style>
+</style>
+    
 </head>
 <body><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <div class="main-content container" style="max-width: 1000px; margin: auto; padding: 40px 20px;">
