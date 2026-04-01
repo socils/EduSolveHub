@@ -174,7 +174,39 @@
             content.classList.remove('fade-out');
         }, 300);
     }
+// CONFIGURACIÓN DEL EVENTO 3.5
+async function verificarMigracion() {
+    try {
+        // Consultamos la versión activa en la nube
+        const doc = await firebase.firestore().collection("sistema").doc("configuracion").get();
+        const info = doc.data();
+        const versionActiva = info.version_minima; // Ejemplo: 3.5
 
+        // Revisamos si el usuario ya se movió a la nube
+        const migrado = localStorage.getItem('migrado_v35');
+
+        if (versionActiva >= 3.5 && !migrado) {
+            console.log("⚠️ Evento 3.5 detectado: Limpiando datos locales...");
+            
+            // ELIMINAMOS solo credenciales locales
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_pass');
+            
+            // NOTA: No tocamos 'user_pfp' ni 'foto_perfil', así que se mantienen.
+            
+            // Marcamos como "En proceso de migración" para que no buclee
+            localStorage.setItem('migrado_v35', 'pending');
+            
+            alert("🚀 ¡Evento Alonixz 3.5! Tu cuenta ahora será 100% en la nube. Por favor, crea tu usuario de nuevo para activar la protección de datos.");
+            location.reload(); 
+        }
+    } catch (e) {
+        console.log("Error de check de versión:", e);
+    }
+}
+
+// Se ejecuta automático al abrir la página
+verificarMigracion();
     async function handleAuth() {
         // Verificar conexión antes de procesar
         if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
@@ -216,7 +248,9 @@
                     rango: "Estudiante",
                     puntos: 0,
                     creado: new Date().toISOString()
-                });
+                });// Confirmamos que la migración terminó con éxito
+localStorage.setItem('migrado_v35', 'true');
+alert("¡Bienvenido a la Nube Alonixz 3.5!");
 
                 alert("¡Cuenta Alonixz-ID creada con éxito! Ya puedes iniciar sesión.");
                 toggleMode();
