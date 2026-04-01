@@ -9,7 +9,67 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-  
+  /* --- SISTEMA DE BLOQUEO DE FUNCIONES v3.5/v3.6 --- */
+
+.blocked-for-maintenance {
+    position: relative;
+    overflow: hidden;
+    cursor: not-allowed; /* Cambia el mouse a señal de prohibido */
+    transition: all 0.3s ease;
+}
+
+/* 1. La Cinta de Construcción */
+.maintenance-ribbon {
+    position: absolute;
+    top: 15px;
+    right: -35px;
+    padding: 8px 40px;
+    background: #f1c40f; /* Amarillo construcción */
+    color: #000;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    transform: rotate(45deg);
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* 2. El Overlay de "Próximamente" */
+.blocked-status-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Oculto por defecto */
+    transition: 0.4s;
+    z-index: 5;
+    color: #1e293b;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* Mostrar el overlay al pasar el mouse */
+.blocked-for-maintenance:hover .blocked-status-overlay {
+    opacity: 1;
+}
+
+/* --- ADAPTACIÓN MODO OSCURO --- */
+body.dark-mode .blocked-status-overlay {
+    background: rgba(15, 23, 42, 0.9);
+    color: #f1f5f9;
+}
+
+body.dark-mode .maintenance-ribbon {
+    background: #6366f1; /* En modo oscuro, la cinta se ve mejor en Indigo */
+    color: white;
+}
     /* --- VARIABLES Y BASE --- */
     :root {
         --primary: #6366f1;
@@ -204,10 +264,19 @@
 <h3 style="text-align:left; margin-bottom:15px; font-size: 1.1rem; color: #1e293b;">Herramientas 3° Secundaria</h3>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
     
-    <div class="card-glass" style="padding: 15px; text-align: center; cursor: pointer;" onclick="window.open('https://www.google.com/search?q=calculadora+cientifica')">
-        <span style="font-size: 1.5rem;">🧮</span>
-        <p style="margin: 8px 0 0; font-size: 0.8rem; font-weight: 700;">Calculadora</p>
+   <div class="card blocked-for-maintenance">
+    <div class="maintenance-ribbon">PRÓXIMAMENTE</div>
+    
+    <div style="opacity: 0.3;"> <span>🧪</span>
+        <h3>Diccionario de Fórmulas</h3>
+        <p>Accede a fórmulas de Física y Química.</p>
     </div>
+
+    <div class="blocked-status-overlay">
+        <span style="font-size: 20px;">🚧</span>
+        <p style="margin-top: 10px;">Lanzamiento en la v3.6</p>
+    </div>
+</div>
 
     <div class="card-glass" style="padding: 15px; text-align: center; cursor: pointer;" onclick="location.href='horario.html'">
         <span style="font-size: 1.5rem;">⏰</span>
@@ -1439,7 +1508,25 @@ function navegar(url) {
     }
 
     location.href = url;
-}
+};document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionamos todos los botones bloqueados
+    const botonesBloqueados = document.querySelectorAll('.blocked-for-maintenance');
+
+    botonesBloqueados.forEach(boton => {
+        // Evitar que cualquier clic funcione
+        boton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Animación de "vibración" (Shake) para indicar que no está disponible
+            boton.style.transform = "translateX(5px)";
+            setTimeout(() => boton.style.transform = "translateX(-5px)", 50);
+            setTimeout(() => boton.style.transform = "translateX(0)", 100);
+            
+            console.log("🔒 Función en desarrollo por Alonixz-Group para la v3.6");
+        });
+    });
+});
 </script>
 </body>
 </html>
