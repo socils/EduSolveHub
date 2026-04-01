@@ -148,13 +148,16 @@
             <a href="#" onclick="toggleMode()" style="color: var(--primary); text-decoration: none; font-weight: 700;">Hazlo aquí</a>
         </p>
 
-        <div class="device-alert">
-            <span>⚠️</span>
-            <span>Las cuentas solo son válidas en este dispositivo (Almacenamiento Local).</span>
-        </div>
+      <div class="device-alert" style="background: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
+    <span>🌐</span>
+    <span>Cuenta Alonixz-ID: Tus datos se guardan en la nube y funcionan en cualquier equipo.</span>
+</div>
     </div>
 </div>
-
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 <script>
     let isLogin = true;
 
@@ -173,56 +176,64 @@
         }, 300);
     }
 
- function handleAuth() {
+async function handleAuth() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value;
     const remember = document.getElementById('remember').checked; 
     
     if(!user || !pass) return alert("Completa todos los campos.");
 
-    let db = JSON.parse(localStorage.getItem('edusolve_users')) || [];
+    // Creamos un correo ficticio para que Firebase lo acepte
+    const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
-    if (isLogin) {
-        // --- LÓGICA DE LOGIN ---
-        const found = db.find(u => u.n === user && u.p === pass);
-        
-        if (found || (user === "Alonso" && pass === "1234")) {
-            // Guardamos en TODAS las llaves para que el Menú lo encuentre sí o sí
-            localStorage.setItem('user_name', user); 
-            localStorage.setItem('eduSolve_User', user);
-            localStorage.setItem('active_user', user);
+    try {
+        if (isLogin) {
+            // --- LOGIN EN LA NUBE ---
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+            const fbUser = userCredential.user;
+
+            // Obtener datos extra desde Firestore (Rango, Puntos)
+            const doc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+            const userData = doc.data();
+
+            // Guardar en LocalStorage para que tu menú actual siga funcionando
+            localStorage.setItem('user_name', user);
+            localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+            localStorage.setItem('user_points', userData.puntos || 0);
 
             if (remember) {
                 localStorage.setItem('remember_me', 'true');
-            } else {
-                sessionStorage.setItem('active_user', user);
             }
 
-            console.log("✅ Sesión lista para Alonixz-Group");
+            console.log("✅ Sesión iniciada desde la Nube Alonixz");
             window.location.href = 'menu.html';
-            return; // Importante para detener la función aquí
-        } else {
-            return alert("Usuario o clave incorrecta.");
-        }
-    } else { 
-        // --- LÓGICA DE REGISTRO (Solo entra aquí si isLogin es false) ---
-        
-        if (pass.length < 6) {
-            return alert("Seguridad insuficiente: La contraseña debe tener al menos 6 caracteres.");
-        }
 
-        if (pass.toLowerCase() === user.toLowerCase()) {
-            return alert("Error: La contraseña no puede ser igual al nombre de usuario.");
-        }
+        } else { 
+            // --- REGISTRO EN LA NUBE ---
+            if (pass.length < 6) return alert("Mínimo 6 caracteres.");
+            if (pass.toLowerCase() === user.toLowerCase()) return alert("Clave no puede ser igual al usuario.");
 
-        if(db.find(u => u.n === user)) {
-            return alert("Este nombre de usuario ya está registrado en este dispositivo.");
+            // 1. Crear usuario en el sistema de autenticación
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
+            const fbUser = userCredential.user;
+
+            // 2. Guardar el perfil en la base de datos Firestore
+            await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
+                n: user,
+                rango: "Estudiante", // Por defecto todos son gratis
+                puntos: 0,
+                creado: new Date().toISOString()
+            });
+
+            alert("¡Cuenta Alonixz-ID creada con éxito en la nube!");
+            toggleMode();
         }
-        
-        db.push({ n: user, p: pass });
-        localStorage.setItem('edusolve_users', JSON.stringify(db));
-        alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
-        toggleMode();
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'auth/user-not-found') alert("El usuario no existe.");
+        else if (error.code === 'auth/wrong-password') alert("Contraseña incorrecta.");
+        else if (error.code === 'auth/email-already-in-use') alert("Este nombre de usuario ya está tomado.");
+        else alert("Error Alonixz-Cloud: " + error.message);
     }
 }
 </script>
