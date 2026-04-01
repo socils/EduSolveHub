@@ -289,8 +289,17 @@ verificarMigracion();
             // O si prefieres que se logueen manualmente, deja el toggleMode()
             // toggleMode(); 
         }
-    } catch (error) {
-        // ... (resto de tus errores)
+    } } catch (error) {
+        console.error("Detalles del Error:", error.code, error.message);
+        
+        // El error 400 suele ser 'auth/operation-not-allowed'
+        if (error.code === 'auth/operation-not-allowed') {
+            alert("❌ ERROR CRÍTICO: Debes ir a la Consola de Firebase > Authentication > Sign-in Method y ACTIVAR 'Correo electrónico/contraseña'.");
+        } else if (error.code === 'auth/invalid-email') {
+            alert("❌ El nombre de usuario tiene caracteres no permitidos.");
+        } else {
+            alert("Error Alonixz-Cloud: " + error.message);
+        }
     }
 }
 </script>
