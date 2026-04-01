@@ -179,26 +179,24 @@ async function verificarMigracion() {
     try {
         const doc = await firebase.firestore().collection("sistema").doc("configuracion").get();
         
-        // Verificamos si el documento realmente existe
-        if (!doc.exists) {
-            console.warn("⚠️ El documento 'configuracion' no existe en Firestore.");
-            return; 
-        }
+        if (doc.exists) {
+            const data = doc.data();
+            // 🛠️ Convertimos el texto "3.5" a número 3.5
+            const versionServer = Number(data.version_minima); 
+            
+            console.log("✅ Versión detectada:", versionServer);
 
-        const info = doc.data();
-        // Usamos una validación para evitar el TypeError
-        const versionActiva = info ? info.version_minima : 0; 
+            const yaMigrado = localStorage.getItem('alonixz_v35_nube');
+            const usuarioAntiguo = localStorage.getItem('user_name');
 
-        const migrado = localStorage.getItem('alonixz_v35_nube');
-
-        // Si la versión en la nube es 3.5 o más y el usuario no ha migrado
-        if (versionActiva >= 3.5 && migrado !== 'true' && localStorage.getItem('user_name')) {
-            console.log("🚀 Evento 3.5 detectado...");
-            // Aquí se dispara tu modal de 8 segundos o la limpieza
-            // (El código que ya tienes para mostrar el evento)
+            // Si la versión es 3.5 o superior y no ha migrado
+            if (versionServer >= 3.5 && yaMigrado !== 'true' && usuarioAntiguo) {
+                // Se dispara el evento que creamos
+                lanzarEvento35(); 
+            }
         }
     } catch (e) {
-        console.error("❌ Error de check de versión:", e.message);
+        console.error("Error en el sistema de versiones:", e);
     }
 }
 
