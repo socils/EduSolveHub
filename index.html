@@ -115,20 +115,7 @@
     </style>
 </head>
 <body>
-<div style="display: flex; align-items: center; gap: 15px; padding: 10px;">
-    <svg viewBox="0 0 100 100" style="width: 50px; height: 50px;">
-        <path d="M50 10 L85 85 M50 10 L15 85 M30 50 L70 50" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="50" cy="10" r="6" fill="#38bdf8"/>
-        <circle cx="85" cy="85" r="6" fill="#38bdf8"/>
-        <circle cx="15" cy="85" r="6" fill="#38bdf8"/>
-        <path d="M75 65 L95 45 L80 50 L75 65 Z" fill="#fbbf24" stroke="#1e293b" stroke-width="2"/>
-    </svg>
-    
-    <div style="line-height: 1.1;">
-        <h1 style="margin: 0; font-size: 1.5rem; color: #1e293b; font-weight: 800; letter-spacing: -1px;">ALONIXZ</h1>
-        <span style="font-size: 0.7rem; color: #64748b; font-weight: 600; letter-spacing: 2px;">GROUP DEV</span>
-    </div>
-</div>
+
 <div class="auth-card" id="card">
     <div class="fade-content" id="form-content">
         <div class="logo-dot"></div>
@@ -154,12 +141,25 @@
 </div>
     </div>
 </div>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
+<!-- 1. LIBRERÍAS DE FIREBASE (Versión Compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+
+<!-- 2. TU CONFIGURACIÓN (Debe estar debajo de las librerías) -->
+<script src="firebase-config.js"></script>
+
 <script>
     let isLogin = true;
+
+    // Verificar si Firebase cargó correctamente al abrir la página
+    window.onload = () => {
+        if (typeof firebase === 'undefined') {
+            console.error("❌ Error: Firebase no se cargó. Revisa tu conexión o el archivo config.");
+        } else {
+            console.log("🚀 Alonixz-Cloud Conectado");
+        }
+    };
 
     function toggleMode() {
         const content = document.getElementById('form-content');
@@ -168,74 +168,71 @@
         setTimeout(() => {
             isLogin = !isLogin;
             document.getElementById('title').innerText = isLogin ? "EduSolve ID" : "Crear Usuario";
-            document.getElementById('subtitle').innerText = isLogin ? "Ingresa para ver tareas y exámenes" : "Regístrate en este dispositivo";
+            document.getElementById('subtitle').innerText = isLogin ? "Ingresa para ver tareas y exámenes" : "Regístrate en la nube Alonixz";
             document.getElementById('main-btn').innerText = isLogin ? "Entrar al Panel" : "Registrar ahora";
             document.getElementById('toggle-text').innerText = isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?";
-            
             content.classList.remove('fade-out');
         }, 300);
     }
 
-async function handleAuth() {
-    const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value;
-    const remember = document.getElementById('remember').checked; 
-    
-    if(!user || !pass) return alert("Completa todos los campos.");
+    async function handleAuth() {
+        // Verificar conexión antes de procesar
+        if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
 
-    // Creamos un correo ficticio para que Firebase lo acepte
-    const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        const remember = document.getElementById('remember').checked; 
+        
+        if(!user || !pass) return alert("Completa todos los campos.");
 
-    try {
-        if (isLogin) {
-            // --- LOGIN EN LA NUBE ---
-            const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
-            const fbUser = userCredential.user;
+        const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
-            // Obtener datos extra desde Firestore (Rango, Puntos)
-            const doc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
-            const userData = doc.data();
+        try {
+            if (isLogin) {
+                // --- LOGIN ---
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+                const fbUser = userCredential.user;
 
-            // Guardar en LocalStorage para que tu menú actual siga funcionando
-            localStorage.setItem('user_name', user);
-            localStorage.setItem('user_rank', userData.rango || 'Estudiante');
-            localStorage.setItem('user_points', userData.puntos || 0);
+                const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+                const userData = userDoc.data() || {};
 
-            if (remember) {
-                localStorage.setItem('remember_me', 'true');
+                localStorage.setItem('user_name', user);
+                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+                localStorage.setItem('user_points', userData.puntos || 0);
+
+                if (remember) localStorage.setItem('remember_me', 'true');
+
+                window.location.href = 'menu.html';
+
+            } else { 
+                // --- REGISTRO ---
+                if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
+
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
+                const fbUser = userCredential.user;
+
+                await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
+                    n: user,
+                    rango: "Estudiante",
+                    puntos: 0,
+                    creado: new Date().toISOString()
+                });
+
+                alert("¡Cuenta Alonixz-ID creada con éxito! Ya puedes iniciar sesión.");
+                toggleMode();
             }
-
-            console.log("✅ Sesión iniciada desde la Nube Alonixz");
-            window.location.href = 'menu.html';
-
-        } else { 
-            // --- REGISTRO EN LA NUBE ---
-            if (pass.length < 6) return alert("Mínimo 6 caracteres.");
-            if (pass.toLowerCase() === user.toLowerCase()) return alert("Clave no puede ser igual al usuario.");
-
-            // 1. Crear usuario en el sistema de autenticación
-            const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
-            const fbUser = userCredential.user;
-
-            // 2. Guardar el perfil en la base de datos Firestore
-            await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
-                n: user,
-                rango: "Estudiante", // Por defecto todos son gratis
-                puntos: 0,
-                creado: new Date().toISOString()
-            });
-
-            alert("¡Cuenta Alonixz-ID creada con éxito en la nube!");
-            toggleMode();
+        } catch (error) {
+            console.error(error);
+            // Traducción de errores comunes para tus compañeros
+            const errors = {
+                'auth/user-not-found': "El usuario no existe.",
+                'auth/wrong-password': "Contraseña incorrecta.",
+                'auth/email-already-in-use': "Ese nombre de usuario ya está registrado.",
+                'auth/network-request-failed': "Sin conexión a internet."
+            };
+            alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
         }
-    } catch (error) {
-        console.error(error);
-        if (error.code === 'auth/user-not-found') alert("El usuario no existe.");
-        else if (error.code === 'auth/wrong-password') alert("Contraseña incorrecta.");
-        else if (error.code === 'auth/email-already-in-use') alert("Este nombre de usuario ya está tomado.");
-        else alert("Error Alonixz-Cloud: " + error.message);
     }
-}
 </script>
 
 </body>
