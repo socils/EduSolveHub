@@ -250,7 +250,7 @@ verificarMigracion();
                     creado: new Date().toISOString()
                 });// Confirmamos que la migración terminó con éxito
 localStorage.setItem('migrado_v35', 'true');
-alert("¡Bienvenido a la Nube Alonixz 3.5!");
+alert("¡Bienvenido a la Nube Alonixz 3.5!");localStorage.setItem('alonixz_v35_nube', 'true'); // Esto evita que el modal vuelva a salir
 
                 alert("¡Cuenta Alonixz-ID creada con éxito! Ya puedes iniciar sesión.");
                 toggleMode();
