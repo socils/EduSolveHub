@@ -177,31 +177,28 @@
 // CONFIGURACIÓN DEL EVENTO 3.5
 async function verificarMigracion() {
     try {
-        // Consultamos la versión activa en la nube
         const doc = await firebase.firestore().collection("sistema").doc("configuracion").get();
+        
+        // Verificamos si el documento realmente existe
+        if (!doc.exists) {
+            console.warn("⚠️ El documento 'configuracion' no existe en Firestore.");
+            return; 
+        }
+
         const info = doc.data();
-        const versionActiva = info.version_minima; // Ejemplo: 3.5
+        // Usamos una validación para evitar el TypeError
+        const versionActiva = info ? info.version_minima : 0; 
 
-        // Revisamos si el usuario ya se movió a la nube
-        const migrado = localStorage.getItem('migrado_v35');
+        const migrado = localStorage.getItem('alonixz_v35_nube');
 
-        if (versionActiva >= 3.5 && !migrado) {
-            console.log("⚠️ Evento 3.5 detectado: Limpiando datos locales...");
-            
-            // ELIMINAMOS solo credenciales locales
-            localStorage.removeItem('user_name');
-            localStorage.removeItem('user_pass');
-            
-            // NOTA: No tocamos 'user_pfp' ni 'foto_perfil', así que se mantienen.
-            
-            // Marcamos como "En proceso de migración" para que no buclee
-            localStorage.setItem('migrado_v35', 'pending');
-            
-            alert("🚀 ¡Evento Alonixz 3.5! Tu cuenta ahora será 100% en la nube. Por favor, crea tu usuario de nuevo para activar la protección de datos.");
-            location.reload(); 
+        // Si la versión en la nube es 3.5 o más y el usuario no ha migrado
+        if (versionActiva >= 3.5 && migrado !== 'true' && localStorage.getItem('user_name')) {
+            console.log("🚀 Evento 3.5 detectado...");
+            // Aquí se dispara tu modal de 8 segundos o la limpieza
+            // (El código que ya tienes para mostrar el evento)
         }
     } catch (e) {
-        console.log("Error de check de versión:", e);
+        console.error("❌ Error de check de versión:", e.message);
     }
 }
 
