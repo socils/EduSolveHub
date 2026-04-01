@@ -207,66 +207,67 @@ async function verificarMigracion() {
 
 // Se ejecuta automático al abrir la página
 verificarMigracion();
-    async function handleAuth() {
-        // Verificar conexión antes de procesar
-        if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
+ async function handleAuth() {
+    if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
 
-        const user = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value;
-        const remember = document.getElementById('remember').checked; 
-        
-        if(!user || !pass) return alert("Completa todos los campos.");
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value;
+    const remember = document.getElementById('remember').checked; 
+    
+    if(!user || !pass) return alert("Completa todos los campos.");
 
-        const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
+    const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
-        try {
-            if (isLogin) {
-                // --- LOGIN ---
-                const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
-                const fbUser = userCredential.user;
+    try {
+        if (isLogin) {
+            // --- LOGIN ---
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+            const fbUser = userCredential.user;
 
-                const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
-                const userData = userDoc.data() || {};
+            const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+            const userData = userDoc.data() || {};
 
-                localStorage.setItem('user_name', user);
-                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
-                localStorage.setItem('user_points', userData.puntos || 0);
+            // 🔑 CLAVE MAESTRA: Guardamos lo que el menú busca
+            localStorage.setItem('eduSolve_User', user); 
+            
+            localStorage.setItem('user_name', user);
+            localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+            localStorage.setItem('user_points', userData.puntos || 0);
 
-                if (remember) localStorage.setItem('remember_me', 'true');
+            if (remember) localStorage.setItem('remember_me', 'true');
 
-                window.location.href = 'menu.html';
+            window.location.href = 'menu.html';
 
-            } else { 
-                // --- REGISTRO ---
-                if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
+        } else { 
+            // --- REGISTRO ---
+            if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
 
-                const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
-                const fbUser = userCredential.user;
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
+            const fbUser = userCredential.user;
 
-                await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
-                    n: user,
-                    rango: "Estudiante",
-                    puntos: 0,
-                    creado: new Date().toISOString()
-                });// Confirmamos que la migración terminó con éxito
-localStorage.setItem('migrado_v35', 'true');
-alert("¡Bienvenido a la Nube Alonixz 3.5!");localStorage.setItem('alonixz_v35_nube', 'true'); // Esto evita que el modal vuelva a salir
+            await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
+                n: user,
+                rango: "Estudiante",
+                puntos: 50, // 🎁 Bono de 50 puntos por migrar a la nube!
+                creado: new Date().toISOString()
+            });
 
-                alert("¡Cuenta Alonixz-ID creada con éxito! Ya puedes iniciar sesión.");
-                toggleMode();
-            }
-        } catch (error) {
-            console.error(error);
-            // Traducción de errores comunes para tus compañeros
-            const errors = {
-                'auth/user-not-found': "El usuario no existe.",
-                'auth/wrong-password': "Contraseña incorrecta.",
-                'auth/email-already-in-use': "Ese nombre de usuario ya está registrado.",
-                'auth/network-request-failed': "Sin conexión a internet."
-            };
-            alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
+            // 🔑 CLAVE MAESTRA: También la guardamos aquí si quieres que entren directo
+            localStorage.setItem('eduSolve_User', user); 
+            localStorage.setItem('alonixz_v35_nube', 'true'); 
+
+            alert("¡Cuenta Alonixz-ID en la Nube creada! Bienvenido a la v3.5.");
+            
+            // Si quieres que entren directo al menú tras registrarse:
+            window.location.href = 'menu.html'; 
+            
+            // O si prefieres que se logueen manualmente, deja el toggleMode()
+            // toggleMode(); 
         }
+    } catch (error) {
+        // ... (resto de tus errores)
     }
+}
 </script>
 
 </body>
