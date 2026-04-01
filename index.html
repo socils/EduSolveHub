@@ -223,15 +223,38 @@
             document.body.appendChild(modal);
         }, 8000);
     }
+function ejecutarMigracionFinal() {
+    console.log("🧹 Iniciando barrido total de versiones antiguas...");
 
-    function ejecutarMigracionFinal() {
-        // Limpiamos rastro antiguo para evitar conflictos
-        localStorage.removeItem('user_name');
-        localStorage.removeItem('eduSolve_User');
-        localStorage.setItem('alonixz_v35_nube', 'pending');
-        alert("🚀 Preparando Alonixz-ID... Por favor, regístrate de nuevo.");
-        location.reload();
-    }
+    // 1. Lista de posibles nombres que pudimos usar antes
+    const llavesAntiguas = [
+        'user_name', 'user_pass', 'user_rank', 'user_points', // Actuales
+        'username', 'password', 'rango', 'puntos',           // Genéricos
+        'nombre_usuario', 'pass_usuario', 'n',               // Abreviados
+        'eduSolve_User', 'eduSolve_Pass', 'sesion_activa',   // De marca
+        'alonixz_user', 'alonixz_pass', 'v3_data',           // De sistema
+        'remember_me', 'usuario_guardado'                    // De cookies
+    ];
+
+    // 2. Borramos cada una por si acaso
+    llavesAntiguas.forEach(llave => {
+        localStorage.removeItem(llave);
+    });
+
+    // 3. 🔥 El "Golpe de Gracia": Borra TODO lo demás que falte
+    localStorage.clear(); 
+
+    // 4. Marcamos que el proceso de limpieza se hizo (importante)
+    // Usamos 'pending' para que el index sepa que debe mostrar el registro
+    localStorage.setItem('alonixz_v35_nube', 'pending');
+    
+    console.log("✅ Memoria limpia. Reiniciando para registro en la nube.");
+
+    alert("🚀 ¡Sincronización Exitosa! Tu acceso local ha sido eliminado. Por favor, crea tu cuenta oficial en Alonixz-Cloud.");
+    
+    // 5. Recarga total
+    location.reload();
+};
 
     // 4. AUTENTICACIÓN (Login y Registro con Firebase)
     async function handleAuth() {
