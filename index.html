@@ -232,7 +232,7 @@ async function verificarMigracion() {
 
 // Se ejecuta automático al abrir la página
 verificarMigracion();
- async function handleAuth() {
+async function handleAuth() {
     if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
 
     const user = document.getElementById('username').value.trim();
@@ -252,9 +252,7 @@ verificarMigracion();
             const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
             const userData = userDoc.data() || {};
 
-            // 🔑 CLAVE MAESTRA: Guardamos lo que el menú busca
             localStorage.setItem('eduSolve_User', user); 
-            
             localStorage.setItem('user_name', user);
             localStorage.setItem('user_rank', userData.rango || 'Estudiante');
             localStorage.setItem('user_points', userData.puntos || 0);
@@ -273,33 +271,29 @@ verificarMigracion();
             await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
                 n: user,
                 rango: "Estudiante",
-                puntos: 50, // 🎁 Bono de 50 puntos por migrar a la nube!
+                puntos: 50, 
                 creado: new Date().toISOString()
             });
 
-            // 🔑 CLAVE MAESTRA: También la guardamos aquí si quieres que entren directo
             localStorage.setItem('eduSolve_User', user); 
             localStorage.setItem('alonixz_v35_nube', 'true'); 
 
             alert("¡Cuenta Alonixz-ID en la Nube creada! Bienvenido a la v3.5.");
-            
-            // Si quieres que entren directo al menú tras registrarse:
             window.location.href = 'menu.html'; 
-            
-            // O si prefieres que se logueen manualmente, deja el toggleMode()
-            // toggleMode(); 
         }
-    } } catch (error) {
+    } catch (error) {
         console.error("Detalles del Error:", error.code, error.message);
         
-        // El error 400 suele ser 'auth/operation-not-allowed'
-        if (error.code === 'auth/operation-not-allowed') {
-            alert("❌ ERROR CRÍTICO: Debes ir a la Consola de Firebase > Authentication > Sign-in Method y ACTIVAR 'Correo electrónico/contraseña'.");
-        } else if (error.code === 'auth/invalid-email') {
-            alert("❌ El nombre de usuario tiene caracteres no permitidos.");
-        } else {
-            alert("Error Alonixz-Cloud: " + error.message);
-        }
+        const errors = {
+            'auth/operation-not-allowed': "❌ Debes activar 'Email/Password' en la consola de Firebase.",
+            'auth/invalid-email': "❌ El nombre de usuario tiene caracteres no permitidos.",
+            'auth/email-already-in-use': "❌ Este nombre de usuario ya está registrado en la nube.",
+            'auth/weak-password': "❌ La contraseña es muy corta.",
+            'auth/user-not-found': "❌ El usuario no existe en la nube.",
+            'auth/wrong-password': "❌ Contraseña incorrecta."
+        };
+
+        alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
     }
 }
 </script>
