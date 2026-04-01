@@ -152,150 +152,151 @@
 <script>
     let isLogin = true;
 
-    // Verificar si Firebase cargó correctamente al abrir la página
+    // 1. INICIO DEL SISTEMA
     window.onload = () => {
         if (typeof firebase === 'undefined') {
-            console.error("❌ Error: Firebase no se cargó. Revisa tu conexión o el archivo config.");
+            console.error("❌ Error: Firebase no se cargó. Revisa firebase-config.js");
         } else {
-            console.log("🚀 Alonixz-Cloud Conectado");
+            console.log("🚀 Alonixz-Cloud v3.5 Conectado");
+            verificarMigracion(); 
         }
     };
 
+    // 2. INTERFAZ (Toggle entre Login y Registro)
     function toggleMode() {
         const content = document.getElementById('form-content');
+        if(!content) return;
+        
         content.classList.add('fade-out');
 
         setTimeout(() => {
             isLogin = !isLogin;
+            // Restauramos todos los textos originales
             document.getElementById('title').innerText = isLogin ? "EduSolve ID" : "Crear Usuario";
             document.getElementById('subtitle').innerText = isLogin ? "Ingresa para ver tareas y exámenes" : "Regístrate en la nube Alonixz";
             document.getElementById('main-btn').innerText = isLogin ? "Entrar al Panel" : "Registrar ahora";
             document.getElementById('toggle-text').innerText = isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?";
+            
+            // Limpiamos los inputs al cambiar de modo
+            document.getElementById('username').value = "";
+            document.getElementById('password').value = "";
+            
             content.classList.remove('fade-out');
         }, 300);
     }
-// CONFIGURACIÓN DEL EVENTO 3.5function lanzarEvento35() {
-    console.log("⏳ Iniciando contador de 8 segundos para el evento...");
-    
-    setTimeout(() => {
-        // Creamos el Modal Dinámico
-        const modal = document.createElement('div');
-        modal.id = "modal-v35";
-        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:9999; font-family:sans-serif; text-align:center; padding:20px;";
-        
-        modal.innerHTML = `
-            <div style="background:white; padding:30px; border-radius:15px; max-width:500px; width:90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <img src="actualizacion5.png" alt="Update 3.5" style="width:100%; border-radius:10px; margin-bottom:20px;">
-                <h2 style="color:#1e293b; margin-bottom:10px;">¡MIGRACIÓN OBLIGATORIA!</h2>
-                <p style="color:#64748b; margin-bottom:20px;">Alonixz-Group ha evolucionado a la Nube. Tu acceso local será eliminado para proteger tus datos.</p>
-                <button onclick="ejecutarMigracionFinal()" style="background:#2563eb; color:white; border:none; padding:12px 25px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">MIGRAR AHORA</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }, 8000); // 8 segundos exactos
-}
 
-function ejecutarMigracionFinal() {
-    console.log("🧹 Limpiando datos antiguos...");
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_pass');
-    localStorage.removeItem('eduSolve_User'); // Limpiamos todo
-    localStorage.setItem('alonixz_v35_nube', 'pending');
-    
-    alert("🚀 ¡Sincronizando con Alonixz-Cloud! Por favor, crea tu nueva cuenta.");
-    location.reload(); // Esto recargará la página y, como ya no hay user_name, el modal no saldrá y podrán registrarse
-}
-async function verificarMigracion() {
-    try {
-        const doc = await firebase.firestore().collection("sistema").doc("configuracion").get();
-        
-        if (doc.exists) {
-            const data = doc.data();
-            // 🛠️ Convertimos el texto "3.5" a número 3.5
-            const versionServer = Number(data.version_minima); 
-            
-            console.log("✅ Versión detectada:", versionServer);
+    // 3. LÓGICA DE MIGRACIÓN (Evento 3.5)
+    async function verificarMigracion() {
+        try {
+            const doc = await firebase.firestore().collection("sistema").doc("configuracion").get();
+            if (doc.exists) {
+                const data = doc.data();
+                const versionServer = Number(data.version_minima); 
+                
+                const yaMigrado = localStorage.getItem('alonixz_v35_nube');
+                const usuarioAntiguo = localStorage.getItem('user_name');
 
-            const yaMigrado = localStorage.getItem('alonixz_v35_nube');
-            const usuarioAntiguo = localStorage.getItem('user_name');
-
-            // Si la versión es 3.5 o superior y no ha migrado
-            if (versionServer >= 3.5 && yaMigrado !== 'true' && usuarioAntiguo) {
-                // Se dispara el evento que creamos
-                lanzarEvento35(); 
+                // Si detectamos un usuario de la v3.0 que no ha pasado a la nube
+                if (versionServer >= 3.5 && yaMigrado !== 'true' && usuarioAntiguo) {
+                    lanzarEvento35(); 
+                }
             }
+        } catch (e) {
+            console.error("Error en sistema de versiones:", e);
         }
-    } catch (e) {
-        console.error("Error en el sistema de versiones:", e);
     }
-}
 
-// Se ejecuta automático al abrir la página
-verificarMigracion();
-async function handleAuth() {
-    if (typeof firebase === 'undefined') return alert("Error de sistema: Firebase no definido.");
+    function lanzarEvento35() {
+        console.log("⏳ Iniciando contador de 8 segundos para migración...");
+        setTimeout(() => {
+            const modal = document.createElement('div');
+            modal.id = "modal-v35";
+            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; z-index:9999; text-align:center; padding:20px;";
+            modal.innerHTML = `
+                <div style="background:white; padding:30px; border-radius:15px; max-width:500px; width:95%; box-shadow: 0 0 20px rgba(255,255,255,0.2);">
+                    <img src="actualizacion5.png" alt="Update" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                    <h2 style="color:#1e293b; font-family:sans-serif;">¡SISTEMA ACTUALIZADO!</h2>
+                    <p style="color:#64748b; font-family:sans-serif;">Estamos migrando a <b>Alonixz-Cloud</b>. Tu cuenta antigua debe ser renovada.</p>
+                    <button onclick="ejecutarMigracionFinal()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; font-size:16px;">EMPEZAR MIGRACIÓN</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }, 8000);
+    }
 
-    const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value;
-    const remember = document.getElementById('remember').checked; 
-    
-    if(!user || !pass) return alert("Completa todos los campos.");
+    function ejecutarMigracionFinal() {
+        // Limpiamos rastro antiguo para evitar conflictos
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('eduSolve_User');
+        localStorage.setItem('alonixz_v35_nube', 'pending');
+        alert("🚀 Preparando Alonixz-ID... Por favor, regístrate de nuevo.");
+        location.reload();
+    }
 
-    const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
+    // 4. AUTENTICACIÓN (Login y Registro con Firebase)
+    async function handleAuth() {
+        if (typeof firebase === 'undefined') return alert("Error: Firebase no cargó correctamente.");
 
-    try {
-        if (isLogin) {
-            // --- LOGIN ---
-            const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
-            const fbUser = userCredential.user;
-
-            const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
-            const userData = userDoc.data() || {};
-
-            localStorage.setItem('eduSolve_User', user); 
-            localStorage.setItem('user_name', user);
-            localStorage.setItem('user_rank', userData.rango || 'Estudiante');
-            localStorage.setItem('user_points', userData.puntos || 0);
-
-            if (remember) localStorage.setItem('remember_me', 'true');
-
-            window.location.href = 'menu.html';
-
-        } else { 
-            // --- REGISTRO ---
-            if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
-
-            const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
-            const fbUser = userCredential.user;
-
-            await firebase.firestore().collection("usuarios").doc(fbUser.uid).set({
-                n: user,
-                rango: "Estudiante",
-                puntos: 50, 
-                creado: new Date().toISOString()
-            });
-
-            localStorage.setItem('eduSolve_User', user); 
-            localStorage.setItem('alonixz_v35_nube', 'true'); 
-
-            alert("¡Cuenta Alonixz-ID en la Nube creada! Bienvenido a la v3.5.");
-            window.location.href = 'menu.html'; 
-        }
-    } catch (error) {
-        console.error("Detalles del Error:", error.code, error.message);
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        const remember = document.getElementById('remember') ? document.getElementById('remember').checked : false;
         
-        const errors = {
-            'auth/operation-not-allowed': "❌ Debes activar 'Email/Password' en la consola de Firebase.",
-            'auth/invalid-email': "❌ El nombre de usuario tiene caracteres no permitidos.",
-            'auth/email-already-in-use': "❌ Este nombre de usuario ya está registrado en la nube.",
-            'auth/weak-password': "❌ La contraseña es muy corta.",
-            'auth/user-not-found': "❌ El usuario no existe en la nube.",
-            'auth/wrong-password': "❌ Contraseña incorrecta."
-        };
+        if(!user || !pass) return alert("Por favor, completa todos los campos.");
+        
+        // Creamos el email falso para Firebase
+        const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
-        alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
+        try {
+            if (isLogin) {
+                // --- MODO LOGIN ---
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+                const fbUser = userCredential.user;
+                
+                const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+                const userData = userDoc.data() || {};
+
+                // Guardamos la sesión (la llave que busca menu.html)
+                localStorage.setItem('eduSolve_User', user); 
+                localStorage.setItem('user_name', user);
+                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+                localStorage.setItem('user_points', userData.puntos || 0);
+
+                if (remember) localStorage.setItem('remember_me', 'true');
+
+                window.location.href = 'menu.html';
+
+            } else {
+                // --- MODO REGISTRO ---
+                if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
+
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
+                
+                // Guardamos los datos iniciales en la nube
+                await firebase.firestore().collection("usuarios").doc(userCredential.user.uid).set({
+                    n: user,
+                    rango: "Estudiante",
+                    puntos: 50, // Bono de bienvenida
+                    creado: new Date().toISOString()
+                });
+
+                localStorage.setItem('eduSolve_User', user); 
+                localStorage.setItem('alonixz_v35_nube', 'true'); 
+
+                alert("¡Bienvenido a la Nube Alonixz! Tu cuenta ha sido creada.");
+                window.location.href = 'menu.html';
+            }
+        } catch (error) {
+            console.error("Error en Auth:", error.code);
+            const errors = {
+                'auth/operation-not-allowed': "⚠️ Debes activar Email/Password en la consola de Firebase.",
+                'auth/invalid-email': "⚠️ El nombre de usuario contiene caracteres prohibidos.",
+                'auth/email-already-in-use': "⚠️ Este usuario ya está registrado en la nube.",
+                'auth/wrong-password': "❌ Contraseña incorrecta.",
+                'auth/user-not-found': "❌ El usuario no existe en la base de datos."
+            };
+            alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
+        }
     }
-}
 </script>
 
 </body>
