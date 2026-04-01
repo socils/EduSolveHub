@@ -8,8 +8,8 @@ var firebaseConfig = {
   appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
 };
 
-// ESTA ES LA LÍNEA QUE FALTA O NO SE ESTÁ EJECUTANDO:
+// Inicialización global para Alonixz-Group
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
-    console.log("✅ Alonixz-Cloud: App Inicializada");
+    console.log("✅ Configuración cargada: App [DEFAULT] creada.");
 }
