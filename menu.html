@@ -1528,15 +1528,15 @@ function ejecutarMigracionFinal() {
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_pass');
     
-    // 2. NO borramos la foto (asumo que se llama 'user_pfp' o 'foto_perfil')
-    // localStorage.removeItem('user_pfp'); <-- Esta línea NO existe para no borrarla.
-
-    // 3. Marcamos que el usuario ya vio el aviso y aceptó migrar
+    // 2. Marcamos que el proceso de la v3.5 ha iniciado
     localStorage.setItem('alonixz_v35_nube', 'pending');
 
-    // 4. Redirigimos al formulario de registro
-    alert("Acceso local eliminado. Por favor, crea tu cuenta nueva en el formulario.");
-    location.reload(); 
+    // 3. Alerta profesional para tus compañeros
+    alert("🚀 ¡Acceso local eliminado! Redirigiendo al Registro en la Nube...");
+
+    // 4. REDIRECCIÓN FORZADA a index.html
+    // Usamos el path relativo para asegurar que encuentre el archivo
+    window.location.href = 'index.html'; 
 }
 </script>
 <script>
