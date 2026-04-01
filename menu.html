@@ -1457,6 +1457,86 @@ function cerrarYGuardarPreferencias() {
     // Cerramos el modal
     const modal = document.getElementById('evento-actualizacion-v34');
     if (modal) modal.remove();
+};window.addEventListener('load', () => {
+    // 1. Verificamos si el usuario ya migró a la nube
+    const yaMigrado = localStorage.getItem('alonixz_v35_nube');
+    const usuarioLocal = localStorage.getItem('user_name');
+
+    // Solo lanzamos el evento si el usuario tiene nombre local pero NO ha migrado
+    if (yaMigrado === 'true' || !usuarioLocal) {
+        return; 
+    }
+
+    // 2. Esperamos los 8 segundos para el impacto visual
+    setTimeout(() => {
+        console.log("🚀 Lanzando Notificación: MIGRACIÓN NUBE 3.5...");
+
+        const modal = document.createElement('div');
+        modal.id = 'evento-migracion-v35';
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(8px); transition: all 0.5s;";
+
+        modal.innerHTML = `
+            <div style="background:#ffffff; width:92%; max-width:440px; border-radius:20px; overflow:hidden; border:1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); font-family: 'Segoe UI', system-ui, sans-serif; animation: slideUp 0.4s ease-out;">
+                
+                <div style="background:#2563eb; padding:20px; text-align:center;">
+                    <h2 style="color:white; margin:0; font-size:13px; letter-spacing:2px; text-transform:uppercase; font-weight:900;">⚠️ ACCIÓN REQUERIDA • V3.5 NUBE</h2>
+                </div>
+
+                <div style="background:#f8fafc; width:100%; height:200px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #e2e8f0;">
+                    <img src="actualizacion5.png" alt="Update Alonixz 3.5" style="max-width:100%; max-height:100%; object-fit:contain;">
+                </div>
+
+                <div style="padding:30px;">
+                    <h3 style="color:#1e293b; margin:0 0 10px 0; font-size:20px; font-weight:800;">Tus datos ahora en la Nube</h3>
+                    <p style="color:#64748b; font-size:13px; line-height:1.6; margin-bottom:20px;">
+                        Para activar la <b>v3.5</b>, eliminaremos tu acceso local. Deberás registrarte de nuevo para que tus puntos y tareas se guarden en <b>Alonixz-Cloud</b>.
+                    </p>
+                    
+                    <div style="background:#eff6ff; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #dbeafe;">
+                        <ul style="margin:0; padding-left:15px; color:#1e40af; font-size:12px; list-style-type: '☁️'; line-height:1.8;">
+                            <li><b>Seguridad:</b> Accede desde cualquier dispositivo.</li>
+                            <li><b>Bono:</b> +50 Puntos de regalo por migración.</li>
+                            <li><b>Perfil:</b> Tu foto se mantendrá intacta.</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="ejecutarMigracionFinal()" 
+                            style="background:#2563eb; color:white; border:none; width:100%; padding:16px; cursor:pointer; font-weight:800; border-radius:12px; font-size:15px; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.4); transition: 0.3s;">
+                        REGISTRARME EN LA NUBE 🚀
+                    </button>
+
+                    <div style="text-align:center; margin-top:20px; opacity: 0.5;">
+                        <span style="font-size:9px; color:#94a3b8; font-weight:bold; letter-spacing:2px;">ALONIXZ-GROUP • SISTEMA DE GESTIÓN NUBE</span>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+            </style>
+        `;
+
+        document.body.appendChild(modal);
+
+    }, 8000); 
+});
+
+// FUNCIÓN MAESTRA DE MIGRACIÓN
+function ejecutarMigracionFinal() {
+    console.log("🧹 Ejecutando limpieza de Alonixz-ID Local...");
+    
+    // 1. Borramos el acceso viejo (Nombre y Pass)
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_pass');
+    
+    // 2. NO borramos la foto (asumo que se llama 'user_pfp' o 'foto_perfil')
+    // localStorage.removeItem('user_pfp'); <-- Esta línea NO existe para no borrarla.
+
+    // 3. Marcamos que el usuario ya vio el aviso y aceptó migrar
+    localStorage.setItem('alonixz_v35_nube', 'pending');
+
+    // 4. Redirigimos al formulario de registro
+    alert("Acceso local eliminado. Por favor, crea tu cuenta nueva en el formulario.");
+    location.reload(); 
 }
 </script>
 <script>
