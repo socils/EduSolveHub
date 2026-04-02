@@ -582,21 +582,31 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (mensaje === "") return;
 
+    // Obtención de identidad (Priorizando user_name o eduSolve_User)
     const nombreReal = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || "Invitado";
     const fotoReal = localStorage.getItem('user_photo_base64') || null;
 
+    // Referencia y envío a Firebase
     const chatRef = db.ref('mensajes').push();
     chatRef.set({
         user: nombreReal,
         text: mensaje,
         photo: fotoReal,
+        // Captura de tiempo exacta en formato 24h o 12h según sistema
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
     }).then(() => {
-        if(sonidoEnvio) sonidoEnvio.play().catch(e => console.log("Audio bloqueado"));
+        // Feedback de audio (Si está definido)
+        if(sonidoEnvio) {
+            sonidoEnvio.play().catch(e => console.log("Audio bloqueado por el navegador"));
+        }
+        
+        // Limpieza y foco del input
         input.value = ""; 
         input.focus();
-    }).catch((error) => console.error("Error al enviar:", error));
+    }).catch((error) => {
+        console.error("Error crítico al enviar a Firebase:", error);
+    });
 }
 </script><script>
 // --- FUNCIÓN PARA ESCUCHAR EL CHAT EN TIEMPO REAL ---
@@ -615,21 +625,36 @@ function escucharChat() {
             const m = data[id];
             const esMio = m.user === miNombre;
 
+            // Lógica de Avatar
             let avatarHtml = m.photo && m.photo !== "null" 
                 ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
                 : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user ? m.user.charAt(0).toUpperCase() : '?'}</div>`;
 
+            // Renderizado con Nombre y Hora
             box.innerHTML += `
-                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px; width: 100%;">
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:12px; width: 100%;">
                     ${avatarHtml}
-                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'}; max-width: 70%;">
-                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #f1f5f9; font-size:14px; word-wrap: break-word;">
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'}; max-width: 75%;">
+                        
+                        <!-- NOMBRE DEL USUARIO AGREGADO AQUÍ -->
+                        <span style="font-size:10px; color:#64748b; margin-bottom:2px; font-weight:bold; margin-${esMio ? 'right' : 'left'}:5px;">
+                            ${m.user}
+                        </span>
+
+                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #f1f5f9; font-size:14px; word-wrap: break-word; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                             ${m.text}
                         </div>
-                        <small style="font-size:9px; color:#94a3b8; margin-top:2px;">${m.time}</small>
+
+                        <!-- HORA Y MINUTOS -->
+                        <small style="font-size:9px; color:#94a3b8; margin-top:3px;">
+                            ${m.time || '--:--'}
+                        </small>
+
                     </div>
                 </div>`;
         });
+        
+        // Auto-scroll al último mensaje
         box.scrollTop = box.scrollHeight;
     });
 }
