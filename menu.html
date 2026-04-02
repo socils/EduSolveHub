@@ -949,67 +949,42 @@ function limpiarTodo() {
 // --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
 
 function enviarMensaje() {
-
     const input = document.getElementById('chat-input');
-
     const mensaje = input.value.trim();
 
+    // 1. OBTENER EL USUARIO ACTUAL DE FIREBASE
+    // firebase.auth().currentUser es la forma más segura de saber quién está logueado
+    const userAuth = firebase.auth().currentUser;
 
-
-    // 1. BUSCAR EL NOMBRE REAL (Probamos todas las opciones)
-
-    const nombreReal = localStorage.getItem('user_name') || 
-
+    // 2. DEFINIR NOMBRE Y FOTO (Prioridad: Firebase > LocalStorage > Invitado)
+    const nombreReal = userAuth?.displayName || 
+                       localStorage.getItem('user_name') || 
                        localStorage.getItem('active_user') || 
-
-                       sessionStorage.getItem('active_user') || 
-
                        "Invitado";
 
-
-
-    // 2. BUSCAR LA FOTO REAL
-
-    const fotoReal = localStorage.getItem('user_photo_base64') || null;
-
-
+    const fotoReal = userAuth?.photoURL || 
+                     localStorage.getItem('user_photo_base64') || 
+                     null;
 
     // Si no hay mensaje, no hacemos nada
-
     if (mensaje === "") return;
 
-
-
     // 3. ENVIAR A FIREBASE
-
     const chatRef = db.ref('mensajes').push();
-
     chatRef.set({
-
-        user: nombreReal,     // Aquí ya no dirá "Invitado" si el login funcionó
-
+        user: nombreReal,
         text: mensaje,
-
-        photo: fotoReal,     // Enviamos la foto guardada
-
+        photo: fotoReal,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-
-        timestamp: Date.now()
-
+        timestamp: Date.now(),
+        uid: userAuth ? userAuth.uid : null // Tip: Guardar el ID del usuario ayuda mucho después
     }).then(() => {
-
-        input.value = ""; // Limpiar el cuadro
-
+        input.value = ""; 
         console.log("Mensaje enviado por: " + nombreReal);
-
     }).catch((error) => {
-
         console.error("Error al enviar:", error);
-
     });
-
 }
-
 // 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
 
 ;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
