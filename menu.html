@@ -949,24 +949,27 @@ function limpiarTodo() {
 // --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
 
 // 1. Pre-cargar el sonido (asegúrate de tener el archivo en esa ruta)
-const sonidoEnvio = new Audio('audio/send-sound.mp3'); 
+// --- 1. CONFIGURACIÓN DE SONIDOS ---
+const sonidoEnvio = new Audio('audio/send-sound.mp3');
+const sonidoMensaje = new Audio('audio/notificacion.mp3'); // Para cuando recibes uno
 
+// --- 2. FUNCIÓN PARA ENVIAR ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
-    const mensaje = input.value.trim();
+    if (!input) return;
 
+    const mensaje = input.value.trim();
     if (mensaje === "") return;
 
-    // Obtener usuario de Firebase o fallback a LocalStorage
     const userAuth = firebase.auth().currentUser;
     
+    // Prioridad de nombre y foto
     const nombreReal = (userAuth && userAuth.displayName) ? userAuth.displayName : 
                        (localStorage.getItem('user_name') || "Invitado");
 
     const fotoReal = (userAuth && userAuth.photoURL) ? userAuth.photoURL : 
                      (localStorage.getItem('user_photo_base64') || null);
 
-    // 2. ENVIAR A FIREBASE
     const chatRef = db.ref('mensajes').push();
     chatRef.set({
         user: nombreReal,
@@ -975,144 +978,73 @@ function enviarMensaje() {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
     }).then(() => {
-        // 3. Reproducir sonido y limpiar input
-        sonidoEnvio.play().catch(err => console.log("Error al reproducir sonido:", err));
+        sonidoEnvio.play().catch(e => console.log("Audio bloqueado"));
         input.value = ""; 
-        input.focus(); // Mantiene el cursor en el cuadro de texto
-    }).catch((error) => {
-        console.error("Error al enviar:", error);
+        input.focus();
+    }).catch((error) => console.error("Error al enviar:", error));
+}
+
+// --- 3. ESCUCHAR TECLA ENTER ---
+// Usamos una comprobación para evitar el error de "null" si el input no ha cargado
+document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                enviarMensaje();
+            }
+        });
+    }
+});
+
+// --- 4. ESCUCHAR EL CHAT Y MOSTRAR MENSAJES ---
+function escucharChat() {
+    const box = document.getElementById('chat-box');
+    if (!box) return;
+
+    console.log("Conectando al chat de Firebase...");
+
+    db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+            box.innerHTML = "<p style='text-align:center; color:gray;'>No hay mensajes aún.</p>";
+            return;
+        }
+
+        box.innerHTML = ""; 
+        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
+
+        Object.keys(data).forEach(id => {
+            const m = data[id];
+            const esMio = m.user === miNombre;
+            
+            // Lógica de Avatar mejorada
+            let avatarHtml = m.photo && m.photo !== "null" 
+                ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
+                : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user ? m.user.charAt(0).toUpperCase() : '?'}</div>`;
+
+            box.innerHTML += `
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
+                    ${avatarHtml}
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
+                        <small style="font-size:10px; color:gray;">${m.user}</small>
+                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            ${m.text}
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        box.scrollTop = box.scrollHeight;
+        // Sonido opcional al recibir mensaje (descomentar si quieres)
+        // sonidoMensaje.play().catch(() => {});
+    }, (error) => {
+        console.error("Error de Firebase:", error);
     });
 }
 
-// 4. LOGICA PARA LA TECLA ENTER
-document.getElementById('chat-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        enviarMensaje();
-    }
-}); 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
-
-;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
-
-function escucharChat() {// BUSCA ESTA PARTE EN TU CÓDIGO ACTUAL:
-
-db.ref('mensajes').on('child_added', (snapshot) => {
-
-    const datos = snapshot.val();
-
-    
-
-    // --- AQUÍ PEGAS LA MEJORA ---
-
-    sonidoMensaje.play().catch(e => console.log("Esperando interacción para sonar..."));
-
-    // ----------------------------
-
-
-
-    // Aquí sigue tu código normal para mostrar el mensaje en pantalla...
-
-    
-
-});
-
-    console.log("Intentando conectar al chat de Firebase...");
-
-
-
-    db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
-
-        const data = snapshot.val();
-
-        const box = document.getElementById('chat-box');
-
-
-
-        if (!box) {
-
-            console.error("❌ ERROR: No se encontró el elemento 'chat-box' en el HTML");
-
-            return;
-
-        }
-
-
-
-        if (!data) {
-
-            console.log("☁️ Conectado, pero el chat está vacío.");
-
-            box.innerHTML = "<p style='text-align:center; color:gray;'>No hay mensajes aún.</p>";
-
-            return;
-
-        }
-
-
-
-        console.log("📩 Mensajes recibidos:", data); // Esto debe salir en F12
-
-        box.innerHTML = ""; 
-
-
-
-        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
-
-
-
-        Object.keys(data).forEach(id => {
-
-            const m = data[id];
-
-            const esMio = m.user === miNombre;
-
-            
-
-            // Lógica de Avatar
-
-            let avatarHtml = m.photo && m.photo !== "null" 
-
-                ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
-
-                : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user.charAt(0).toUpperCase()}</div>`;
-
-
-
-            box.innerHTML += `
-
-                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
-
-                    ${avatarHtml}
-
-                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
-
-                        <small style="font-size:10px; color:gray;">${m.user}</small>
-
-                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px;">
-
-                            ${m.text}
-
-                        </div>
-
-                    </div>
-
-                </div>`;
-
-        });
-
-        
-
-        box.scrollTop = box.scrollHeight; // Auto-bajar
-
-    }, (error) => {
-
-        console.error("❌ Error de Firebase:", error);
-
-    });// --- FUNCIÓN DE RANGO (FUNDADOR) ---
-
-// --- SISTEMA DE CONTROL DE FUNDADOR ---
-
-
-
+// Iniciar la escucha
+escucharChat();
 window.verificarRango = function() {
 
     console.log("Iniciando escaneo de rango...");
