@@ -948,44 +948,48 @@ function limpiarTodo() {
 
 // --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
 
+// 1. Pre-cargar el sonido (asegúrate de tener el archivo en esa ruta)
+const sonidoEnvio = new Audio('audio/send-sound.mp3'); 
+
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     const mensaje = input.value.trim();
 
-    // 1. OBTENER EL USUARIO ACTUAL DE FIREBASE
-    // firebase.auth().currentUser es la forma más segura de saber quién está logueado
-    const userAuth = firebase.auth().currentUser;
-
-    // 2. DEFINIR NOMBRE Y FOTO (Prioridad: Firebase > LocalStorage > Invitado)
-    const nombreReal = userAuth?.displayName || 
-                       localStorage.getItem('user_name') || 
-                       localStorage.getItem('active_user') || 
-                       "Invitado";
-
-    const fotoReal = userAuth?.photoURL || 
-                     localStorage.getItem('user_photo_base64') || 
-                     null;
-
-    // Si no hay mensaje, no hacemos nada
     if (mensaje === "") return;
 
-    // 3. ENVIAR A FIREBASE
+    // Obtener usuario de Firebase o fallback a LocalStorage
+    const userAuth = firebase.auth().currentUser;
+    
+    const nombreReal = (userAuth && userAuth.displayName) ? userAuth.displayName : 
+                       (localStorage.getItem('user_name') || "Invitado");
+
+    const fotoReal = (userAuth && userAuth.photoURL) ? userAuth.photoURL : 
+                     (localStorage.getItem('user_photo_base64') || null);
+
+    // 2. ENVIAR A FIREBASE
     const chatRef = db.ref('mensajes').push();
     chatRef.set({
         user: nombreReal,
         text: mensaje,
         photo: fotoReal,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now(),
-        uid: userAuth ? userAuth.uid : null // Tip: Guardar el ID del usuario ayuda mucho después
+        timestamp: Date.now()
     }).then(() => {
+        // 3. Reproducir sonido y limpiar input
+        sonidoEnvio.play().catch(err => console.log("Error al reproducir sonido:", err));
         input.value = ""; 
-        console.log("Mensaje enviado por: " + nombreReal);
+        input.focus(); // Mantiene el cursor en el cuadro de texto
     }).catch((error) => {
         console.error("Error al enviar:", error);
     });
 }
-// 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
+
+// 4. LOGICA PARA LA TECLA ENTER
+document.getElementById('chat-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        enviarMensaje();
+    }
+}); 1. Identificamos los elementos (Asegúrate de que los IDs coincidan con tu HTML)
 
 ;// --- ESCUCHAR CHAT Y MOSTRAR FOTOS ---
 
