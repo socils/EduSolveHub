@@ -428,290 +428,123 @@ body.dark-mode .maintenance-ribbon {
     }
 </style>
 
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
+ <!-- Carga de Librerías Firebase v8.10.1 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-
-
 <script>
-
 (function guardianSincronizado() {
-
     // 1. Ocultar el menú de inmediato (Estilo Flat)
-
     document.body.style.display = "none";
-
-
 
     console.log("🛡️ Alonixz-Group: Verificando identidad...");
 
-
-
     // 2. Dar 5 segundos de gracia para que cargue la memoria
-
     setTimeout(() => {
-
         // Buscamos en ambos almacenamientos
-
         const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
-
-
 
         console.log("🔍 Usuario detectado:", user);
 
-
-
         // 3. Si no existe o es el "Invitado" fantasma, fuera.
-
         if (!user || user === "" || user.toLowerCase() === "invitado") {
-
             console.error("❌ Acceso denegado.");
-
             alert("⚠️ Sesión no válida. Regresando al Index...");
-
             window.location.href = 'index.html';
-
         } else {
-
             // 4. ¡Acceso concedido!
-
             console.log("✅ Bienvenido a EduSolve, " + user);
+            
+            // Forzamos que el cuerpo sea visible
+            document.body.style.display = "block"; 
+            
+            // Si usaste opacity: 0, actívalo con un efecto suave
+            document.body.style.opacity = "1";
+            document.body.style.transition = "opacity 0.5s ease-in";
 
-// 1. Forzamos que el cuerpo sea visible
-
-    document.body.style.display = "block"; 
-
-    
-
-    // 2. Si usaste opacity: 0, actívalo con un efecto suave
-
-    document.body.style.opacity = "1";
-
-    document.body.style.transition = "opacity 0.5s ease-in";
-
-
-
-    // 3. OPCIONAL: Si tienes un contenedor principal (ej: <div id="app">)
-
-    const mainApp = document.getElementById('main-container');
-
-    if(mainApp) mainApp.style.visibility = "visible";
-
+            // OPCIONAL: Si tienes un contenedor principal
+            const mainApp = document.getElementById('main-container');
+            if(mainApp) mainApp.style.visibility = "visible";
         }
-
     }, 5000); 
-
 })();
 
-    // Cargamos el sonido en la memoria
-
+// 1. CONFIGURACIÓN DE SONIDOS
+const sonidoEnvio = new Audio('audio/send-sound.mp3');
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 
-// 2. CONFIGURACIÓN DE TU PROYECTO
-
+// 2. CONFIGURACIÓN DE TU PROYECTO FIREBASE
 const firebaseConfig = {
-
   apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
-
   authDomain: "edusolve-947c1.firebaseapp.com",
-
   projectId: "edusolve-947c1",
-
   storageBucket: "edusolve-947c1.firebasestorage.app",
-
   messagingSenderId: "1089784819674",
-
   appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
-
 };
 
-
-
-// 3. INICIALIZAR (Sin usar 'import')
-
-firebase.initializeApp(firebaseConfig);
-
+// 3. INICIALIZAR FIREBASE
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.database();
-
-
-
+</script><script>
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
-
-
 function actualizarHeader() {
-
     // 1. Buscamos el nombre real en la memoria del navegador
-
     const nombre = localStorage.getItem('user_name') || 
-
                    localStorage.getItem('eduSolve_User') || 
-
                    localStorage.getItem('active_user') || 
-
-                   "Usuario"; // Si no encuentra nada, usa "Usuario"
-
-
+                   "Usuario";
 
     console.log("👤 Cargando perfil para: " + nombre);
 
-
-
     // 2. Actualizamos el nombre principal
-
     const welcomeName = document.getElementById('welcome-name');
-
     if (welcomeName) {
-
         welcomeName.innerText = nombre;
-
-    } else {
-
-        console.error("❌ No encontré el ID 'welcome-name'");
-
     }
-
-
 
     // 3. Actualizamos el @ (quitando espacios y poniendo minúsculas)
-
     const userFullName = document.getElementById('user-full-name');
-
     if (userFullName) {
-
         const arroba = "@" + nombre.toLowerCase().replace(/\s/g, '');
-
         userFullName.innerText = arroba;
-
-    } else {
-
-        console.error("❌ No encontré el ID 'user-full-name'");
-
     }
-
-
 
     // 4. Actualizamos el Avatar (Foto o Inicial)
-
     const foto = localStorage.getItem('user_photo_base64');
-
     const avatar = document.getElementById('avatar-circle');
 
-
-
     if (avatar) {
-
         if (foto && foto !== "null" && foto !== "") {
-
-            // Si hay foto, la mostramos
-
             avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-
         } else {
-
-            // Si NO hay foto, mostramos la primera inicial en mayúscula
-
             const inicial = nombre.charAt(0).toUpperCase();
-
             avatar.innerHTML = `<span id="user-initial">${inicial}</span>`;
-
         }
-
-    } else {
-
-        console.error("❌ No encontré el ID 'avatar-circle'");
-
     }
-
 }
-
-
-
-// ¡IMPORTANTE! Forzamos la actualización al cargar la página
-
-window.addEventListener('load', () => {
-
-    actualizarHeader();
-
-});
-
-
-
-// ¡IMPORTANTE! Llama a la función apenas cargue la página
-
-window.onload = actualizarHeader;
 
 // Función para el menú
-
 function toggleUserMenu() {
-
     const menu = document.getElementById('user-menu');
-
-    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-
+    if(menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
 }
 
-
-
-// Función de Cerrar Sesión
-
+// Función de Cerrar Sesión (Limpieza de eduSolve_User)
 function logout() {
-
     if(confirm("¿Cerrar sesión en EduSolve PRO?")) {
-
         localStorage.removeItem('user_name');
-
+        localStorage.removeItem('eduSolve_User');
         localStorage.removeItem('active_user');
-
         sessionStorage.removeItem('active_user');
-
         location.href = 'index.html';
-
     }
-
 }
 
-
-
-// --- PANEL ADMIN (10 CLICS) ---
-
-let contadorAdmin = 0;
-
-let tiempoEspera;
-
-
-
-function activacionSecreta() {
-
-    clearTimeout(tiempoEspera);
-
-    contadorAdmin++;
-
-    if (contadorAdmin === 10) {
-
-        document.getElementById('admin-panel').style.display = 'flex';
-
-        contadorAdmin = 0;
-
-        alert("🛠️ Modo Administrador Activado");
-
-    }
-
-    tiempoEspera = setTimeout(() => { contadorAdmin = 0; }, 2000);
-
-}
-
-
-
-// --- FUNCIONES DE FIREBASE (NOTICIAS) ---
-
-
-
-// --- FUNCIÓN PARA EL MENÚ DE ALUMNOS ---
-
-// --- FUNCIÓN PARA EL MENÚ DE ALUMNOS ---
-
+// --- FUNCIÓN PARA EL MENÚ DE ALUMNOS (NOTICIAS) ---
 function escucharNoticias() {
     db.ref('noticias').on('value', (snapshot) => {
         const contenedor = document.getElementById('news-container');
@@ -727,7 +560,6 @@ function escucharNoticias() {
         const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
 
         lista.forEach(n => {
-            // Si está completado, guardamos el check en una variable
             const checkIcon = n.completado ? '<span style="color:#22c55e; margin-left:5px;">✅</span>' : '';
 
             contenedor.innerHTML += `
@@ -740,220 +572,9 @@ function escucharNoticias() {
                 </div>`;
         });
     });
-};
-
-
-
-// --- EJECUCIÓN AL CARGAR LA PÁGINA ---
-
-window.onload = function() {
-
-    actualizarHeader();
-
-    escucharNoticias();
-
-    // Vinculamos el clic secreto al avatar
-
-    document.getElementById('avatar-circle').addEventListener('click', activacionSecreta);
-
-};
-
-
-
-// Cerrar menú al hacer clic fuera
-
-window.onclick = function(event) {
-
-    if (!event.target.closest('#avatar-circle') && !event.target.closest('#user-menu')) {
-
-        const menu = document.getElementById('user-menu');
-
-        if(menu) menu.style.display = 'none';
-
-    }
-
-}// --- FUNCIONES DEL PANEL ADMINISTRADOR ---
-
-
-
-// 1. Cerrar el panel
-
-function cerrarAdmin() {
-
-    document.getElementById('admin-panel').style.display = 'none';
-
-    document.getElementById('admin-output').style.display = 'none';
-
 }
 
-
-
-// 2. Ver usuarios registrados en este navegador
-
-function verUsuarios() {
-
-    const usuarios = JSON.parse(localStorage.getItem('edusolve_users')) || [];
-
-    const output = document.getElementById('admin-output');
-
-    output.style.display = 'block';
-
-    
-
-    if (usuarios.length === 0) {
-
-        output.innerHTML = "> No hay usuarios locales.";
-
-    } else {
-
-        output.innerHTML = "<b>Usuarios Locales:</b><br>" + 
-
-            usuarios.map(u => `• ${u.n} (Pass: ${u.p})`).join("<br>");
-
-    }
-
-}
-
-
-
-// 3. Ver y borrar noticias de la NUBE (Firebase)
-
-function verNoticiasEnConsola() {
-
-    const output = document.getElementById('admin-output');
-
-    output.style.display = 'block';
-
-    output.innerHTML = "Conectando a Firebase...";
-
-
-
-    // Usamos la variable 'db' que ya inicializaste arriba
-
-    db.ref('noticias').once('value', (snapshot) => {
-
-        const data = snapshot.val();
-
-        if (!data) {
-
-            output.innerHTML = "> La nube está vacía.";
-
-            return;
-
-        }
-
-
-
-        let html = "<b>Editor de Nube (Firebase):</b><br>";
-
-        Object.keys(data).reverse().forEach(id => {
-
-            const n = data[id];
-
-            html += `
-
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:8px; border-radius:8px; margin-top:5px; border:1px solid #334155;">
-
-                    <span style="font-size:10px; color:#94a3b8;">${n.titulo.substring(0,15)}...</span>
-
-                    <button onclick="eliminarNoticia('${id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:5px; cursor:pointer; font-size:10px;">BORRAR</button>
-
-                </div>`;
-
-        });
-
-        output.innerHTML = html;
-
-    });
-
-}
-
-
-
-// 4. Función para borrar físicamente de Firebase
-
-function eliminarNoticia(id) {
-
-    if(confirm("¿Eliminar esta noticia de la nube para todos?")) {
-
-        db.ref('noticias/' + id).remove()
-
-        .then(() => {
-
-            alert("Noticia eliminada.");
-
-            verNoticiasEnConsola(); // Refrescar la lista
-
-        })
-
-        .catch(err => alert("Error: " + err.message));
-
-    }
-
-}
-
-
-
-// 5. Reset total del dispositivo
-
-function limpiarTodo() {
-
-    if(confirm("⚠️ ADVERTENCIA: Se borrarán todos tus datos locales (incluyendo tu sesión). ¿Continuar?")) {
-
-        localStorage.clear();
-
-        sessionStorage.clear();
-
-        location.href = 'index.html'; // Te manda al nuevo Login
-
-    }
-
-}function publicarNoticia() {
-
-    const titulo = document.getElementById('news-title').value.trim();
-
-    const tag = document.getElementById('news-tag').value;
-
-    
-
-    if(!titulo) return alert("Escribe el tema");
-
-
-
-    // Guardar en Firebase
-
-    const nuevaNoticiaRef = db.ref('noticias').push();
-
-    nuevaNoticiaRef.set({
-
-        titulo: titulo,
-
-        tag: tag,
-
-        fecha: new Date().toLocaleDateString(),
-
-        autor: sessionStorage.getItem('active_user') || "Admin",
-
-        timestamp: Date.now()
-
-    }).then(() => {
-
-        document.getElementById('news-title').value = "";
-
-        alert("¡Publicado en la nube para todos!");
-
-    }).catch(err => alert("Error: " + err.message));
-
-}
-
-// --- FUNCIÓN PARA ENVIAR MENSAJE CON FOTO ---
-
-// 1. Pre-cargar el sonido (asegúrate de tener el archivo en esa ruta)
-// --- 1. CONFIGURACIÓN DE SONIDOS ---
-const sonidoEnvio = new Audio('audio/send-sound.mp3');
-const sonidoMensaje = new Audio('audio/notificacion.mp3'); // Para cuando recibes uno
-
-// --- 2. FUNCIÓN PARA ENVIAR ---
+// --- FUNCIÓN PARA ENVIAR MENSAJE ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     if (!input) return;
@@ -961,14 +582,8 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (mensaje === "") return;
 
-    const userAuth = firebase.auth().currentUser;
-    
-    // Prioridad de nombre y foto
-    const nombreReal = (userAuth && userAuth.displayName) ? userAuth.displayName : 
-                       (localStorage.getItem('user_name') || "Invitado");
-
-    const fotoReal = (userAuth && userAuth.photoURL) ? userAuth.photoURL : 
-                     (localStorage.getItem('user_photo_base64') || null);
+    const nombreReal = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || "Invitado";
+    const fotoReal = localStorage.getItem('user_photo_base64') || null;
 
     const chatRef = db.ref('mensajes').push();
     chatRef.set({
@@ -978,550 +593,128 @@ function enviarMensaje() {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
     }).then(() => {
-        sonidoEnvio.play().catch(e => console.log("Audio bloqueado"));
+        if(sonidoEnvio) sonidoEnvio.play().catch(e => console.log("Audio bloqueado"));
         input.value = ""; 
         input.focus();
     }).catch((error) => console.error("Error al enviar:", error));
 }
-
-// --- 3. ESCUCHAR TECLA ENTER ---
-// Usamos una comprobación para evitar el error de "null" si el input no ha cargado
-document.addEventListener('DOMContentLoaded', () => {
-    const chatInput = document.getElementById('chat-input');
-    if (chatInput) {
-        chatInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                enviarMensaje();
-            }
-        });
-    }
-});
-
-// --- 4. ESCUCHAR EL CHAT Y MOSTRAR MENSAJES ---
+</script><script>
+// --- FUNCIÓN PARA ESCUCHAR EL CHAT EN TIEMPO REAL ---
 function escucharChat() {
     const box = document.getElementById('chat-box');
     if (!box) return;
 
-    console.log("Conectando al chat de Firebase...");
-
     db.ref('mensajes').limitToLast(20).on('value', (snapshot) => {
         const data = snapshot.val();
-        if (!data) {
-            box.innerHTML = "<p style='text-align:center; color:gray;'>No hay mensajes aún.</p>";
-            return;
-        }
+        if (!data) return;
 
         box.innerHTML = ""; 
-        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('active_user');
+        const miNombre = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User');
 
         Object.keys(data).forEach(id => {
             const m = data[id];
             const esMio = m.user === miNombre;
-            
-            // Lógica de Avatar mejorada
+
             let avatarHtml = m.photo && m.photo !== "null" 
                 ? `<img src="${m.photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">`
                 : `<div style="width:30px; height:30px; border-radius:50%; background:#94a3b8; color:white; display:flex; align-items:center; justify-content:center; font-size:10px;">${m.user ? m.user.charAt(0).toUpperCase() : '?'}</div>`;
 
             box.innerHTML += `
-                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px;">
+                <div style="display:flex; flex-direction:${esMio ? 'row-reverse' : 'row'}; align-items:flex-end; gap:8px; margin-bottom:10px; width: 100%;">
                     ${avatarHtml}
-                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'};">
-                        <small style="font-size:10px; color:gray;">${m.user}</small>
-                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #eee; font-size:14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                    <div style="display:flex; flex-direction:column; align-items:${esMio ? 'flex-end' : 'flex-start'}; max-width: 70%;">
+                        <div style="background:${esMio ? '#2563eb' : 'white'}; color:${esMio ? 'white' : 'black'}; padding:8px 12px; border-radius:12px; border:1px solid #f1f5f9; font-size:14px; word-wrap: break-word;">
                             ${m.text}
                         </div>
+                        <small style="font-size:9px; color:#94a3b8; margin-top:2px;">${m.time}</small>
                     </div>
                 </div>`;
         });
-
         box.scrollTop = box.scrollHeight;
-        // Sonido opcional al recibir mensaje (descomentar si quieres)
-        // sonidoMensaje.play().catch(() => {});
-    }, (error) => {
-        console.error("Error de Firebase:", error);
     });
 }
 
-// Iniciar la escucha
-escucharChat();
-window.verificarRango = function() {
-
-    console.log("Iniciando escaneo de rango...");
-
-    
-
-    // Extraer nombre de todas las fuentes posibles
-
-    var n1 = localStorage.getItem('user_name');
-
-    var n2 = localStorage.getItem('active_user');
-
-    var n3 = sessionStorage.getItem('active_user');
-
-    
-
-    var nombreDetectado = (n1 || n2 || n3 || "").toLowerCase().trim();
-
-    var botonAdmin = document.getElementById('admin-btn-auto');
-
-
-
-    if (botonAdmin) {
-
-        if (nombreDetectado === "alonso") {
-
-            botonAdmin.style.display = "block";
-
-            console.log("✅ Acceso de Fundador detectado: Hola Alonso");
-
-        } else {
-
-            botonAdmin.style.display = "none";
-
-            console.log("Acceso denegado para: " + nombreDetectado);
-
-        }
-
-    } else {
-
-        console.error("No se encontró el botón 'admin-btn-auto' en el HTML");
-
-    }
-
-};
-
-
-
-window.abrirPanelAdmin = function() {
-
-    var panel = document.getElementById('admin-panel');
-
-    if (panel) {
-
-        panel.style.display = 'flex';
-
-    } else {
-
-        alert("Error: El panel con ID 'admin-panel' no existe.");
-
-    }
-
-};
-
-
-
-// --- FUNCIÓN PARA EL CLIC DEL BOTÓN ---
-
-function abrirPanelAdmin() {
-
-    var panel = document.getElementById('admin-panel');
-
-    if (panel) {
-
-        panel.style.display = 'flex';
-
-    } else {
-
-        alert("Error: No se encontró el panel con ID 'admin-panel'");
-
-    }
-
-}
-
-// Función para abrir el panel que ya tenías
-
-function abrirPanelAdmin() {
-
-    document.getElementById('admin-panel').style.display = 'flex';
-
-}// NUEVA: Borrar el último mensaje del chat (por si alguien puso algo malo)
-
-function borrarUltimoMensaje() {
-
-    if(confirm("¿Borrar el último mensaje enviado al chat?")) {
-
-        db.ref('mensajes').limitToLast(1).once('value', snapshot => {
-
-            snapshot.forEach(child => {
-
-                child.ref.remove();
-
-            });
-
-            alert("Mensaje eliminado.");
-
-        });
-
-    }
-
-}
-
-
-
-// NUEVA: Mensaje de Sistema (Publicar como 'SISTEMA' en color rojo)
-
-function enviarAnuncioSistema() {
-
-    const anuncio = prompt("Escribe el anuncio global:");
-
-    if(!anuncio) return;
-
-
-
-    db.ref('mensajes').push({
-
-        user: "SISTEMA",
-
-        text: "⚠️ " + anuncio,
-
-        photo: "https://cdn-icons-png.flaticon.com/512/179/179386.png", // Icono de alerta
-
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-
-        timestamp: Date.now()
-
-    });
-
-}
-
-}// --- VINCULAR TECLA ENTER (VERSIÓN ALONIXZ-GROUP) ---
-
-window.addEventListener('load', function() {
-
-    // 1. Buscamos el cuadro de texto (probamos ambos IDs comunes)
-
-    const inputChat = document.getElementById('chat-input') || document.getElementById('message-input');
-
-    const btnEnviar = document.getElementById('send-btn') || document.querySelector('[onclick="enviarMensaje()"]');
-
-
-
-    if (inputChat) {
-
-        inputChat.addEventListener('keydown', function(e) {
-
-            if (e.key === 'Enter') {
-
-                e.preventDefault(); // Evita que se baje el cursor
-
-                
-
-                // Si existe el botón, le damos clic; si no, llamamos a la función directo
-
-                if (btnEnviar) {
-
-                    btnEnviar.click();
-
-                } else {
-
-                    enviarMensaje();
-
-                }
-
-            }
-
-        });
-
-        console.log("✅ Tecla Enter vinculada al elemento:", inputChat.id);
-
-    } else {
-
-        console.error("❌ No se encontró el cuadro de texto del chat. Revisa el ID en tu HTML.");
-
-    }
-
-    
-
-    // Ejecutar tus otras funciones originales
-
-    actualizarHeader();
-
-    escucharNoticias();
-
-    escucharChat();
-
-    setTimeout(() => { if(window.verificarRango) window.verificarRango(); }, 1000);
-
-});
-
-// Función para abrir el panel que ya tenías antes
-
-function buscarActualizaciones() {
-
-    const btn = document.getElementById('update-btn');
-
-    const textoOriginal = btn.innerHTML;
-
-    
-
-    btn.innerHTML = "🔍 Buscando...";
-
-    btn.style.opacity = "0.7";
-
-    btn.disabled = true;
-
-
+// --- MODAL DE ACTUALIZACIÓN v3.4 (AGENDA) ---
+function gestionarModalV34() {
+    if (localStorage.getItem('alonixz_v34_ocultar') === 'true') return;
 
     setTimeout(() => {
-
-        btn.innerHTML = "✅ Estás actualizado";
-
-        btn.style.background = "#dcfce7";
-
-        btn.style.color = "#166534";
-
-        btn.style.borderColor = "#bbf7d0";
-
-        
-
-        setTimeout(() => {
-
-            btn.innerHTML = textoOriginal;
-
-            btn.style.background = "#f1f5f9";
-
-            btn.style.color = "#475569";
-
-            btn.style.borderColor = "#e2e8f0";
-
-            btn.disabled = false;
-
-            btn.style.opacity = "1";
-
-        }, 3000);
-
-    }, 2000);
-
-    }
-
-;window.addEventListener('load', () => {
-    // 1. Verificamos si el usuario ya pidió no ver este aviso de la v3.4
-    const ocultarAviso = localStorage.getItem('alonixz_v34_ocultar');
-
-    if (ocultarAviso === 'true') {
-        console.log("🙈 El usuario eligió no volver a ver el anuncio de la v3.4");
-        return; // Detenemos todo, el modal no se crea
-    }
-
-    // 2. Si no lo ha ocultado, esperamos los 8 segundos
-    setTimeout(() => {
-        console.log("🚀 Lanzando Notificación: v3.4 YA ESTÁ AQUÍ...");
-
         const modal = document.createElement('div');
         modal.id = 'evento-actualizacion-v34';
         modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px);";
-
         modal.innerHTML = `
-            <div style="background:#ffffff; width:92%; max-width:440px; border-radius:15px; overflow:hidden; border:1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); font-family: 'Segoe UI', system-ui, sans-serif;">
-                
-                <div style="background:#27ae60; padding:20px; text-align:center;">
-                    <h2 style="color:white; margin:0; font-size:14px; letter-spacing:2px; text-transform:uppercase; font-weight:900;">✅ ACTUALIZACIÓN INSTALADA • V3.4</h2>
+            <div style="background:#ffffff; width:92%; max-width:440px; border-radius:15px; overflow:hidden; border:1px solid #e2e8f0;">
+                <div style="background:#27ae60; padding:20px; text-align:center;"><h2 style="color:white; margin:0; font-size:14px; letter-spacing:2px;">ACTUALIZACIÓN V3.4</h2></div>
+                <div style="padding:25px; text-align:center;">
+                    <h3 style="margin:0 0 10px 0;">¡Agenda Escolar Activada!</h3>
+                    <p style="font-size:12px; color:#64748b;">Gestiona tus tareas y comunicados oficiales desde el nuevo panel.</p>
+                    <button onclick="cerrarV34()" style="background:#27ae60; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:800; border-radius:10px;">¡ENTENDIDO! 🚀</button>
+                    <div style="text-align:center; margin-top:15px;"><input type="checkbox" id="check-no-mostrar"> <label for="check-no-mostrar" style="font-size:11px;">No volver a mostrar</label></div>
                 </div>
-
-                <div style="background:#fffcf5; width:100%; height:180px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #f9f0da;">
-                    <img src="actualizacion4.png" alt="Update Alonixz 3.4" style="max-width:100%; max-height:100%; object-fit:contain;">
-                </div>
-
-                <div style="padding:25px;">
-                    <h3 style="color:#2c3e50; margin:0 0 8px 0; font-size:18px; font-weight:800;">¡Agenda Escolar Activada!</h3>
-                    
-                    <div style="background:#f0fdf4; padding:12px; border-radius:12px; margin-bottom:15px; border:1px solid #dcfce7;">
-                        <ul style="margin:0; padding-left:15px; color:#166534; font-size:12px; list-style-type: '⚡'; line-height:1.8;">
-                            <li><b>Agenda Digital:</b> Gestión de tareas y exámenes.</li>
-                            <li><b>Notas Personales:</b> Espacio privado de apuntes.</li>
-                            <li><b>Comunicados:</b> Avisos oficiales en tiempo real.</li>
-                        </ul>
-                    </div>
-                    
-                    <button onclick="cerrarYGuardarPreferencias()" 
-                            style="background:#27ae60; color:white; border:none; width:100%; padding:14px; cursor:pointer; font-weight:800; border-radius:10px; font-size:14px; transition: 0.2s;">
-                        ¡ENTENDIDO, PROBAR AGENDA! 🚀
-                    </button>
-
-                    <div style="text-align:center; margin-top:15px; display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <input type="checkbox" id="check-no-mostrar" style="cursor:pointer;">
-                        <label for="check-no-mostrar" style="font-size:11px; color:#94a3b8; cursor:pointer; font-weight:bold;">No volver a mostrar este aviso</label>
-                    </div>
-                    
-                    <div style="text-align:center; margin-top:10px; opacity: 0.4;">
-                        <span style="font-size:8px; color:#94a3b8; font-weight:bold; letter-spacing:1px;">ALONIXZ-GROUP • AREQUIPA 2026</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
+            </div>`;
         document.body.appendChild(modal);
+    }, 8000);
+}
 
-    }, 8000); 
-});
+function cerrarV34() {
+    if (document.getElementById('check-no-mostrar').checked) localStorage.setItem('alonixz_v34_ocultar', 'true');
+    const m = document.getElementById('evento-actualizacion-v34');
+    if (m) m.remove();
+}
 
-// Función para cerrar y guardar la decisión del usuario
-function cerrarYGuardarPreferencias() {
-    const checkbox = document.getElementById('check-no-mostrar');
-    
-    // Si el checkbox está marcado, guardamos en el navegador
-    if (checkbox && checkbox.checked) {
-        localStorage.setItem('alonixz_v34_ocultar', 'true');
-    }
+// --- MODAL DE MIGRACIÓN v3.5 (NUBE) ---
+function gestionarModalV35() {
+    const migrado = localStorage.getItem('alonixz_v35_nube');
+    const userActivo = localStorage.getItem('eduSolve_User') || localStorage.getItem('user_name');
 
-    // Cerramos el modal
-    const modal = document.getElementById('evento-actualizacion-v34');
-    if (modal) modal.remove();
-};window.addEventListener('load', () => {
-    // 1. Verificamos si el usuario ya migró a la nube
-    const yaMigrado = localStorage.getItem('alonixz_v35_nube');
-    const usuarioLocal = localStorage.getItem('user_name');
+    if (migrado === 'true' || !userActivo) return;
 
-    // Solo lanzamos el evento si el usuario tiene nombre local pero NO ha migrado
-    if (yaMigrado === 'true' || !usuarioLocal) {
-        return; 
-    }
-
-    // 2. Esperamos los 8 segundos para el impacto visual
     setTimeout(() => {
-        console.log("🚀 Lanzando Notificación: MIGRACIÓN NUBE 3.5...");
-
         const modal = document.createElement('div');
         modal.id = 'evento-migracion-v35';
-        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(8px); transition: all 0.5s;";
-
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(8px);";
         modal.innerHTML = `
-            <div style="background:#ffffff; width:92%; max-width:440px; border-radius:20px; overflow:hidden; border:1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); font-family: 'Segoe UI', system-ui, sans-serif; animation: slideUp 0.4s ease-out;">
-                
-                <div style="background:#2563eb; padding:20px; text-align:center;">
-                    <h2 style="color:white; margin:0; font-size:13px; letter-spacing:2px; text-transform:uppercase; font-weight:900;">⚠️ ACCIÓN REQUERIDA • V3.5 NUBE</h2>
-                </div>
-
-                <div style="background:#f8fafc; width:100%; height:200px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #e2e8f0;">
-                    <img src="actualizacion5.png" alt="Update Alonixz 3.5" style="max-width:100%; max-height:100%; object-fit:contain;">
-                </div>
-
-                <div style="padding:30px;">
-                    <h3 style="color:#1e293b; margin:0 0 10px 0; font-size:20px; font-weight:800;">Tus datos ahora en la Nube</h3>
-                    <p style="color:#64748b; font-size:13px; line-height:1.6; margin-bottom:20px;">
-                        Para activar la <b>v3.5</b>, eliminaremos tu acceso local. Deberás registrarte de nuevo para que tus puntos y tareas se guarden en <b>Alonixz-Cloud</b>.
-                    </p>
-                    
-                    <div style="background:#eff6ff; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #dbeafe;">
-                        <ul style="margin:0; padding-left:15px; color:#1e40af; font-size:12px; list-style-type: '☁️'; line-height:1.8;">
-                            <li><b>Seguridad:</b> Accede desde cualquier dispositivo.</li>
-                            <li><b>Bono:</b> +50 Puntos de regalo por migración.</li>
-                            <li><b>Perfil:</b> Tu foto se mantendrá intacta.</li>
-                        </ul>
-                    </div>
-                    
-                    <button onclick="ejecutarMigracionFinal()" 
-                            style="background:#2563eb; color:white; border:none; width:100%; padding:16px; cursor:pointer; font-weight:800; border-radius:12px; font-size:15px; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.4); transition: 0.3s;">
-                        REGISTRARME EN LA NUBE 🚀
-                    </button>
-
-                    <div style="text-align:center; margin-top:20px; opacity: 0.5;">
-                        <span style="font-size:9px; color:#94a3b8; font-weight:bold; letter-spacing:2px;">ALONIXZ-GROUP • SISTEMA DE GESTIÓN NUBE</span>
-                    </div>
-                </div>
-            </div>
-            <style>
-                @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-            </style>
-        `;
-
+            <div style="background:#ffffff; width:92%; max-width:440px; border-radius:20px; padding:30px; text-align:center; border:1px solid #e2e8f0;">
+                <h2 style="color:#2563eb;">MIGRACIÓN V3.5 NUBE</h2>
+                <p style="font-size:13px; color:#64748b;">Tu cuenta <b>${userActivo}</b> será movida a Alonixz-Cloud. Deberás registrarte de nuevo para activar la v3.5.</p>
+                <button onclick="ejecutarMigracionFinal()" style="background:#2563eb; color:white; border:none; width:100%; padding:16px; cursor:pointer; font-weight:800; border-radius:12px;">REGISTRARME EN LA NUBE 🚀</button>
+            </div>`;
         document.body.appendChild(modal);
-
-    }, 8000); 
-});
-
-// FUNCIÓN MAESTRA DE MIGRACIÓN
-function ejecutarMigracionFinal() {
-    console.log("🧹 Ejecutando limpieza de Alonixz-ID Local...");
-    
-    // 1. Borramos el acceso viejo (Nombre y Pass)
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_pass');
-    
-    // 2. Marcamos que el proceso de la v3.5 ha iniciado
-    localStorage.setItem('alonixz_v35_nube', 'pending');
-
-    // 3. Alerta profesional para tus compañeros
-    alert("🚀 ¡Acceso local eliminado! Redirigiendo al Registro en la Nube...");
-
-    // 4. REDIRECCIÓN FORZADA a index.html
-    // Usamos el path relativo para asegurar que encuentre el archivo
-    window.location.href = 'index.html'; 
+    }, 12000);
 }
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const esModoOscuro = localStorage.getItem('alonixz_dark_mode') === 'true';
-    
-    if (esModoOscuro) {
-        // 1. Aplicamos la clase al body
+
+function ejecutarMigracionFinal() {
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('eduSolve_User');
+    localStorage.removeItem('active_user');
+    localStorage.setItem('alonixz_v35_nube', 'true');
+    alert("¡Sesión eliminada! Redirigiendo al Registro Cloud...");
+    window.location.href = 'index.html';
+}
+
+// --- INICIALIZACIÓN FINAL DEL DOM ---
+window.addEventListener('DOMContentLoaded', () => {
+    actualizarHeader();
+    escucharNoticias();
+    escucharChat();
+    gestionarModalV34();
+    gestionarModalV35();
+
+    // Modo Oscuro Persistente
+    if (localStorage.getItem('alonixz_dark_mode') === 'true') {
         document.body.classList.add('dark-mode');
-
-        // 2. FORZAMOS el cambio en los elementos con estilo en línea
-        // Buscamos todos los DIVs que tengan fondo blanco manual
-        const elementos = document.querySelectorAll('div[style*="background: #ffffff"], div[style*="background:#ffffff"], div[style*="background: white"]');
-        
-        elementos.forEach(el => {
-            el.style.backgroundColor = '#1e293b'; // Azul oscuro de EduSolve
-            el.style.color = '#f1f5f9';           // Texto blanco
-            el.style.borderColor = '#334155';     // Borde suave
-        });
-
-        // 3. Forzamos los textos (p y h3) que tengan colores grises manuales
-        const textos = document.querySelectorAll('p[style*="color"], h3[style*="color"], span[style*="color"]');
-        textos.forEach(txt => {
-            txt.style.setProperty('color', '#f1f5f9', 'important');
-        });
-
-        console.log("🌙 Modo Oscuro forzado en elementos con style manual.");
-    }
-    
-    // Cargar nombre del perfil
-    const nombre = localStorage.getItem('alonixz_user_name') || 'Estudiante';
-    const display = document.getElementById('nav-user-name');
-    if(display) display.innerText = nombre;
-});
-
-    // --- 3. GESTIÓN DE NOTIFICACIONES (Punto Rojo) ---
-    // Si hay un examen o comunicado nuevo, podemos mostrar un aviso en el botón de Agenda
-    const tieneNotificaciones = localStorage.getItem('alonixz_notif') === 'true';
-    const puntoNotif = document.getElementById('punto-agenda');
-
-    if (tieneNotificaciones && puntoNotif) {
-        puntoNotif.style.display = 'block';
-    }
-});
-
-// --- 4. FUNCIÓN DE NAVEGACIÓN RÁPIDA ---
-function navegar(url) {
-    // Añadimos una pequeña transición o sonido si el usuario lo activó
-    const sonidosActivos = localStorage.getItem('alonixz_sound') === 'true';
-    
-    if (sonidosActivos) {
-        // Aquí podrías reproducir un 'click.mp3' corto
-        console.log("🔊 Sonido de clic ejecutado");
     }
 
-    location.href = url;
-};document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionamos todos los botones bloqueados
-    const botonesBloqueados = document.querySelectorAll('.blocked-for-maintenance');
-
-    botonesBloqueados.forEach(boton => {
-        // Evitar que cualquier clic funcione
-        boton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Animación de "vibración" (Shake) para indicar que no está disponible
-            boton.style.transform = "translateX(5px)";
-            setTimeout(() => boton.style.transform = "translateX(-5px)", 50);
-            setTimeout(() => boton.style.transform = "translateX(0)", 100);
-            
-            console.log("🔒 Función en desarrollo por Alonixz-Group para la v3.6");
+    // Enter para el chat
+    const inputChat = document.getElementById('chat-input');
+    if (inputChat) {
+        inputChat.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                enviarMensaje();
+            }
         });
-    });
+    }
 });
 </script>
 </body>
