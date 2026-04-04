@@ -536,14 +536,23 @@ function toggleUserMenu() {
 // Función de Cerrar Sesión (Limpieza de eduSolve_User)
 function logout() {
     if(confirm("¿Cerrar sesión en EduSolve PRO?")) {
+        // 1. Limpiamos los nombres de usuario
         localStorage.removeItem('user_name');
         localStorage.removeItem('eduSolve_User');
         localStorage.removeItem('active_user');
         sessionStorage.removeItem('active_user');
+
+        // 2. 🔥 CLAVE: Borramos la foto de perfil para que no se quede grabada
+        localStorage.removeItem('user_photo_base64');
+        
+        // 3. Opcional: Limpiar el rango o puntos si los guardas
+        localStorage.removeItem('user_rank');
+        localStorage.removeItem('user_points');
+
+        // 4. Redirección
         location.href = 'index.html';
     }
 }
-
 // --- FUNCIÓN PARA EL MENÚ DE ALUMNOS (NOTICIAS) ---
 function escucharNoticias() {
     db.ref('noticias').on('value', (snapshot) => {
