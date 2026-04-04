@@ -465,7 +465,7 @@ body.dark-mode .maintenance-ribbon {
             const mainApp = document.getElementById('main-container');
             if(mainApp) mainApp.style.visibility = "visible";
         }
-    }, 5000); 
+    }, 1000); 
 })();
 
 // 1. CONFIGURACIÓN DE SONIDOS
@@ -724,12 +724,56 @@ function ejecutarMigracionFinal() {
     alert("¡Sesión eliminada! Redirigiendo al Registro Cloud...");
     window.location.href = 'index.html';
 }
+async function recuperarFotoNube() {
+    // 1. Verificamos si ya hay una foto local para no gastar datos de Firebase
+    const fotoLocal = localStorage.getItem('user_photo_base64');
+    if (fotoLocal && fotoLocal.length > 500) {
+        console.log("📸 Foto cargada desde memoria local.");
+        return; 
+    }
 
-// --- INICIALIZACIÓN FINAL DEL DOM ---
+    // 2. Si no hay foto local, la buscamos en la Nube (Firestore)
+    // Usamos el observador para estar seguros de que el usuario ya se "logueó"
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log("☁️ Buscando foto en Alonixz-Cloud...");
+            try {
+                // Referencia directa a la colección de usuarios
+                const doc = await firebase.firestore().collection("usuarios").doc(user.uid).get();
+                
+                if (doc.exists && doc.data().foto) {
+                    const fotoNube = doc.data().foto;
+                    
+                    // Guardamos en el navegador para la próxima vez
+                    localStorage.setItem('user_photo_base64', fotoNube);
+                    
+                    // Actualizamos el círculo visualmente sin recargar la página
+                    const avatar = document.getElementById('avatar-circle');
+                    if (avatar) {
+                        avatar.innerHTML = `<img src="${fotoNube}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; transition: opacity 0.5s;">`;
+                        console.log("✅ Foto de perfil sincronizada con éxito.");
+                    }
+                }
+            } catch (error) {
+                console.warn("⚠️ Nota: No se pudo conectar a la nube para la foto (posible v3.0 o sin internet).");
+            }
+        }
+    });
+};
+// --- INICIALIZACIÓN FINAL DEL DOM (v3.5 Sincronizada) ---
 window.addEventListener('DOMContentLoaded', () => {
-    actualizarHeader();
+    // 1. Carga rápida (Interfaz base)
+    actualizarHeader(); 
+    
+    // 2. FUNCIÓN INDEPENDIENTE PARA LA FOTO (No bloquea)
+    // Se lanza sola y cuando termine, actualizará el círculo del avatar
+    recuperarFotoNube(); 
+
+    // 3. Servicios en tiempo real
     escucharNoticias();
     escucharChat();
+
+    // 4. Modales y persistencia
     gestionarModalV34();
     gestionarModalV35();
 
