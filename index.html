@@ -301,25 +301,83 @@ function ejecutarMigracionFinal() {
                     puntos: 50, // Bono de bienvenida
                     creado: new Date().toISOString()
                 });
+async function handleAuth() {
+    if (typeof firebase === 'undefined') return alert("Error: Firebase no cargó correctamente.");
 
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value;
+    const remember = document.getElementById('remember') ? document.getElementById('remember').checked : false;
+    
+    if(!user || !pass) return alert("Por favor, completa todos los campos.");
+    
+    // Generamos el identificador único para la nube
+    const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
+
+    try {
+        if (isLogin) {
+            // --- MODO LOGIN: ESTO ES LO QUE SINCRONIZA OTROS DISPOSITIVOS ---
+            // 1. Firebase verifica el usuario y pass en su base de datos global
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+            const fbUser = userCredential.user;
+            
+            // 2. Bajamos los datos de perfil (puntos, rango) desde Firestore
+            const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+            
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+
+                // 3. ¡IMPORTANTE! Guardamos en el LocalStorage del nuevo dispositivo
+                // Esto hace que el "Guardian" del menu.html te deje pasar
                 localStorage.setItem('eduSolve_User', user); 
-                localStorage.setItem('alonixz_v35_nube', 'true'); 
+                localStorage.setItem('user_name', user);
+                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+                localStorage.setItem('user_points', userData.puntos || 0);
+                localStorage.setItem('alonixz_v35_nube', 'true');
 
-                alert("¡Bienvenido a la Nube Alonixz! Tu cuenta ha sido creada.");
+                if (remember) localStorage.setItem('remember_me', 'true');
+
+                console.log("✅ Acceso concedido en nuevo dispositivo.");
                 window.location.href = 'menu.html';
             }
-        } catch (error) {
-            console.error("Error en Auth:", error.code);
-            const errors = {
-                'auth/operation-not-allowed': "⚠️ Debes activar Email/Password en la consola de Firebase.",
-                'auth/invalid-email': "⚠️ El nombre de usuario contiene caracteres prohibidos.",
-                'auth/email-already-in-use': "⚠️ Este usuario ya está registrado en la nube.",
-                'auth/wrong-password': "❌ Contraseña incorrecta.",
-                'auth/user-not-found': "❌ El usuario no existe en la base de datos."
-            };
-            alert(errors[error.code] || "Error Alonixz-Cloud: " + error.message);
+
+        } else {
+            // --- MODO REGISTRO: GUARDA LA PASS EN LA NUBE ---
+            if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
+
+            // 1. Creamos el usuario en Authentication (Aquí se guarda la contraseña)
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
+            
+            // 2. Creamos su perfil en Firestore (Datos públicos)
+            await firebase.firestore().collection("usuarios").doc(userCredential.user.uid).set({
+                n: user,
+                rango: "Estudiante",
+                puntos: 50,
+                creado: new Date().toISOString()
+            });
+
+            // 3. Guardamos sesión local inicial
+            localStorage.setItem('eduSolve_User', user); 
+            localStorage.setItem('user_name', user);
+            localStorage.setItem('alonixz_v35_nube', 'true'); 
+
+            alert("🚀 ¡Cuenta Alonixz-ID creada con éxito!");
+            window.location.href = 'menu.html';
         }
+    } catch (error) {
+        console.error("Error Alonixz-Auth:", error.code);
+        
+        // Manejo de errores específicos para el usuario
+        const errores = {
+            'auth/wrong-password': "❌ La contraseña no coincide.",
+            'auth/user-not-found': "❌ Este usuario no está registrado en la nube.",
+            'auth/email-already-in-use': "⚠️ El nombre de usuario ya está ocupado.",
+            'auth/invalid-email': "⚠️ El formato de usuario no es válido.",
+            'auth/network-request-failed': "🌐 Error de conexión. Revisa tu internet."
+        };
+
+        alert(errores[error.code] || "Error en Alonixz-Cloud: " + error.message);
     }
+}
 </script>
 
 </body>
