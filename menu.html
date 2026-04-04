@@ -435,14 +435,16 @@ body.dark-mode .maintenance-ribbon {
 
 <script>
 // --- GUARDIAN CLOUD v3.5 (FIXED) ---
+// --- GUARDIAN CLOUD v3.5 (RECARGADO) ---
 (function guardianSincronizado() {
+    // Bloqueo visual inicial
     document.documentElement.style.display = "none"; 
 
-    // Esperamos a que la ventana cargue para asegurar que 'firebase' exista
     window.addEventListener('load', () => {
+        // Verificación de seguridad de librerías
         if (typeof firebase === 'undefined' || !firebase.auth) {
-            console.error("❌ Firebase no cargó. Desbloqueando pantalla por emergencia...");
-            document.documentElement.style.display = "block";
+            console.error("❌ Error Crítico: Librerías Firebase no detectadas.");
+            document.documentElement.style.display = "block"; 
             return;
         }
 
@@ -450,31 +452,37 @@ body.dark-mode .maintenance-ribbon {
             const userLocal = localStorage.getItem('eduSolve_User');
             const esNube = localStorage.getItem('alonixz_v35_nube');
 
+            // 1. Verificación de acceso
             if (!userAuth || !userLocal || esNube !== 'true') {
+                console.warn("⚠️ Usuario no autorizado o v3.0");
                 if (esNube !== 'true') localStorage.clear();
                 window.location.href = 'index.html';
                 return;
             }
 
-            // Recuperar foto si el logout la borró
+            // 2. RECUPERAR FOTO (Usa 'fs' que declaramos arriba)
             if (!localStorage.getItem('user_photo_base64')) {
                 try {
                     const doc = await firebase.firestore().collection("usuarios").doc(userAuth.uid).get();
                     if (doc.exists && doc.data().foto) {
                         localStorage.setItem('user_photo_base64', doc.data().foto);
+                        console.log("📸 Foto restaurada en Menu.");
                     }
-                } catch (e) { console.error("Error sincronizando:", e); }
+                } catch (e) { console.error("Error en sincronización de foto:", e); }
             }
 
-            // Dibujar y Mostrar
-            if (typeof actualizarHeader === 'function') actualizarHeader();
+            // 3. DESBLOQUEO Y RENDER
+            actualizarHeader(); // Llamamos a la función
             
             document.documentElement.style.display = "block";
-            document.body.style.opacity = "1";
+            document.body.style.opacity = "0";
+            setTimeout(() => {
+                document.body.style.transition = "opacity 0.5s ease";
+                document.body.style.opacity = "1";
+            }, 50);
         });
     });
 })();
-
 // 1. CONFIGURACIÓN DE SONIDOS
 const sonidoEnvio = new Audio('audio/send-sound.mp3');
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
@@ -493,7 +501,10 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-const db = firebase.database();
+
+// DECLARAMOS AMBAS PARA QUE NO HAYA ERRORES
+const db = firebase.database();       // Para el Chat y Noticias
+const fs = firebase.firestore();      // Para la Foto y Perfil (Cloud)
 </script><script>
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
@@ -561,34 +572,51 @@ function logout() {
 }
 // --- FUNCIÓN PARA EL MENÚ DE ALUMNOS (NOTICIAS) ---
 function escucharNoticias() {
-    db.ref('noticias').on('value', (snapshot) => {
-        const contenedor = document.getElementById('news-container');
-        if (!contenedor) return; 
+    // 1. Verificación de seguridad: ¿Existe la base de datos y el contenedor?
+    if (typeof db === 'undefined') return console.error("❌ Error: Realtime Database (db) no inicializada.");
+    const contenedor = document.getElementById('news-container');
+    if (!contenedor) return; 
 
+    // 2. Escuchador en tiempo real
+    db.ref('noticias').on('value', (snapshot) => {
         const data = snapshot.val();
+        
+        // Si no hay datos, mostramos mensaje amigable
         if (!data) {
-            contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3><p>Sin novedades.</p>';
+            contenedor.innerHTML = `
+                <h3 style="margin-bottom:15px;">📢 Novedades</h3>
+                <p style="color:#94a3b8; font-size:0.8rem; text-align:center;">Sin novedades por ahora.</p>`;
             return;
         }
 
+        // 3. Limpiamos y preparamos la lista (Invertida para ver lo más nuevo arriba)
         contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
         const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
 
+        // 4. Renderizado limpio
+        let htmlFinal = ''; // Usamos una variable temporal para evitar múltiples renders
         lista.forEach(n => {
             const checkIcon = n.completado ? '<span style="color:#22c55e; margin-left:5px;">✅</span>' : '';
+            const bgColor = n.completado ? '#dcfce7' : '#dbeafe';
+            const textColor = n.completado ? '#15803d' : '#2563eb';
 
-            contenedor.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
+            htmlFinal += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.01); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                     <div style="text-align:left;">
                         <b style="color:#1e293b; font-size:0.9rem;">${n.titulo} ${checkIcon}</b>
-                        <small style="color:#94a3b8; display:block;">${n.autor} • ${n.fecha}</small>
+                        <small style="color:#94a3b8; display:block;">${n.autor || 'Admin'} • ${n.fecha || 'Reciente'}</small>
                     </div>
-                    <span style="background:${n.completado ? '#dcfce7' : '#dbeafe'}; color:${n.completado ? '#15803d' : '#2563eb'}; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
+                    <span style="background:${bgColor}; color:${textColor}; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800; text-transform:uppercase;">
+                        ${n.tag || 'INFO'}
+                    </span>
                 </div>`;
         });
+        
+        contenedor.innerHTML += htmlFinal;
+    }, (error) => {
+        console.error("Error al cargar noticias:", error);
     });
 }
-
 // --- FUNCIÓN PARA ENVIAR MENSAJE ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
