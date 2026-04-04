@@ -434,39 +434,62 @@ body.dark-mode .maintenance-ribbon {
 
 <script>
 (function guardianSincronizado() {
-    // 1. Ocultar el menú de inmediato (Estilo Flat)
-    document.body.style.display = "none";
+    // 1. Bloqueo visual inmediato (Evita el "parpadeo" de ver el menú sin datos)
+    document.documentElement.style.display = "none"; 
 
-    console.log("🛡️ Alonixz-Group: Verificando identidad...");
+    console.log("🛡️ Alonixz-Group: Sincronizando Perfil Cloud...");
 
-    // 2. Dar 5 segundos de gracia para que cargue la memoria
-    setTimeout(() => {
-        // Buscamos en ambos almacenamientos
-        const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
+    // 2. Usamos el observador oficial de Firebase (Más rápido y seguro que un setTimeout)
+    firebase.auth().onAuthStateChanged(async (userAuth) => {
+        const userLocal = localStorage.getItem('eduSolve_User');
+        const esNube = localStorage.getItem('alonixz_v35_nube');
 
-        console.log("🔍 Usuario detectado:", user);
-
-        // 3. Si no existe o es el "Invitado" fantasma, fuera.
-        if (!user || user === "" || user.toLowerCase() === "invitado") {
-            console.error("❌ Acceso denegado.");
-            alert("⚠️ Sesión no válida. Regresando al Index...");
+        // 3. VALIDACIÓN ANTI-BYPASS
+        if (!userAuth || !userLocal || esNube !== 'true') {
+            console.error("❌ Acceso denegado: Sesión inválida o cuenta v3.0");
+            if (esNube !== 'true') localStorage.clear();
             window.location.href = 'index.html';
-        } else {
-            // 4. ¡Acceso concedido!
-            console.log("✅ Bienvenido a EduSolve, " + user);
-            
-            // Forzamos que el cuerpo sea visible
-            document.body.style.display = "block"; 
-            
-            // Si usaste opacity: 0, actívalo con un efecto suave
-            document.body.style.opacity = "1";
-            document.body.style.transition = "opacity 0.5s ease-in";
-
-            // OPCIONAL: Si tienes un contenedor principal
-            const mainApp = document.getElementById('main-container');
-            if(mainApp) mainApp.style.visibility = "visible";
+            return;
         }
-    }, 5000); 
+
+        // 4. RECUPERACIÓN CRÍTICA DE FOTO
+        // Si el localStorage está vacío (por un logout previo), lo reconstruimos desde Firestore
+        const fotoExistente = localStorage.getItem('user_photo_base64');
+        
+        if (!fotoExistente || fotoExistente === "null" || fotoExistente === "") {
+            try {
+                const doc = await firebase.firestore().collection("usuarios").doc(userAuth.uid).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.foto) {
+                        localStorage.setItem('user_photo_base64', data.foto);
+                        console.log("📸 Foto restaurada desde la nube.");
+                    }
+                    if (data.puntos) localStorage.setItem('user_points', data.puntos);
+                    if (data.rango) localStorage.setItem('user_rank', data.rango);
+                }
+            } catch (e) {
+                console.error("Error en rescate de datos:", e);
+            }
+        }
+
+        // 5. LANZAMIENTO DE INTERFAZ
+        // Llamamos a actualizarHeader antes de mostrar la página para que la foto ya esté ahí
+        if (typeof actualizarHeader === 'function') {
+            actualizarHeader();
+        }
+
+        // Mostramos el menú con un efecto suave
+        document.documentElement.style.display = "block";
+        document.body.style.opacity = "0";
+        
+        // Pequeño delay para que el navegador renderice la opacidad
+        setTimeout(() => {
+            document.body.style.transition = "opacity 0.4s ease-out";
+            document.body.style.opacity = "1";
+            console.log("✅ Sistema Alonixz-Cloud listo.");
+        }, 50);
+    });
 })();
 
 // 1. CONFIGURACIÓN DE SONIDOS
