@@ -428,67 +428,50 @@ body.dark-mode .maintenance-ribbon {
     }
 </style>
 
- <!-- Carga de Librerías Firebase v8.10.1 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 
 <script>
+// --- GUARDIAN CLOUD v3.5 (FIXED) ---
 (function guardianSincronizado() {
-    // 1. Bloqueo visual inmediato (Evita el "parpadeo" de ver el menú sin datos)
     document.documentElement.style.display = "none"; 
 
-    console.log("🛡️ Alonixz-Group: Sincronizando Perfil Cloud...");
-
-    // 2. Usamos el observador oficial de Firebase (Más rápido y seguro que un setTimeout)
-    firebase.auth().onAuthStateChanged(async (userAuth) => {
-        const userLocal = localStorage.getItem('eduSolve_User');
-        const esNube = localStorage.getItem('alonixz_v35_nube');
-
-        // 3. VALIDACIÓN ANTI-BYPASS
-        if (!userAuth || !userLocal || esNube !== 'true') {
-            console.error("❌ Acceso denegado: Sesión inválida o cuenta v3.0");
-            if (esNube !== 'true') localStorage.clear();
-            window.location.href = 'index.html';
+    // Esperamos a que la ventana cargue para asegurar que 'firebase' exista
+    window.addEventListener('load', () => {
+        if (typeof firebase === 'undefined' || !firebase.auth) {
+            console.error("❌ Firebase no cargó. Desbloqueando pantalla por emergencia...");
+            document.documentElement.style.display = "block";
             return;
         }
 
-        // 4. RECUPERACIÓN CRÍTICA DE FOTO
-        // Si el localStorage está vacío (por un logout previo), lo reconstruimos desde Firestore
-        const fotoExistente = localStorage.getItem('user_photo_base64');
-        
-        if (!fotoExistente || fotoExistente === "null" || fotoExistente === "") {
-            try {
-                const doc = await firebase.firestore().collection("usuarios").doc(userAuth.uid).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.foto) {
-                        localStorage.setItem('user_photo_base64', data.foto);
-                        console.log("📸 Foto restaurada desde la nube.");
-                    }
-                    if (data.puntos) localStorage.setItem('user_points', data.puntos);
-                    if (data.rango) localStorage.setItem('user_rank', data.rango);
-                }
-            } catch (e) {
-                console.error("Error en rescate de datos:", e);
+        firebase.auth().onAuthStateChanged(async (userAuth) => {
+            const userLocal = localStorage.getItem('eduSolve_User');
+            const esNube = localStorage.getItem('alonixz_v35_nube');
+
+            if (!userAuth || !userLocal || esNube !== 'true') {
+                if (esNube !== 'true') localStorage.clear();
+                window.location.href = 'index.html';
+                return;
             }
-        }
 
-        // 5. LANZAMIENTO DE INTERFAZ
-        // Llamamos a actualizarHeader antes de mostrar la página para que la foto ya esté ahí
-        if (typeof actualizarHeader === 'function') {
-            actualizarHeader();
-        }
+            // Recuperar foto si el logout la borró
+            if (!localStorage.getItem('user_photo_base64')) {
+                try {
+                    const doc = await firebase.firestore().collection("usuarios").doc(userAuth.uid).get();
+                    if (doc.exists && doc.data().foto) {
+                        localStorage.setItem('user_photo_base64', doc.data().foto);
+                    }
+                } catch (e) { console.error("Error sincronizando:", e); }
+            }
 
-        // Mostramos el menú con un efecto suave
-        document.documentElement.style.display = "block";
-        document.body.style.opacity = "0";
-        
-        // Pequeño delay para que el navegador renderice la opacidad
-        setTimeout(() => {
-            document.body.style.transition = "opacity 0.4s ease-out";
+            // Dibujar y Mostrar
+            if (typeof actualizarHeader === 'function') actualizarHeader();
+            
+            document.documentElement.style.display = "block";
             document.body.style.opacity = "1";
-            console.log("✅ Sistema Alonixz-Cloud listo.");
-        }, 50);
+        });
     });
 })();
 
