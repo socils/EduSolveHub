@@ -197,26 +197,38 @@
         const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
         try {
-            if (isLogin) {
-                // MODO LOGIN (Sincroniza cualquier dispositivo)
-                const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
-                const fbUser = userCredential.user;
-                
-                const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
-                const userData = userDoc.data() || {};
+           if (isLogin) {
+    // 1. MODO LOGIN (Sincroniza cualquier dispositivo)
+    const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+    const fbUser = userCredential.user;
+    
+    // 2. Traemos el documento del usuario de Firestore
+    const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+    const userData = userDoc.data() || {};
 
-                localStorage.setItem('eduSolve_User', user); 
-                localStorage.setItem('user_name', user);
-                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
-                localStorage.setItem('user_points', userData.puntos || 0);
-                localStorage.setItem('alonixz_v35_nube', 'true');
+    // 3. Guardamos datos básicos en el dispositivo actual
+    localStorage.setItem('eduSolve_User', user); 
+    localStorage.setItem('user_name', user);
+    localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+    localStorage.setItem('user_points', userData.puntos || 0);
+    localStorage.setItem('alonixz_v35_nube', 'true');
 
-                if (remember) localStorage.setItem('remember_me', 'true');
+    // --- 🔥 SINCRONIZACIÓN DE FOTO ---
+    // Si el usuario tiene foto en la nube (Firestore), la bajamos.
+    // Si no tiene, limpiamos el rastro de cualquier sesión anterior.
+    if (userData.foto && userData.foto !== "") {
+        localStorage.setItem('user_photo_base64', userData.foto);
+        console.log("📸 Foto de perfil sincronizada desde la nube.");
+    } else {
+        localStorage.removeItem('user_photo_base64');
+    }
+    // ---------------------------------
 
-                console.log("✅ Acceso concedido y sincronizado.");
-                window.location.href = 'menu.html';
+    if (remember) localStorage.setItem('remember_me', 'true');
 
-            } else {
+    console.log("✅ Acceso concedido y sincronizado.");
+    window.location.href = 'menu.html';
+} else {
                 // MODO REGISTRO (Guarda en la nube)
                 if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
 
