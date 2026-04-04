@@ -207,7 +207,7 @@ body.dark-mode .maintenance-ribbon {
         <h1 style="font-weight: 800; font-size: 2.2rem; margin: 0; color: #1e293b;">
             Bienvenido, <span id="welcome-name" style="color: var(--primary);">Usuario</span>
         </h1>
-        <p style="color: #64748b; margin-top: 5px;">Panel de control de EduSolve PRO v3.3</p>
+        <p style="color: #64748b; margin-top: 5px;">Panel de control de EduSolve PRO v3.5</p>
     </div>
 
     <div style="position: relative;">
@@ -428,61 +428,46 @@ body.dark-mode .maintenance-ribbon {
     }
 </style>
 
-<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-// --- GUARDIAN CLOUD v3.5 (FIXED) ---
-// --- GUARDIAN CLOUD v3.5 (RECARGADO) ---
 (function guardianSincronizado() {
-    // Bloqueo visual inicial
-    document.documentElement.style.display = "none"; 
+    // 1. Ocultar el menú de inmediato (Estilo Flat)
+    document.body.style.display = "none";
 
-    window.addEventListener('load', () => {
-        // Verificación de seguridad de librerías
-        if (typeof firebase === 'undefined' || !firebase.auth) {
-            console.error("❌ Error Crítico: Librerías Firebase no detectadas.");
-            document.documentElement.style.display = "block"; 
-            return;
-        }
+    console.log("🛡️ Alonixz-Group: Verificando identidad...");
 
-        firebase.auth().onAuthStateChanged(async (userAuth) => {
-            const userLocal = localStorage.getItem('eduSolve_User');
-            const esNube = localStorage.getItem('alonixz_v35_nube');
+    // 2. Dar 5 segundos de gracia para que cargue la memoria
+    setTimeout(() => {
+        // Buscamos en ambos almacenamientos
+        const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
 
-            // 1. Verificación de acceso
-            if (!userAuth || !userLocal || esNube !== 'true') {
-                console.warn("⚠️ Usuario no autorizado o v3.0");
-                if (esNube !== 'true') localStorage.clear();
-                window.location.href = 'index.html';
-                return;
-            }
+        console.log("🔍 Usuario detectado:", user);
 
-            // 2. RECUPERAR FOTO (Usa 'fs' que declaramos arriba)
-            if (!localStorage.getItem('user_photo_base64')) {
-                try {
-                    const doc = await firebase.firestore().collection("usuarios").doc(userAuth.uid).get();
-                    if (doc.exists && doc.data().foto) {
-                        localStorage.setItem('user_photo_base64', doc.data().foto);
-                        console.log("📸 Foto restaurada en Menu.");
-                    }
-                } catch (e) { console.error("Error en sincronización de foto:", e); }
-            }
-
-            // 3. DESBLOQUEO Y RENDER
-            actualizarHeader(); // Llamamos a la función
+        // 3. Si no existe o es el "Invitado" fantasma, fuera.
+        if (!user || user === "" || user.toLowerCase() === "invitado") {
+            console.error("❌ Acceso denegado.");
+            alert("⚠️ Sesión no válida. Regresando al Index...");
+            window.location.href = 'index.html';
+        } else {
+            // 4. ¡Acceso concedido!
+            console.log("✅ Bienvenido a EduSolve, " + user);
             
-            document.documentElement.style.display = "block";
-            document.body.style.opacity = "0";
-            setTimeout(() => {
-                document.body.style.transition = "opacity 0.5s ease";
-                document.body.style.opacity = "1";
-            }, 50);
-        });
-    });
+            // Forzamos que el cuerpo sea visible
+            document.body.style.display = "block"; 
+            
+            // Si usaste opacity: 0, actívalo con un efecto suave
+            document.body.style.opacity = "1";
+            document.body.style.transition = "opacity 0.5s ease-in";
+
+            // OPCIONAL: Si tienes un contenedor principal
+            const mainApp = document.getElementById('main-container');
+            if(mainApp) mainApp.style.visibility = "visible";
+        }
+    }, 5000); 
 })();
+
 // 1. CONFIGURACIÓN DE SONIDOS
 const sonidoEnvio = new Audio('audio/send-sound.mp3');
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
@@ -501,10 +486,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-
-// DECLARAMOS AMBAS PARA QUE NO HAYA ERRORES
-const db = firebase.database();       // Para el Chat y Noticias
-const fs = firebase.firestore();      // Para la Foto y Perfil (Cloud)
+const db = firebase.database();
 </script><script>
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
@@ -572,51 +554,34 @@ function logout() {
 }
 // --- FUNCIÓN PARA EL MENÚ DE ALUMNOS (NOTICIAS) ---
 function escucharNoticias() {
-    // 1. Verificación de seguridad: ¿Existe la base de datos y el contenedor?
-    if (typeof db === 'undefined') return console.error("❌ Error: Realtime Database (db) no inicializada.");
-    const contenedor = document.getElementById('news-container');
-    if (!contenedor) return; 
-
-    // 2. Escuchador en tiempo real
     db.ref('noticias').on('value', (snapshot) => {
+        const contenedor = document.getElementById('news-container');
+        if (!contenedor) return; 
+
         const data = snapshot.val();
-        
-        // Si no hay datos, mostramos mensaje amigable
         if (!data) {
-            contenedor.innerHTML = `
-                <h3 style="margin-bottom:15px;">📢 Novedades</h3>
-                <p style="color:#94a3b8; font-size:0.8rem; text-align:center;">Sin novedades por ahora.</p>`;
+            contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3><p>Sin novedades.</p>';
             return;
         }
 
-        // 3. Limpiamos y preparamos la lista (Invertida para ver lo más nuevo arriba)
         contenedor.innerHTML = '<h3 style="margin-bottom:15px;">📢 Novedades</h3>';
         const lista = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
 
-        // 4. Renderizado limpio
-        let htmlFinal = ''; // Usamos una variable temporal para evitar múltiples renders
         lista.forEach(n => {
             const checkIcon = n.completado ? '<span style="color:#22c55e; margin-left:5px;">✅</span>' : '';
-            const bgColor = n.completado ? '#dcfce7' : '#dbeafe';
-            const textColor = n.completado ? '#15803d' : '#2563eb';
 
-            htmlFinal += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.01); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:15px; margin-bottom:10px; border:1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
                     <div style="text-align:left;">
                         <b style="color:#1e293b; font-size:0.9rem;">${n.titulo} ${checkIcon}</b>
-                        <small style="color:#94a3b8; display:block;">${n.autor || 'Admin'} • ${n.fecha || 'Reciente'}</small>
+                        <small style="color:#94a3b8; display:block;">${n.autor} • ${n.fecha}</small>
                     </div>
-                    <span style="background:${bgColor}; color:${textColor}; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800; text-transform:uppercase;">
-                        ${n.tag || 'INFO'}
-                    </span>
+                    <span style="background:${n.completado ? '#dcfce7' : '#dbeafe'}; color:${n.completado ? '#15803d' : '#2563eb'}; padding:5px 10px; border-radius:8px; font-size:0.7rem; font-weight:800;">${n.tag}</span>
                 </div>`;
         });
-        
-        contenedor.innerHTML += htmlFinal;
-    }, (error) => {
-        console.error("Error al cargar noticias:", error);
     });
 }
+
 // --- FUNCIÓN PARA ENVIAR MENSAJE ---
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
