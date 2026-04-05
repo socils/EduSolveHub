@@ -216,18 +216,15 @@
     // --- 🔥 SINCRONIZACIÓN DE FOTO ---
     // Si el usuario tiene foto en la nube (Firestore), la bajamos.
     // Si no tiene, limpiamos el rastro de cualquier sesión anterior.
-    if (userData.foto && userData.foto !== "") {
-        localStorage.setItem('user_photo_base64', userData.foto);
-        console.log("📸 Foto de perfil sincronizada desde la nube.");
-    } else {
-        localStorage.removeItem('user_photo_base64');
-    }
-    // ---------------------------------
-
-    if (remember) localStorage.setItem('remember_me', 'true');
-
-    console.log("✅ Acceso concedido y sincronizado.");
-    window.location.href = 'menu.html';
+ // --- 🔥 SINCRONIZACIÓN DE FOTO REFORZADA ---
+if (userData.foto && userData.foto.length > 100) { 
+    // Solo guardamos si la foto parece ser una imagen real (Base64 largo)
+    localStorage.setItem('user_photo_base64', userData.foto);
+    console.log("📸 Foto recuperada con éxito.");
+} else {
+    // Si no hay foto en la nube, NO borres el localStorage todavía, 
+    // mejor deja que el usuario suba una nueva en el menú.
+    console.log("ℹ️ El usuario no tiene foto en la nube.");
 } else {
                 // MODO REGISTRO (Guarda en la nube)
                 if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
@@ -238,6 +235,7 @@
                     n: user,
                     rango: "Estudiante",
                     puntos: 50,
+                    foto: "",
                     creado: new Date().toISOString()
                 });
 
