@@ -160,10 +160,17 @@
         } else {
             console.log("🚀 Alonixz-Cloud v3.5 Conectado");
             verificarMigracion(); 
+            
+            // Auto-login si "Recordarme" está activo
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user && localStorage.getItem('remember_me') === 'true') {
+                    window.location.href = 'menu.html';
+                }
+            });
         }
     };
 
-    // --- 2. INTERFAZ (Toggle) ---
+    // --- 2. INTERFAZ (Cambio entre Login y Registro) ---
     function toggleMode() {
         const content = document.getElementById('form-content');
         if(!content) return;
@@ -184,58 +191,59 @@
         }, 300);
     }
 
-    // --- 3. AUTENTICACIÓN UNIVERSAL (Firebase Auth + Firestore) ---
+    // --- 3. AUTENTICACIÓN UNIVERSAL (Login / Registro) ---
     async function handleAuth() {
         if (typeof firebase === 'undefined') return alert("Error: Firebase no cargó correctamente.");
 
         const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value;
-        const remember = document.getElementById('remember') ? document.getElementById('remember').checked : false;
+        const rememberCheckbox = document.getElementById('remember');
+        const remember = rememberCheckbox ? rememberCheckbox.checked : false;
         
         if(!user || !pass) return alert("Por favor, completa todos los campos.");
         
         const fakeEmail = `${user.toLowerCase()}@alonixz.com`;
 
         try {
-           if (isLogin) {
-    // 1. MODO LOGIN (Sincroniza cualquier dispositivo)
-    const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
-    const fbUser = userCredential.user;
-    
-    // 2. Traemos el documento del usuario de Firestore
-    const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
-    const userData = userDoc.data() || {};
+            if (isLogin) {
+                // --- MODO LOGIN ---
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pass);
+                const fbUser = userCredential.user;
+                
+                // Traemos datos de Firestore
+                const userDoc = await firebase.firestore().collection("usuarios").doc(fbUser.uid).get();
+                const userData = userDoc.data() || {};
 
-    // 3. Guardamos datos básicos en el dispositivo actual
-    localStorage.setItem('eduSolve_User', user); 
-    localStorage.setItem('user_name', user);
-    localStorage.setItem('user_rank', userData.rango || 'Estudiante');
-    localStorage.setItem('user_points', userData.puntos || 0);
-    localStorage.setItem('alonixz_v35_nube', 'true');
+                // Guardamos en LocalStorage
+                localStorage.setItem('eduSolve_User', user); 
+                localStorage.setItem('user_name', user);
+                localStorage.setItem('user_rank', userData.rango || 'Estudiante');
+                localStorage.setItem('user_points', userData.puntos || 0);
+                localStorage.setItem('alonixz_v35_nube', 'true');
 
-    // --- 🔥 SINCRONIZACIÓN DE FOTO ---
-    // Si el usuario tiene foto en la nube (Firestore), la bajamos.
-    // Si no tiene, limpiamos el rastro de cualquier sesión anterior.
- // --- 🔥 SINCRONIZACIÓN DE FOTO REFORZADA ---
-if (userData.foto && userData.foto.length > 100) { 
-    // Solo guardamos si la foto parece ser una imagen real (Base64 largo)
-    localStorage.setItem('user_photo_base64', userData.foto);
-    console.log("📸 Foto recuperada con éxito.");
-} else {
-    // Si no hay foto en la nube, NO borres el localStorage todavía, 
-    // mejor deja que el usuario suba una nueva en el menú.
-    console.log("ℹ️ El usuario no tiene foto en la nube.");
-} else {
-                // MODO REGISTRO (Guarda en la nube)
+                // Sincronización de Foto (Solo si existe en la nube)
+                if (userData.foto && userData.foto.length > 100) {
+                    localStorage.setItem('user_photo_base64', userData.foto);
+                    console.log("📸 Foto sincronizada.");
+                }
+
+                if (remember) localStorage.setItem('remember_me', 'true');
+
+                console.log("✅ Acceso concedido.");
+                window.location.href = 'menu.html';
+
+            } else {
+                // --- MODO REGISTRO ---
                 if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
 
                 const userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pass);
                 
+                // Creamos el perfil en la nube
                 await firebase.firestore().collection("usuarios").doc(userCredential.user.uid).set({
                     n: user,
                     rango: "Estudiante",
                     puntos: 50,
-                    foto: "",
+                    foto: "", // Espacio vacío para la foto futura
                     creado: new Date().toISOString()
                 });
 
@@ -251,8 +259,8 @@ if (userData.foto && userData.foto.length > 100) {
             const errores = {
                 'auth/wrong-password': "❌ Contraseña incorrecta.",
                 'auth/user-not-found': "❌ El usuario no existe en la nube.",
-                'auth/email-already-in-use': "⚠️ Este usuario ya está registrado.",
-                'auth/network-request-failed': "🌐 Error de conexión."
+                'auth/email-already-in-use': "⚠️ Este nombre de usuario ya está ocupado.",
+                'auth/network-request-failed': "🌐 Revisa tu conexión a internet."
             };
             alert(errores[error.code] || "Error: " + error.message);
         }
@@ -277,13 +285,14 @@ if (userData.foto && userData.foto.length > 100) {
     function lanzarEvento35() {
         setTimeout(() => {
             const modal = document.createElement('div');
-            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;";
+            modal.id = "modal-migracion";
+            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px; backdrop-filter: blur(5px);";
             modal.innerHTML = `
-                <div style="background:white; padding:30px; border-radius:15px; max-width:450px; text-align:center;">
-                    <img src="actualizacion5.png" style="width:100%; border-radius:10px; margin-bottom:15px;">
-                    <h2 style="color:#1e293b;">¡ACTUALIZACIÓN OBLIGATORIA!</h2>
-                    <p style="color:#64748b;">Tu cuenta local debe migrar a la nube v3.5.</p>
-                    <button onclick="ejecutarMigracionFinal()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:8px; cursor:pointer; width:100%; font-weight:bold;">MIGRAR AHORA</button>
+                <div style="background:white; padding:30px; border-radius:20px; max-width:400px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                    <img src="actualizacion5.png" style="width:100px; margin-bottom:15px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/869/869124.png'">
+                    <h2 style="color:#1e293b; margin-bottom:10px;">MIGRACIÓN A LA NUBE</h2>
+                    <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Tu cuenta actual es local. Para continuar, debemos pasar tus datos a la nueva infraestructura v3.5.</p>
+                    <button onclick="ejecutarMigracionFinal()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; width:100%; font-weight:bold; font-size:16px;">MIGRAR MI CUENTA</button>
                 </div>`;
             document.body.appendChild(modal);
         }, 1000);
@@ -292,10 +301,9 @@ if (userData.foto && userData.foto.length > 100) {
     function ejecutarMigracionFinal() {
         localStorage.clear(); 
         localStorage.setItem('alonixz_v35_nube', 'pending');
-        alert("🧹 Memoria limpia. Por favor, crea tu nueva cuenta en la nube.");
+        alert("🧹 Memoria local limpiada. Por favor, regístrate para crear tu cuenta en la nube.");
         location.reload();
     }
 </script>
-
 </body>
 </html>
