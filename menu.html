@@ -568,7 +568,16 @@ function actualizarHeader() {
 // Función para el menú
 function toggleUserMenu() {
     const menu = document.getElementById('user-menu');
-    if(menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    const isOpening = menu.style.display === 'none';
+    
+    if (isOpening) {
+        menu.style.display = 'block';
+        // Forzamos la lectura de puntos justo al abrir
+        const puntosActuales = localStorage.getItem('user_points') || "0";
+        document.getElementById('val-puntos-menu').innerText = puntosActuales + " Pts";
+    } else {
+        menu.style.display = 'none';
+    }
 }
 
 // Función de Cerrar Sesión (Limpieza de eduSolve_User)
