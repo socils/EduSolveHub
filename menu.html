@@ -528,58 +528,96 @@ const db = firebase.database();
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
 function actualizarHeader() {
-    // 1. Buscamos el nombre
-    const nombre = localStorage.getItem('user_name') || "Usuario";
-    
-    // 2. BUSCAR PUNTOS (Manejo de String vacío de Firebase)
-    // Si puntos es "", Number() lo convierte en 0 automáticamente.
-    const puntosRaw = localStorage.getItem('user_points') || "0";
-    const puntosFinal = (puntosRaw === "" || puntosRaw === "null") ? 0 : puntosRaw;
+    // 1. Obtener el usuario actual de Firebase Auth
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            // 2. Escuchar cambios en Firestore en tiempo real
+            db.collection("usuarios").doc(user.uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    
+                    // EXTRAER DATOS (Manejo de strings vacíos de Firebase)
+                    const nombre = data.n || data.nombre || user.displayName || "Usuario";
+                    const puntos = (data.puntos === "" || data.puntos === undefined) ? "0" : data.puntos;
+                    const foto = data.foto || "";
 
-    // 3. Actualizar elementos de texto
-    const welcomeName = document.getElementById('welcome-name');
-    if (welcomeName) welcomeName.innerText = nombre;
+                    // 3. ACTUALIZAR EL HTML DEL HEADER
+                    // Nombre de bienvenida
+                    const welcomeName = document.getElementById('welcome-name');
+                    if (welcomeName) welcomeName.innerText = nombre;
 
-    const userFullName = document.getElementById('user-full-name');
-    if (userFullName) {
-        userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
-    }
+                    // El @usuario en el menú
+                    const userFullName = document.getElementById('user-full-name');
+                    if (userFullName) {
+                        userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
+                    }
 
-    // 4. MOSTRAR SALDO (Con validación)
-    const valPuntos = document.getElementById('val-puntos-menu');
-    if (valPuntos) {
-        valPuntos.innerText = puntosFinal + " Pts";
-    }
+                    // EL SALDO (Aquí es donde se corrige el "0")
+                    const valPuntos = document.getElementById('val-puntos-menu');
+                    if (valPuntos) {
+                        valPuntos.innerText = puntos + " Pts";
+                    }
 
-    // 5. Actualizar Avatar (Foto o Inicial)
-    const foto = localStorage.getItem('user_photo_base64');
-    const avatar = document.getElementById('avatar-circle');
+                    // 4. ACTUALIZAR EL AVATAR
+                    const avatar = document.getElementById('avatar-circle');
+                    if (avatar) {
+                        if (foto && foto !== "") {
+                            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        } else {
+                            const inicial = nombre.charAt(0).toUpperCase();
+                            avatar.innerHTML = `<span id="user-initial" style="font-weight: 800;">${inicial}</span>`;
+                        }
+                    }
 
-    if (avatar) {
-        if (foto && foto !== "null" && foto !== "") {
-            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    // 5. GUARDAR EN LOCALSTORAGE (Para persistencia rápida)
+                    localStorage.setItem('user_name', nombre);
+                    localStorage.setItem('user_points', puntos);
+                    if(foto) localStorage.setItem('user_photo_base64', foto);
+
+                } else {
+                    console.warn("⚠️ El documento del usuario no existe en Firestore.");
+                }
+            });
         } else {
-            const inicial = nombre.charAt(0).toUpperCase();
-            avatar.innerHTML = `<span id="user-initial" style="font-weight: 800;">${inicial}</span>`;
+            // Si no hay sesión, mandamos al index
+            console.log("Sesión no detectada.");
         }
-    }
+    });
 }
 
 // Función para el menú
 function toggleUserMenu() {
     const menu = document.getElementById('user-menu');
-    const isOpening = menu.style.display === 'none';
-    
-    if (isOpening) {
-        menu.style.display = 'block';
-        // Forzamos la lectura de puntos justo al abrir
+    const puntosDisplay = document.getElementById('val-puntos-menu');
+    const nombreDisplay = document.getElementById('user-full-name');
+
+    // 1. Verificar si el menú existe en el HTML
+    if (!menu) return;
+
+    // 2. Lógica de Apertura/Cierre
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        
+        // --- ANTES DE MOSTRAR: Actualizamos los datos rápidos ---
         const puntosActuales = localStorage.getItem('user_points') || "0";
-        document.getElementById('val-puntos-menu').innerText = puntosActuales + " Pts";
+        const nombreActual = localStorage.getItem('user_name') || "Usuario";
+
+        if (puntosDisplay) {
+            puntosDisplay.innerText = puntosActuales + " Pts";
+        }
+        
+        if (nombreDisplay) {
+            nombreDisplay.innerText = "@" + nombreActual.toLowerCase().replace(/\s/g, '');
+        }
+
+        // 3. Mostrar con efecto (Si tienes el CSS de slideDown)
+        menu.style.display = 'block';
+        console.log("📂 Menú Alonixz abierto. Saldo mostrado:", puntosActuales);
+
     } else {
+        // 4. Ocultar
         menu.style.display = 'none';
     }
 }
-
 // Función de Cerrar Sesión (Limpieza de eduSolve_User)
 function logout() {
     if(confirm("¿Cerrar sesión en EduSolve PRO?")) {
