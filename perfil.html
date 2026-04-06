@@ -1,259 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22 fill=%22white%22>es</text></svg>">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Perfil - EduSolve PRO</title>
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <style>
-       /* --- ESTILO PARA LAPTOP (IGUAL QUE SIEMPRE) --- */
-.card {
-    width: 500px;
-    padding: 40px;
-}
-
-/* --- ESTILO SOLO PARA CELULARES --- */
-@media (max-width: 600px) {
-    .card {
-        width: 90%;   /* En celular la carta ocupa casi todo el ancho */
-        padding: 15px; /* Menos espacio interno para que quepa el texto */
-    }
     
-    #welcome-name {
-        font-size: 1.5rem; /* Título más cómodo para el dedo */
-    }
+    <!-- SDK de Firebase (Versión 8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    /* El panel admin se hace más grande para tocarlo fácil */
-    #admin-panel div {
-        width: 95% !important;
-    }
-} 
-       body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .card {
-            background: white;
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        /* FOTO DE PERFIL */
-        .profile-pic-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 15px;
-        }
-        
-        #user-display {
-            width: 100%; height: 100%;
-            background: #2563eb;
-            color: white;
-            font-size: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            overflow: hidden;
-            border: 4px solid white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
+    <style>
+        /* --- ESTILOS (Mantenemos tus estilos originales) --- */
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+        .profile-pic-container { position: relative; width: 120px; height: 120px; margin: 0 auto 15px; }
+        #user-display { width: 100%; height: 100%; background: #2563eb; color: white; font-size: 3rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; overflow: hidden; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         #user-display img { width: 100%; height: 100%; object-fit: cover; }
         #file-input { display: none; }
-
-        .edit-pic-label {
-            position: absolute;
-            bottom: 5px; right: 5px;
-            background: #1e293b;
-            color: white;
-            width: 35px; height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-        }
-
-        /* RANGOS */
-        .badge {
-            display: inline-block;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            background: #f1f5f9;
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-
-        /* SECCIÓN DE DATOS */
-        .data-section {
-            text-align: left;
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .data-row:last-child { border: none; }
-
+        .edit-pic-label { position: absolute; bottom: 5px; right: 5px; background: #1e293b; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        .badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; background: #f1f5f9; color: #64748b; margin-bottom: 20px; text-transform: uppercase; }
+        .data-section { text-align: left; background: #f8fafc; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
         .label { font-size: 0.8rem; color: #64748b; font-weight: 600; }
-        .value { font-size: 0.9rem; color: #1e293b; font-weight: 700; cursor: pointer; }
-        .value:hover { color: #2563eb; text-decoration: underline; }
-
-        .bio-area {
-            font-size: 0.85rem;
-            color: #475569;
-            font-style: italic;
-            margin-top: 10px;
-            display: block;
-        }
-
-        /* BOTONES */
+        .value { font-size: 0.9rem; color: #1e293b; font-weight: 700; }
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        .btn {
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: bold;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
+        .btn { padding: 12px; border-radius: 12px; font-weight: bold; text-decoration: none; border: none; cursor: pointer; font-size: 0.9rem; transition: 0.3s; text-align: center; }
         .btn-main { background: #2563eb; color: white; }
-        .btn-clear { background: #fee2e2; color: #ef4444; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="profile-pic-container">
-        <div id="user-display">A</div>
+        <div id="user-display">...</div>
         <label for="file-input" class="edit-pic-label">📷</label>
         <input type="file" id="file-input" accept="image/*" onchange="subirImagen(event)">
     </div>
 
-    <h2 id="display-name" style="margin:0; color: #1e293b;">Alonso</h2>
-    <div class="badge" id="user-role">ESTUDIANTE 3° B</div>
+    <h2 id="display-name" style="margin:0; color: #1e293b;">Cargando...</h2>
+    <div class="badge" id="user-role">MIEMBRO</div>
 
     <div class="data-section">
-        <div class="data-row">
-            <span class="label">Correo:</span>
-            <span class="value" id="val-email" onclick="editarDato('email', 'Correo')">Sin asignar</span>
-        </div>
-        <div class="data-row">
-            <span class="label">Cumpleaños:</span>
-            <span class="value" id="val-bday" onclick="editarDato('bday', 'Cumpleaños (DD/MM)')">-- / --</span>
-        </div>
-        <div class="data-row">
-            <span class="label">Género:</span>
-            <span class="value" id="val-gender" onclick="editarDato('gender', 'Género')">Prefiero no decir</span>
-        </div>
-        <div style="margin-top:15px">
-            <span class="label">Sobre mí:</span>
-            <span class="bio-area" id="val-bio" onclick="editarDato('bio', 'Biografía corta')">Haz clic para escribir algo sobre ti...</span>
-        </div>
+        <div class="data-row"><span class="label">Puntos:</span> <span class="value" id="val-puntos">0 Pts</span></div>
+        <div class="data-row"><span class="label">ID de Usuario:</span> <span class="value" id="val-uid" style="font-size:0.6rem">---</span></div>
     </div>
 
     <div class="btn-group">
         <a href="menu.html" class="btn btn-main">Volver al Inicio</a>
-        <button class="btn btn-clear" onclick="borrarTodo()">Borrar todos los datos</button>
     </div>
 </div>
 
 <script>
-    const campos = ['name', 'email', 'bday', 'gender', 'bio'];
+    // 1. CONFIGURACIÓN FIREBASE (Usa la tuya)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+        authDomain: "edusolve-947c1.firebaseapp.com",
+        projectId: "edusolve-947c1",
+        storageBucket: "edusolve-947c1.firebasestorage.app",
+        messagingSenderId: "1089784819674",
+        appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+    };
+    
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-  function cargarPerfil() {
-    // 1. Buscamos el nombre que se usó al iniciar sesión
-    // Probamos con todas las llaves posibles para estar seguros
-    const nombreReal = localStorage.getItem('user_name') || 
-                       localStorage.getItem('active_user') || 
-                       sessionStorage.getItem('active_user') || 
-                       "Usuario";
+    // 2. CARGAR DATOS EN TIEMPO REAL
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            const userRef = db.collection("usuarios").doc(user.uid);
+            
+            userRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    const nombre = data.n || "Usuario";
+                    const fotoBase64 = data.foto || ""; // Campo foto en Firebase
+                    const puntos = data.puntos || 0;
 
-    const foto = localStorage.getItem('user_photo_base64');
+                    // Actualizar UI
+                    document.getElementById('display-name').innerText = nombre;
+                    document.getElementById('val-puntos').innerText = puntos + " Pts";
+                    document.getElementById('val-uid').innerText = user.uid;
 
-    // 2. ACTUALIZAR EL NOMBRE EN LA PANTALLA
-    // Esto quita el "Alonso" fijo y pone el nombre real
-    document.getElementById('display-name').innerText = nombreReal;
+                    // Foto o Inicial
+                    const userDisplay = document.getElementById('user-display');
+                    if (fotoBase64) {
+                        userDisplay.innerHTML = `<img src="${fotoBase64}">`;
+                    } else {
+                        userDisplay.innerText = nombre.charAt(0).toUpperCase();
+                    }
 
-    // 3. CARGAR FOTO O INICIAL
-    const userDisplay = document.getElementById('user-display');
-    if (foto && foto !== "null") {
-        userDisplay.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-    } else {
-        userDisplay.innerText = nombreReal.charAt(0).toUpperCase();
-    }
-
-    // 4. CARGAR LOS DATOS EXTRAS (Email, Bio, etc.)
-    const camposExtras = ['email', 'bday', 'gender', 'bio'];
-    camposExtras.forEach(campo => {
-        const guardado = localStorage.getItem('user_' + campo);
-        const elemento = document.getElementById('val-' + campo);
-        if (guardado && elemento) {
-            elemento.innerText = guardado;
+                    // Rango Fundador
+                    if (nombre.toLowerCase() === "alonso") {
+                        document.getElementById('user-role').innerText = "FUNDADOR ALONIXZ";
+                        document.getElementById('user-role').style.background = "#fffbeb";
+                        document.getElementById('user-role').style.color = "#b45309";
+                    }
+                }
+            });
+        } else {
+            window.location.href = "index.html"; // Redirigir si no hay sesión
         }
     });
 
-    // 5. RANGO ESPECIAL (Opcional)
-    const badge = document.getElementById('user-role');
-    if(nombreReal.toLowerCase() === 'alonso') {
-        badge.innerText = "FUNDADOR ALONIXZ";
-        badge.style.background = "#fffbeb";
-        badge.style.color = "#b45309";
-    } else {
-        badge.innerText = "MIEMBRO OFICIAL";
-        badge.style.background = "#f1f5f9";
-        badge.style.color = "#64748b";
-    }
-}
-
-// Asegúrate de que se llame al cargar
-window.onload = cargarPerfil;
-
+    // 3. SUBIR IMAGEN A FIREBASE (Campo 'foto')
     function subirImagen(event) {
         const archivo = event.target.files[0];
-        if (archivo) {
+        const user = auth.currentUser;
+
+        if (archivo && user) {
+            // Validar tamaño (Base64 puede ser pesado, máximo 1MB recomendado)
+            if (archivo.size > 1048576) {
+                alert("La imagen es muy grande. Intenta con una de menos de 1MB.");
+                return;
+            }
+
             const lector = new FileReader();
-            lector.onload = function(e) {
-                localStorage.setItem('user_photo_base64', e.target.result);
-                location.reload();
+            lector.onload = async function(e) {
+                const base64String = e.target.result;
+                
+                try {
+                    await db.collection("usuarios").doc(user.uid).update({
+                        foto: base64String // Guardamos en el campo 'foto'
+                    });
+                    console.log("Foto actualizada en Firebase");
+                } catch (error) {
+                    console.error("Error al subir foto:", error);
+                }
             };
             lector.readAsDataURL(archivo);
         }
     }
-
-    function borrarTodo() {
-        if (confirm("¿Seguro que quieres borrar todos tus datos y la foto?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
-
-    window.onload = cargarPerfil;
 </script>
-
 </body>
 </html>
