@@ -436,41 +436,51 @@ body.dark-mode .maintenance-ribbon {
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
 (function guardianSincronizado() {
-    // 1. Ocultar el menú de inmediato (Estilo Flat)
-    document.body.style.display = "none";
+    // 1. Crear e Inyectar la pantalla de carga al instante
+    const loader = document.createElement('div');
+    loader.id = 'alonixz-loader';
+    loader.style = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #f8fafc; z-index: 1000000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-family: 'Inter', sans-serif; transition: opacity 0.5s ease;
+    `;
+    
+    loader.innerHTML = `
+        <div style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <p style="margin-top: 20px; color: #1e293b; font-weight: 700; font-size: 14px; letter-spacing: 1px;">ALONIXZ CLOUD</p>
+        <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Verificando Identidad...</span>
+        <style>
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+    `;
+    document.documentElement.appendChild(loader);
 
-    console.log("🛡️ Alonixz-Group: Verificando identidad...");
+    console.log("🛡️ Guardián: Validando sesión v3.5...");
 
-    // 2. Dar 5 segundos de gracia para que cargue la memoria
+    // 2. Proceso de verificación
     setTimeout(() => {
-        // Buscamos en ambos almacenamientos
         const user = localStorage.getItem('eduSolve_User') || sessionStorage.getItem('eduSolve_User');
 
-        console.log("🔍 Usuario detectado:", user);
-
-        // 3. Si no existe o es el "Invitado" fantasma, fuera.
         if (!user || user === "" || user.toLowerCase() === "invitado") {
             console.error("❌ Acceso denegado.");
-            alert("⚠️ Sesión no válida. Regresando al Index...");
-            window.location.href = 'index.html';
+            // Animación de error antes de salir
+            loader.innerHTML = `<p style="color: #ef4444; font-weight: bold;">Acceso Denegado</p>`;
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
         } else {
-            // 4. ¡Acceso concedido!
-            console.log("✅ Bienvenido a EduSolve, " + user);
+            console.log("✅ Acceso concedido: " + user);
             
-            // Forzamos que el cuerpo sea visible
-            document.body.style.display = "block"; 
-            
-            // Si usaste opacity: 0, actívalo con un efecto suave
-            document.body.style.opacity = "1";
-            document.body.style.transition = "opacity 0.5s ease-in";
-
-            // OPCIONAL: Si tienes un contenedor principal
-            const mainApp = document.getElementById('main-container');
-            if(mainApp) mainApp.style.visibility = "visible";
+            // 3. Desvanecer el loader y mostrar la web
+            loader.style.opacity = "0";
+            setTimeout(() => {
+                loader.remove(); // Borramos el loader del código
+                document.body.style.opacity = "1";
+            }, 500);
         }
-    }, 1000); 
+    }, 800); // Tiempo optimizado para no aburrir al usuario
 })();
-
 // 1. CONFIGURACIÓN DE SONIDOS
 const sonidoEnvio = new Audio('audio/send-sound.mp3');
 const sonidoMensaje = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
