@@ -51,8 +51,9 @@
     </div>
 </div>
 
+
 <script>
-    // 1. CONFIGURACIÓN FIREBASE (Usa la tuya)
+    // 1. CONFIGURACIÓN FIREBASE (Se mantiene igual)
     const firebaseConfig = {
         apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
         authDomain: "edusolve-947c1.firebaseapp.com",
@@ -65,91 +66,106 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-// --- Lógica de Recepción en Perfil.html ---
-document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const usuarioRecibido = params.get('user');
 
-    if (usuarioRecibido) {
-        // 1. Mostrar el nombre de inmediato para quitar el "Cargando"
-        const nombreDisplay = document.getElementById('display-name');
-        if(nombreDisplay) nombreDisplay.innerText = decodeURIComponent(usuarioRecibido);
-        
-        // 2. Aquí ya puedes llamar a Firebase usando ese nombre o ID
-        cargarDatosDeFirebase(decodeURIComponent(usuarioRecibido));
-    } else {
-        // Si alguien entra a perfil.html a secas, lo regresamos al menu
-        console.warn("No se detectó usuario en la URL");
-        // location.href = 'menu.html'; 
-    }
-});
-    // 2. CARGAR DATOS EN TIEMPO REAL
-    // --- CORRECCIÓN PERFIL.HTML ---
-// 1. Obtener el ID que envió el Menú desde la URL
-const urlParams = new URLSearchParams(window.location.search);
-const userIdDirecto = urlParams.get('id');
+    // --- FUNCIÓN DE CARGA (Mantenemos tu lógica de URL y Auth) ---
+    function cargarDatosDeFirebase(usuarioDeURL) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdDirecto = urlParams.get('id');
 
-auth.onAuthStateChanged((user) => {
-    // Usamos el ID de la URL o el del usuario logueado
-    const uidFinal = userIdDirecto || (user ? user.uid : null);
+        auth.onAuthStateChanged((user) => {
+            // Buscamos por ID de URL, UID de Firebase o el nombre que recibiste por parámetro
+            const uidFinal = userIdDirecto || (user ? user.uid : null);
 
-    if (uidFinal) {
-        const userRef = db.collection("usuarios").doc(uidFinal);
-        
-        userRef.onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
+            if (uidFinal) {
+                const userRef = db.collection("usuarios").doc(uidFinal);
                 
-                // MOSTRAR DATOS AL INSTANTE
-                document.getElementById('display-name').innerText = data.n || "Usuario";
-                document.getElementById('val-puntos').innerText = (data.puntos || 0) + " Pts";
-                document.getElementById('val-uid').innerText = uidFinal;
+                // Escuchador en tiempo real para que no se pierda nada
+                userRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        
+                        // Rellenar datos respetando tus IDs
+                        const nombreFinal = data.n || data.nombre || usuarioDeURL || "Usuario";
+                        document.getElementById('display-name').innerText = nombreFinal;
+                        document.getElementById('val-puntos').innerText = (data.puntos || 0) + " Pts";
+                        document.getElementById('val-uid').innerText = uidFinal;
 
-                // Cargar Foto Cloud
-                const userDisplay = document.getElementById('user-display');
-                if (data.foto) {
-                    userDisplay.innerHTML = `<img src="${data.foto}" style="width:100%; height:100%; object-fit:cover;">`;
-                } else {
-                    userDisplay.innerText = (data.n || "U").charAt(0).toUpperCase();
-                }
+                        // Lógica de Foto Cloud
+                        const userDisplay = document.getElementById('user-display');
+                        if (userDisplay) {
+                            if (data.foto && data.foto !== "") {
+                                userDisplay.innerHTML = `<img src="${data.foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                userDisplay.innerText = nombreFinal.charAt(0).toUpperCase();
+                            }
+                        }
+                    } else {
+                        document.getElementById('display-name').innerText = "Usuario no encontrado";
+                    }
+                });
             } else {
-                // Si el ID es válido pero no hay documento, mostrar error claro
-                document.getElementById('display-name').innerText = "Usuario no encontrado";
+                console.warn("Sesión no detectada");
+                // window.location.href = "index.html"; 
             }
         });
-    } else {
-        window.location.href = "index.html";
     }
-});
 
-    // 3. SUBIR IMAGEN A FIREBASE (Campo 'foto')
+    // --- SUBIR IMAGEN (Ahora con el COMPRESOR para evitar el error de 1MB) ---
     function subirImagen(event) {
         const archivo = event.target.files[0];
         const user = auth.currentUser;
 
         if (archivo && user) {
-            // Validar tamaño (Base64 puede ser pesado, máximo 1MB recomendado)
-            if (archivo.size > 1048576) {
-                alert("La imagen es muy grande. Intenta con una de menos de 1MB.");
-                return;
-            }
-
             const lector = new FileReader();
-            lector.onload = async function(e) {
-                const base64String = e.target.result;
-                
-                try {
-                    await db.collection("usuarios").doc(user.uid).update({
-                        foto: base64String // Guardamos en el campo 'foto'
-                    });
-                    console.log("Foto actualizada en Firebase");
-                } catch (error) {
-                    console.error("Error al subir foto:", error);
-                }
-            };
             lector.readAsDataURL(archivo);
+            
+            lector.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                
+                img.onload = function() {
+                    // --- AQUÍ ESTÁ EL ARREGLO PARA EL ERROR DE TAMAÑO ---
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 450; // Tamaño optimizado para EduSolve PRO
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Convertimos a JPEG 0.7 para que pese poquísimo y Firebase lo acepte
+                    const fotoComprimida = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    // Guardar en Firebase
+                    db.collection("usuarios").doc(user.uid).update({
+                        foto: fotoComprimida
+                    }).then(() => {
+                        console.log("✅ Foto Alonixz-Cloud sincronizada");
+                    }).catch((error) => {
+                        console.error("Error crítico al subir:", error);
+                        alert("Error de red: No se pudo subir la foto.");
+                    });
+                };
+            };
         }
     }
+
+    // --- TU DOMCONTENTLOADED (Se mantiene igual) ---
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const usuarioRecibido = params.get('user');
+
+        if (usuarioRecibido) {
+            const nombreDisplay = document.getElementById('display-name');
+            if(nombreDisplay) nombreDisplay.innerText = decodeURIComponent(usuarioRecibido);
+            
+            // Llamamos a la función que ahora sí existe arriba
+            cargarDatosDeFirebase(decodeURIComponent(usuarioRecibido));
+        } else {
+            cargarDatosDeFirebase(); // Intenta cargar por UID si no hay nombre en URL
+        }
+    });
 </script>
 </body>
 </html>
