@@ -202,67 +202,78 @@ body.dark-mode .maintenance-ribbon {
 </div><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <div class="main-content container" style="max-width: 1000px; margin: auto; padding: 40px 20px;">
     
-    <header style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; position: relative;">
+   <!-- ALONIXZ GROUP - HEADER PRO v3.5 -->
+<header style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; position: relative; font-family: 'Inter', sans-serif;">
+    
+    <!-- Sección Izquierda: Bienvenida -->
     <div>
-        <h1 style="font-weight: 800; font-size: 2.2rem; margin: 0; color: #1e293b;">
-            Bienvenido, <span id="welcome-name" style="color: var(--primary);">Usuario</span>
+        <h1 style="font-weight: 800; font-size: 2.2rem; margin: 0; color: #1e293b; letter-spacing: -1px;">
+            Bienvenido, <span id="welcome-name" style="color: #2563eb;">Usuario</span>
         </h1>
-        <p style="color: #64748b; margin-top: 5px;">Panel de control de EduSolve PRO v3.5</p>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
+            <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Cloud Active</span>
+            <p style="color: #64748b; margin: 0; font-size: 0.85rem; font-weight: 500;">EduSolve PRO v3.5</p>
+        </div>
     </div>
 
+    <!-- Sección Derecha: Usuario y Menú -->
     <div style="position: relative;">
-        <div onclick="toggleUserMenu()" id="avatar-circle" style="width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 1.2rem; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; overflow: hidden;">
+        <!-- Avatar Circular -->
+        <div onclick="toggleUserMenu()" id="avatar-circle" 
+             style="width: 55px; height: 55px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 1.2rem; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: 0.3s; overflow: hidden;">
             <span id="user-initial">U</span>
         </div>
 
-        <div id="user-menu" style="display: none; position: absolute; right: 0; top: 70px; width: 220px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; border: 1px solid #f1f5f9; animation: slideDown 0.3s ease;">
-     <!-- Perfil y Saldo -->
-            <div style="padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 12px;">
-                <p style="margin: 0; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Miembro Alonixz</p>
-                <b id="user-full-name" style="font-size: 1rem; color: #1e293b; display: block; margin-bottom: 8px;">@usuario</b>
+        <!-- Menú Desplegable (User Menu) -->
+        <div id="user-menu" style="display: none; position: absolute; right: 0; top: 70px; width: 230px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.12); padding: 18px; z-index: 1000; border: 1px solid #f1f5f9; animation: slideDown 0.3s ease;">
+            
+            <!-- Perfil y Saldo Único -->
+            <div style="padding-bottom: 15px; border-bottom: 1px solid #f1f5f9; margin-bottom: 12px;">
+                <p style="margin: 0; font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">Miembro Alonixz</p>
+                <b id="user-full-name" style="font-size: 1.05rem; color: #1e293b; display: block; margin: 4px 0 10px 0;">@usuario</b>
                 
-                <!-- TARJETA DE SALDO CLOUD -->
-                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; margin-top: 5px;">
+                <!-- Tarjeta de Saldo Cloud Corregida -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 12px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 1rem; filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));">🪙</span>
-                        <span style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Mi Saldo</span>
+                        <span style="font-size: 1.1rem; filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));">🪙</span>
+                        <span style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Saldo</span>
                     </div>
-                    <span id="val-puntos-menu" style="font-size: 0.9rem; color: #2563eb; font-weight: 800; font-family: 'Segoe UI', system-ui, sans-serif;">
-                        0 Pts
-                    </span>
-                </div>
-            </div>
-                <!-- TARJETA DE SALDO -->
-                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0;">
-                    <span style="font-size: 12px; color: #64748b; font-weight: 600;">Saldo:</span>
-                    <span id="val-puntos-menu" style="font-size: 13px; color: #2563eb; font-weight: 800;">0 Pts</span>
+                    <span id="val-puntos-menu" style="font-size: 0.95rem; color: #2563eb; font-weight: 900;">0 Pts</span>
                 </div>
             </div>
             
-            <!-- Botón Mi Perfil -->
-            <div onclick="irAlPerfilSeguro()" 
-                 style="display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9;" 
-                 onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
-                 onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
-                <span style="font-size: 1.2rem;">👤</span>
-                <div style="display: flex; flex-direction: column;">
-                    <p style="margin: 0; font-size: 0.8rem; font-weight: 800; color: #1e293b;">Mi Perfil</p>
+            <!-- Lista de Acciones -->
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                
+                <!-- Botón Perfil -->
+                <div onclick="irAlPerfilSeguro()" 
+                     style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; border-radius: 12px; transition: 0.2s;" 
+                     onmouseover="this.style.background='#f8fafc'" 
+                     onmouseout="this.style.background='transparent'">
+                    <span style="font-size: 1.2rem;">👤</span>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #334155;">Ver mi Perfil</span>
+                </div>
+
+                <!-- Botón Ajustes -->
+                <div onclick="location.href='configuraciones.html'" 
+                     style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; border-radius: 12px; transition: 0.2s;" 
+                     onmouseover="this.style.background='#f8fafc'" 
+                     onmouseout="this.style.background='transparent'">
+                    <span style="font-size: 1.2rem;">⚙️</span>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #334155;">Ajustes Cloud</span>
+                </div>
+
+                <!-- Botón Admin (Oculto por defecto) -->
+                <div id="btn-admin-access" onclick="abrirAdmin()" 
+                     style="display: none; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; border-radius: 12px; background: #fff7ed; transition: 0.2s;">
+                    <span style="font-size: 1.2rem;">🛠️</span>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #9a3412;">Consola Dev</span>
                 </div>
             </div>
 
-            <!-- Botón Ajustes -->
-            <div onclick="location.href='configuraciones.html'" 
-                 style="display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9; margin-top: 8px;" 
-                 onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
-                 onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
-                <span style="font-size: 1.2rem;">⚙️</span>
-                <div style="display: flex; flex-direction: column;">
-                    <p style="margin: 0; font-size: 0.8rem; font-weight: 800; color: #1e293b;">Ajustes</p>
-                </div>
-            </div>
-            
-            <button onclick="logout()" style="width: 100%; text-align: left; padding: 10px; background: #fff1f2; border: none; border-radius: 10px; cursor: pointer; font-size: 0.8rem; color: #e11d48; display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: bold;">
-                <span>🚪</span> Cerrar Sesión
+            <!-- Botón Cerrar Sesión -->
+            <button onclick="logout()" style="width: 100%; border: none; background: #fff1f2; color: #e11d48; padding: 12px; border-radius: 12px; margin-top: 15px; cursor: pointer; font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;">
+                🚪 Cerrar Sesión
             </button>
         </div>
     </div>
