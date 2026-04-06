@@ -65,7 +65,24 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+// --- Lógica de Recepción en Perfil.html ---
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const usuarioRecibido = params.get('user');
 
+    if (usuarioRecibido) {
+        // 1. Mostrar el nombre de inmediato para quitar el "Cargando"
+        const nombreDisplay = document.getElementById('display-name');
+        if(nombreDisplay) nombreDisplay.innerText = decodeURIComponent(usuarioRecibido);
+        
+        // 2. Aquí ya puedes llamar a Firebase usando ese nombre o ID
+        cargarDatosDeFirebase(decodeURIComponent(usuarioRecibido));
+    } else {
+        // Si alguien entra a perfil.html a secas, lo regresamos al menu
+        console.warn("No se detectó usuario en la URL");
+        // location.href = 'menu.html'; 
+    }
+});
     // 2. CARGAR DATOS EN TIEMPO REAL
     // --- CORRECCIÓN PERFIL.HTML ---
 // 1. Obtener el ID que envió el Menú desde la URL
