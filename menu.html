@@ -527,94 +527,73 @@ const db = firebase.database();
 </script><script>
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
+// --- FUNCIÓN ACTUALIZAR HEADER V3.5 (CONECTADA A FIRESTORE) ---
 function actualizarHeader() {
-    // 1. Obtener el usuario actual de Firebase Auth
-    auth.onAuthStateChanged((user) => {
+    // 1. Verificamos si el usuario está autenticado en Firebase
+    firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            // 2. Escuchar cambios en Firestore en tiempo real
-            db.collection("usuarios").doc(user.uid).onSnapshot((doc) => {
+            // 2. Escuchamos cambios en TIEMPO REAL desde Firestore
+            firebase.firestore().collection("usuarios").doc(user.uid).onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     
-                    // EXTRAER DATOS (Manejo de strings vacíos de Firebase)
-                    const nombre = data.n || data.nombre || user.displayName || "Usuario";
-                    const puntos = (data.puntos === "" || data.puntos === undefined) ? "0" : data.puntos;
-                    const foto = data.foto || "";
+                    // --- EXTRACCIÓN DE DATOS ---
+                    // Si 'puntos' es "" en Firebase, ponemos "0"
+                    const puntosCloud = (data.puntos === "" || data.puntos === undefined) ? "0" : data.puntos;
+                    const nombreCloud = data.nombre || data.n || user.displayName || "Usuario";
+                    const fotoCloud = data.foto || ""; 
 
-                    // 3. ACTUALIZAR EL HTML DEL HEADER
-                    // Nombre de bienvenida
+                    // --- ACTUALIZAR INTERFAZ ---
+                    // Nombre en el saludo
                     const welcomeName = document.getElementById('welcome-name');
-                    if (welcomeName) welcomeName.innerText = nombre;
+                    if (welcomeName) welcomeName.innerText = nombreCloud;
 
-                    // El @usuario en el menú
+                    // @usuario en el menú
                     const userFullName = document.getElementById('user-full-name');
                     if (userFullName) {
-                        userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
+                        userFullName.innerText = "@" + nombreCloud.toLowerCase().replace(/\s/g, '');
                     }
-
-                    // EL SALDO (Aquí es donde se corrige el "0")
+                    
+                    // Puntos en el saldo (Aquí se arregla el "0")
                     const valPuntos = document.getElementById('val-puntos-menu');
                     if (valPuntos) {
-                        valPuntos.innerText = puntos + " Pts";
+                        valPuntos.innerText = puntosCloud + " Pts";
                     }
 
-                    // 4. ACTUALIZAR EL AVATAR
+                    // --- ARREGLAR FOTO DE PERFIL ---
                     const avatar = document.getElementById('avatar-circle');
                     if (avatar) {
-                        if (foto && foto !== "") {
-                            avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        if (fotoCloud && fotoCloud !== "" && fotoCloud !== "null") {
+                            avatar.innerHTML = `<img src="${fotoCloud}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                         } else {
-                            const inicial = nombre.charAt(0).toUpperCase();
+                            const inicial = nombreCloud.charAt(0).toUpperCase();
                             avatar.innerHTML = `<span id="user-initial" style="font-weight: 800;">${inicial}</span>`;
                         }
                     }
 
-                    // 5. GUARDAR EN LOCALSTORAGE (Para persistencia rápida)
-                    localStorage.setItem('user_name', nombre);
-                    localStorage.setItem('user_points', puntos);
-                    if(foto) localStorage.setItem('user_photo_base64', foto);
-
-                } else {
-                    console.warn("⚠️ El documento del usuario no existe en Firestore.");
+                    // Guardamos en LocalStorage para funciones secundarias
+                    localStorage.setItem('user_points', puntosCloud);
+                    localStorage.setItem('user_name', nombreCloud);
+                    localStorage.setItem('user_photo_base64', fotoCloud);
                 }
             });
-        } else {
-            // Si no hay sesión, mandamos al index
-            console.log("Sesión no detectada.");
         }
     });
 }
 
-// Función para el menú
+// --- TOGGLE MENU CORREGIDO ---
 function toggleUserMenu() {
     const menu = document.getElementById('user-menu');
-    const puntosDisplay = document.getElementById('val-puntos-menu');
-    const nombreDisplay = document.getElementById('user-full-name');
-
-    // 1. Verificar si el menú existe en el HTML
     if (!menu) return;
 
-    // 2. Lógica de Apertura/Cierre
     if (menu.style.display === 'none' || menu.style.display === '') {
+        // Al abrir, forzamos la lectura de lo que ya tenemos sincronizado
+        const pts = localStorage.getItem('user_points') || "0";
+        const valPuntos = document.getElementById('val-puntos-menu');
+        if (valPuntos) valPuntos.innerText = pts + " Pts";
         
-        // --- ANTES DE MOSTRAR: Actualizamos los datos rápidos ---
-        const puntosActuales = localStorage.getItem('user_points') || "0";
-        const nombreActual = localStorage.getItem('user_name') || "Usuario";
-
-        if (puntosDisplay) {
-            puntosDisplay.innerText = puntosActuales + " Pts";
-        }
-        
-        if (nombreDisplay) {
-            nombreDisplay.innerText = "@" + nombreActual.toLowerCase().replace(/\s/g, '');
-        }
-
-        // 3. Mostrar con efecto (Si tienes el CSS de slideDown)
         menu.style.display = 'block';
-        console.log("📂 Menú Alonixz abierto. Saldo mostrado:", puntosActuales);
-
     } else {
-        // 4. Ocultar
         menu.style.display = 'none';
     }
 }
