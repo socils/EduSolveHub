@@ -221,7 +221,8 @@ body.dark-mode .maintenance-ribbon {
                 <b id="user-full-name" style="font-size: 1rem; color: #1e293b;">@usuario</b>
             </div>
             
-         <div onclick="location.href='perfil.html'" 
+       <!-- CAMBIO AQUÍ: Usamos irAlPerfilSeguro() -->
+<div onclick="irAlPerfilSeguro()" 
      style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9;" 
      onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
      onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
@@ -553,6 +554,18 @@ function logout() {
         // 4. Redirección
         location.href = 'index.html';
     }
+}// Agrega esta pequeña función en tu bloque de scripts del Menu
+function irAlPerfilSeguro() {
+    // Obtenemos el nombre o ID actual que ya tienes en el localStorage
+    const nombre = localStorage.getItem('user_name') || 
+                   localStorage.getItem('eduSolve_User') || 
+                   "Usuario";
+    
+    // Escapamos el nombre para que no dé error con espacios en la URL
+    const nombreUrl = encodeURIComponent(nombre);
+    
+    // Redirigimos pasando el dato por la URL
+    location.href = `perfil.html?user=${nombreUrl}`;
 }
 // --- FUNCIÓN PARA EL MENÚ DE ALUMNOS (NOTICIAS) ---
 function escucharNoticias() {
