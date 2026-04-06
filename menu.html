@@ -212,7 +212,7 @@ body.dark-mode .maintenance-ribbon {
         </h1>
         <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
             <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Cloud Active</span>
-            <p style="color: #64748b; margin: 0; font-size: 0.85rem; font-weight: 500;">EduSolve PRO v3.5.3</p>
+            <p style="color: #64748b; margin: 0; font-size: 0.85rem; font-weight: 500;">EduSolve PRO v3.5.4</p>
         </div>
     </div>
 
@@ -529,68 +529,74 @@ const db = firebase.database();
 
 // --- FUNCIÓN ACTUALIZAR HEADER V3.5 (CONECTADA A FIRESTORE) ---
 function actualizarHeader() {
-    // 1. Verificamos si el usuario está autenticado en Firebase
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            // 2. Escuchamos cambios en TIEMPO REAL desde Firestore
+            // Escucha en tiempo real a Firestore
             firebase.firestore().collection("usuarios").doc(user.uid).onSnapshot((doc) => {
+                let nombreFinal, puntosFinal, fotoFinal;
+
                 if (doc.exists) {
                     const data = doc.data();
+                    // Buscamos 'puntos' o 'pts' (por si acaso)
+                    puntosFinal = data.puntos || data.pts || "0";
+                    // Buscamos 'nombre' o el nombre de Google
+                    nombreFinal = data.nombre || data.n || user.displayName || "Usuario Nuevo";
+                    fotoFinal = data.foto || data.photoURL || "";
+                } else {
+                    // SI LA CUENTA NO EXISTE EN FIRESTORE TODAVÍA:
+                    nombreFinal = user.displayName || "Usuario Alonixz";
+                    puntosFinal = "0";
+                    fotoFinal = user.photoURL || "";
                     
-                    // --- EXTRACCIÓN DE DATOS ---
-                    // Si 'puntos' es "" en Firebase, ponemos "0"
-                    const puntosCloud = (data.puntos === "" || data.puntos === undefined) ? "0" : data.puntos;
-                    const nombreCloud = data.nombre || data.n || user.displayName || "Usuario";
-                    const fotoCloud = data.foto || ""; 
-
-                    // --- ACTUALIZAR INTERFAZ ---
-                    // Nombre en el saludo
-                    const welcomeName = document.getElementById('welcome-name');
-                    if (welcomeName) welcomeName.innerText = nombreCloud;
-
-                    // @usuario en el menú
-                    const userFullName = document.getElementById('user-full-name');
-                    if (userFullName) {
-                        userFullName.innerText = "@" + nombreCloud.toLowerCase().replace(/\s/g, '');
-                    }
-                    
-                    // Puntos en el saldo (Aquí se arregla el "0")
-                    const valPuntos = document.getElementById('val-puntos-menu');
-                    if (valPuntos) {
-                        valPuntos.innerText = puntosCloud + " Pts";
-                    }
-
-                    // --- ARREGLAR FOTO DE PERFIL ---
-                    const avatar = document.getElementById('avatar-circle');
-                    if (avatar) {
-                        if (fotoCloud && fotoCloud !== "" && fotoCloud !== "null") {
-                            avatar.innerHTML = `<img src="${fotoCloud}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                        } else {
-                            const inicial = nombreCloud.charAt(0).toUpperCase();
-                            avatar.innerHTML = `<span id="user-initial" style="font-weight: 800;">${inicial}</span>`;
-                        }
-                    }
-
-                    // Guardamos en LocalStorage para funciones secundarias
-                    localStorage.setItem('user_points', puntosCloud);
-                    localStorage.setItem('user_name', nombreCloud);
-                    localStorage.setItem('user_photo_base64', fotoCloud);
+                    // Opcional: Crear el documento automáticamente para que ya no falle
+                    firebase.firestore().collection("usuarios").doc(user.uid).set({
+                        nombre: nombreFinal,
+                        puntos: "0",
+                        foto: fotoFinal,
+                        rol: "Estudiante"
+                    });
                 }
+
+                // --- INYECTAR EN EL HTML ---
+                if (document.getElementById('welcome-name')) 
+                    document.getElementById('welcome-name').innerText = nombreFinal;
+
+                if (document.getElementById('val-puntos-menu')) 
+                    document.getElementById('val-puntos-menu').innerText = puntosFinal + " Pts";
+
+                if (document.getElementById('user-full-name'))
+                    document.getElementById('user-full-name').innerText = "@" + nombreFinal.toLowerCase().replace(/\s/g, '');
+
+                // Lógica de Foto
+                const avatar = document.getElementById('avatar-circle');
+                if (avatar) {
+                    if (fotoFinal && fotoFinal !== "" && fotoFinal !== "null") {
+                        avatar.innerHTML = `<img src="${fotoFinal}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    } else {
+                        const inicial = nombreFinal.charAt(0).toUpperCase();
+                        avatar.innerHTML = `<span style="font-weight:800;">${inicial}</span>`;
+                    }
+                }
+
+                // Guardar para uso rápido de otros scripts
+                localStorage.setItem('user_points', puntosFinal);
+                localStorage.setItem('user_name', nombreFinal);
             });
         }
     });
 }
 
-// --- TOGGLE MENU CORREGIDO ---
 function toggleUserMenu() {
     const menu = document.getElementById('user-menu');
     if (!menu) return;
 
     if (menu.style.display === 'none' || menu.style.display === '') {
-        // Al abrir, forzamos la lectura de lo que ya tenemos sincronizado
+        // Leemos del localStorage lo que acaba de guardar actualizarHeader
         const pts = localStorage.getItem('user_points') || "0";
-        const valPuntos = document.getElementById('val-puntos-menu');
-        if (valPuntos) valPuntos.innerText = pts + " Pts";
+        const nom = localStorage.getItem('user_name') || "Usuario";
+
+        const displayPts = document.getElementById('val-puntos-menu');
+        if (displayPts) displayPts.innerText = pts + " Pts";
         
         menu.style.display = 'block';
     } else {
