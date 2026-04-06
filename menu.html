@@ -202,7 +202,7 @@ body.dark-mode .maintenance-ribbon {
 </div><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <div class="main-content container" style="max-width: 1000px; margin: auto; padding: 40px 20px;">
     
-     <header style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; position: relative;">
+    <header style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; position: relative;">
     <div>
         <h1 style="font-weight: 800; font-size: 2.2rem; margin: 0; color: #1e293b;">
             Bienvenido, <span id="welcome-name" style="color: var(--primary);">Usuario</span>
@@ -215,40 +215,53 @@ body.dark-mode .maintenance-ribbon {
             <span id="user-initial">U</span>
         </div>
 
-        <div id="user-menu" style="display: none; position: absolute; right: 0; top: 70px; width: 210px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; border: 1px solid #f1f5f9; animation: slideDown 0.3s ease;">
-            <div style="padding-bottom: 10px; border-bottom: 1px solid #f1f5f9; margin-bottom: 10px;">
-                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Miembro Alonixz</p>
-                <b id="user-full-name" style="font-size: 1rem; color: #1e293b;">@usuario</b>
+        <div id="user-menu" style="display: none; position: absolute; right: 0; top: 70px; width: 220px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; border: 1px solid #f1f5f9; animation: slideDown 0.3s ease;">
+     <!-- Perfil y Saldo -->
+            <div style="padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 12px;">
+                <p style="margin: 0; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Miembro Alonixz</p>
+                <b id="user-full-name" style="font-size: 1rem; color: #1e293b; display: block; margin-bottom: 8px;">@usuario</b>
+                
+                <!-- TARJETA DE SALDO CLOUD -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; margin-top: 5px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1rem; filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));">🪙</span>
+                        <span style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Mi Saldo</span>
+                    </div>
+                    <span id="val-puntos-menu" style="font-size: 0.9rem; color: #2563eb; font-weight: 800; font-family: 'Segoe UI', system-ui, sans-serif;">
+                        0 Pts
+                    </span>
+                </div>
+            </div>
+                <!-- TARJETA DE SALDO -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0;">
+                    <span style="font-size: 12px; color: #64748b; font-weight: 600;">Saldo:</span>
+                    <span id="val-puntos-menu" style="font-size: 13px; color: #2563eb; font-weight: 800;">0 Pts</span>
+                </div>
             </div>
             
-       <!-- CAMBIO AQUÍ: Usamos irAlPerfilSeguro() -->
-<div onclick="irAlPerfilSeguro()" 
-     style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9;" 
-     onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
-     onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
-    
-    <span style="font-size: 1.3rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👤</span>
-    
-    <div style="display: flex; flex-direction: column;">
-        <p id="nav-user-name" style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #1e293b;">Mi Perfil</p>
-        <span style="font-size: 10px; color: #94a3b8; font-weight: 600;">Ver configuración</span>
-    </div>
-</div>
-<div onclick="location.href='configuraciones.html'" 
-     style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9; margin-top: 10px;" 
-     onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
-     onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
-    
-    <span style="font-size: 1.3rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">⚙️</span>
-    
-    <div style="display: flex; flex-direction: column;">
-        <p style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #1e293b;">Ajustes</p>
-        <span style="font-size: 10px; color: #94a3b8; font-weight: 600;">Modo Oscuro, Notificaciones</span>
-    </div>
-</div>
+            <!-- Botón Mi Perfil -->
+            <div onclick="irAlPerfilSeguro()" 
+                 style="display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9;" 
+                 onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
+                 onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
+                <span style="font-size: 1.2rem;">👤</span>
+                <div style="display: flex; flex-direction: column;">
+                    <p style="margin: 0; font-size: 0.8rem; font-weight: 800; color: #1e293b;">Mi Perfil</p>
+                </div>
+            </div>
 
+            <!-- Botón Ajustes -->
+            <div onclick="location.href='configuraciones.html'" 
+                 style="display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 12px; transition: 0.3s; background: #ffffff; border: 1px solid #f1f5f9; margin-top: 8px;" 
+                 onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';" 
+                 onmouseout="this.style.background='#ffffff'; this.style.borderColor='#f1f5f9;'">
+                <span style="font-size: 1.2rem;">⚙️</span>
+                <div style="display: flex; flex-direction: column;">
+                    <p style="margin: 0; font-size: 0.8rem; font-weight: 800; color: #1e293b;">Ajustes</p>
+                </div>
+            </div>
             
-            <button onclick="logout()" style="width: 100%; text-align: left; padding: 10px; background: #fff1f2; border: none; border-radius: 10px; cursor: pointer; font-size: 0.85rem; color: #e11d48; display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: bold;">
+            <button onclick="logout()" style="width: 100%; text-align: left; padding: 10px; background: #fff1f2; border: none; border-radius: 10px; cursor: pointer; font-size: 0.8rem; color: #e11d48; display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: bold;">
                 <span>🚪</span> Cerrar Sesión
             </button>
         </div>
@@ -504,28 +517,30 @@ const db = firebase.database();
 // --- TUS FUNCIONES DE SIEMPRE (No se tocan) ---
 
 function actualizarHeader() {
-    // 1. Buscamos el nombre real en la memoria del navegador
-    const nombre = localStorage.getItem('user_name') || 
-                   localStorage.getItem('eduSolve_User') || 
-                   localStorage.getItem('active_user') || 
-                   "Usuario";
+    // 1. Buscamos el nombre
+    const nombre = localStorage.getItem('user_name') || "Usuario";
+    
+    // 2. BUSCAR PUNTOS (Manejo de String vacío de Firebase)
+    // Si puntos es "", Number() lo convierte en 0 automáticamente.
+    const puntosRaw = localStorage.getItem('user_points') || "0";
+    const puntosFinal = (puntosRaw === "" || puntosRaw === "null") ? 0 : puntosRaw;
 
-    console.log("👤 Cargando perfil para: " + nombre);
-
-    // 2. Actualizamos el nombre principal
+    // 3. Actualizar elementos de texto
     const welcomeName = document.getElementById('welcome-name');
-    if (welcomeName) {
-        welcomeName.innerText = nombre;
-    }
+    if (welcomeName) welcomeName.innerText = nombre;
 
-    // 3. Actualizamos el @ (quitando espacios y poniendo minúsculas)
     const userFullName = document.getElementById('user-full-name');
     if (userFullName) {
-        const arroba = "@" + nombre.toLowerCase().replace(/\s/g, '');
-        userFullName.innerText = arroba;
+        userFullName.innerText = "@" + nombre.toLowerCase().replace(/\s/g, '');
     }
 
-    // 4. Actualizamos el Avatar (Foto o Inicial)
+    // 4. MOSTRAR SALDO (Con validación)
+    const valPuntos = document.getElementById('val-puntos-menu');
+    if (valPuntos) {
+        valPuntos.innerText = puntosFinal + " Pts";
+    }
+
+    // 5. Actualizar Avatar (Foto o Inicial)
     const foto = localStorage.getItem('user_photo_base64');
     const avatar = document.getElementById('avatar-circle');
 
@@ -534,7 +549,7 @@ function actualizarHeader() {
             avatar.innerHTML = `<img src="${foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
         } else {
             const inicial = nombre.charAt(0).toUpperCase();
-            avatar.innerHTML = `<span id="user-initial">${inicial}</span>`;
+            avatar.innerHTML = `<span id="user-initial" style="font-weight: 800;">${inicial}</span>`;
         }
     }
 }
