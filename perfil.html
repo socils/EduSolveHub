@@ -67,42 +67,60 @@
     const auth = firebase.auth();
 
     // 2. CARGAR DATOS EN TIEMPO REAL
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            const userRef = db.collection("usuarios").doc(user.uid);
-            
-            userRef.onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    const nombre = data.n || "Usuario";
-                    const fotoBase64 = data.foto || ""; // Campo foto en Firebase
-                    const puntos = data.puntos || 0;
+    // --- CORRECCIÓN PERFIL.HTML ---
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Usuario detectado:", user.uid);
+        const userRef = db.collection("usuarios").doc(user.uid);
+        
+        // Usamos onSnapshot para que los cambios (como la foto) se vean al instante
+        userRef.onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                
+                // 1. Mostrar Nombre (Prioridad al campo 'n' de tu base de datos)
+                const nombreFinal = data.n || user.displayName || "Usuario Cloud";
+                document.getElementById('display-name').innerText = nombreFinal;
+                
+                // 2. Mostrar Puntos e ID
+                document.getElementById('val-puntos').innerText = (data.puntos || 0) + " Pts";
+                document.getElementById('val-uid').innerText = user.uid;
 
-                    // Actualizar UI
-                    document.getElementById('display-name').innerText = nombre;
-                    document.getElementById('val-puntos').innerText = puntos + " Pts";
-                    document.getElementById('val-uid').innerText = user.uid;
-
-                    // Foto o Inicial
-                    const userDisplay = document.getElementById('user-display');
-                    if (fotoBase64) {
-                        userDisplay.innerHTML = `<img src="${fotoBase64}">`;
-                    } else {
-                        userDisplay.innerText = nombre.charAt(0).toUpperCase();
-                    }
-
-                    // Rango Fundador
-                    if (nombre.toLowerCase() === "alonso") {
-                        document.getElementById('user-role').innerText = "FUNDADOR ALONIXZ";
-                        document.getElementById('user-role').style.background = "#fffbeb";
-                        document.getElementById('user-role').style.color = "#b45309";
-                    }
+                // 3. Lógica de Foto de Perfil (Solución al error de carga)
+                const userDisplay = document.getElementById('user-display');
+                if (data.foto) {
+                    userDisplay.innerHTML = `<img src="${data.foto}" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    userDisplay.innerText = nombreFinal.charAt(0).toUpperCase();
+                    userDisplay.style.background = "#2563eb"; // Color por defecto
                 }
-            });
-        } else {
-            window.location.href = "index.html"; // Redirigir si no hay sesión
-        }
-    });
+
+                // 4. Rango Especial
+                if (nombreFinal.toLowerCase() === "alonso") {
+                    const role = document.getElementById('user-role');
+                    role.innerText = "FUNDADOR ALONIXZ";
+                    role.style.background = "#fffbeb";
+                    role.style.color = "#b45309";
+                }
+            } else {
+                // SI EL USUARIO ES NUEVO EN LA V3.5 Y NO TIENE DOC EN FIRESTORE:
+                console.log("Creando perfil inicial en la nube...");
+                userRef.set({
+                    n: user.displayName || "Nuevo Usuario",
+                    puntos: 0,
+                    foto: "",
+                    creado: new Date().toISOString()
+                });
+            }
+        }, (error) => {
+            console.error("Error al obtener datos:", error);
+            document.getElementById('display-name').innerText = "Error de Conexión";
+        });
+    } else {
+        // Si no hay sesión, mandarlo al index
+        window.location.href = "index.html";
+    }
+});
 
     // 3. SUBIR IMAGEN A FIREBASE (Campo 'foto')
     function subirImagen(event) {
