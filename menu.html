@@ -665,7 +665,14 @@ function escucharNoticias() {
     });
 }
 
-// --- FUNCIÓN PARA ENVIAR MENSAJE ---
+// 1. ESCUCHA DE TECLA ENTER
+document.getElementById('chat-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        enviarMensaje();
+    }
+});
+
+// 2. FUNCIÓN DE ENVÍO
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     if (!input) return;
@@ -673,31 +680,58 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (mensaje === "") return;
 
-    // Obtención de identidad (Priorizando user_name o eduSolve_User)
+    // Recuperar datos de identidad
+    // IMPORTANTE: Asegúrate de que estas claves existan en tu localStorage
+    const userUID = localStorage.getItem('user_uid'); 
     const nombreReal = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || "Invitado";
-    const fotoReal = localStorage.getItem('user_photo_base64') || null;
+    const fotoReal = localStorage.getItem('user_photo_base64') || "";
 
-    // Referencia y envío a Firebase
+    // Formatear hora local
+    const ahora = new Date();
+    const horaEnvio = ahora.getHours().toString().padStart(2, '0') + ":" + 
+                     ahora.getMinutes().toString().padStart(2, '0');
+
+    // REFERENCIA A REALTIME DATABASE (Mensajes)
     const chatRef = db.ref('mensajes').push();
+    
     chatRef.set({
         user: nombreReal,
         text: mensaje,
         photo: fotoReal,
-        // Captura de tiempo exacta en formato 24h o 12h según sistema
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
+        time: horaEnvio,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-        // Feedback de audio (Si está definido)
-        if(sonidoEnvio) {
-            sonidoEnvio.play().catch(e => console.log("Audio bloqueado por el navegador"));
+        console.log("✅ Mensaje enviado al chat.");
+
+        // --- LÓGICA DE PUNTOS (Firestore) ---
+        if (userUID) {
+            // Referencia exacta a tu colección 'usuarios'
+            const userRef = firebase.firestore().collection("usuarios").doc(userUID);
+            
+            userRef.update({
+                puntos: firebase.firestore.FieldValue.increment(100)
+            }).then(() => {
+                console.log("💰 +100 puntos acreditados a:", userUID);
+            }).catch((err) => {
+                console.error("❌ Error al actualizar puntos en Firestore:", err);
+            });
+        } else {
+            console.warn("⚠️ No se sumaron puntos porque 'user_uid' no existe en localStorage.");
         }
-        
-        // Limpieza y foco del input
+
+        // Feedback visual y limpieza
         input.value = ""; 
         input.focus();
+        if(typeof sonidoEnvio !== 'undefined') sonidoEnvio.play().catch(()=>{});
+
     }).catch((error) => {
-        console.error("Error crítico al enviar a Firebase:", error);
+        console.error("❌ Error crítico al enviar el mensaje:", error);
     });
+}
+
+// 3. FIX PARA EL ERROR DE MODAL (Evita que el script se detenga)
+function gestionarModalV34() {
+    console.log("Modal V34 llamado pero no definido, creando placeholder.");
 }
 </script><script>
 // --- FUNCIÓN PARA ESCUCHAR EL CHAT EN TIEMPO REAL ---
