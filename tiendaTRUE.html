@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alonixz Store - Premium Experience</title>
+    
+    <!-- Google Fonts para un look moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --secondary: #302b63;
+            --accent: #00d2ff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* --- Header & Balance --- */
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .balance-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #userBalance {
+            color: var(--accent);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        /* --- Grid de Productos --- */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .product-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        .product-card h3 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .product-card p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .price-wrapper {
+            background: rgba(142, 68, 173, 0.2);
+            padding: 8px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            display: inline-block;
+            width: 80%;
+            border: 1px solid rgba(142, 68, 173, 0.3);
+        }
+
+        /* --- Botones --- */
+        .btn-buy {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(45deg, var(--primary), #9b59b6);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buy:hover:not(:disabled) {
+            filter: brightness(1.2);
+            box-shadow: 0 5px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .btn-buy:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* --- Animaciones --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notificaciones */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }.auth-instruction-banner {
+    background: linear-gradient(135deg, rgba(142, 68, 173, 0.2), rgba(0, 210, 255, 0.1));
+    border-left: 5px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.banner-icon {
+    font-size: 1.8rem;
+}
+
+.banner-content h4 {
+    margin-bottom: 5px;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.banner-content p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 12px;
+}
+
+.credentials-box {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.credential-item {
+    margin-bottom: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.credential-item:last-child { margin-bottom: 0; }
+
+.label {
+    color: var(--accent);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.value {
+    color: #f1c40f; /* Color resaltado para los datos */
+    background: rgba(241, 196, 15, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.banner-content small {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+}.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-logout {
+    background: rgba(231, 76, 60, 0.2); /* Rojo suave translúcido */
+    border: 1px solid rgba(231, 76, 60, 0.5);
+    color: #e74c3c;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-logout:hover {
+    background: #e74c3c;
+    color: white;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+    transform: scale(1.05);
+}
+
+.btn-logout .icon {
+    font-size: 1rem;
+}/* Estilo para los títulos de sección */
+.section-header {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    border-left: 5px solid #00ffcc; /* Color neón */
+    padding-left: 15px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 0;
+}
+
+.section-subtitle {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Badge para productos destacados */
+.badge {
+    background: #ff0055;
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.product-card.featured {
+    border: 2px solid #00ffcc; /* Resalta los recomendados */
+    position: relative;
+}/* Contenedor del sistema de canje dentro de la tarjeta */
+.redeem-box {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* El campo donde se escribe el código */
+.redeem-input {
+    width: 100%;
+    padding: 12px;
+    background: #0d0d0d; /* Fondo ultra oscuro */
+    border: 2px solid #333;
+    border-radius: 8px;
+    color: #00ffcc; /* Texto color neón */
+    font-family: 'Courier New', Courier, monospace; /* Fuente tipo código */
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Efecto cuando el usuario hace clic en el input */
+.redeem-input:focus {
+    border-color: #00ffcc;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+    background: #151515;
+}
+
+/* Botón de Activación / Canje */
+.btn-redeem {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00ffcc 0%, #0099ff 100%);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animación del botón al pasar el mouse */
+.btn-redeem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.5);
+    filter: brightness(1.1);
+}
+
+/* Animación cuando se presiona el botón */
+.btn-redeem:active {
+    transform: scale(0.95);
+}
+
+/* Estilo para los precios en soles */
+.price-tag {
+    font-size: 1.2rem;
+    color: #ffcc00;
+    font-weight: bold;
+    margin: 10px 0;
+    display: block;
+}
+
+/* Clase especial para Packs Legendarios (S/ 100 - S/ 200) */
+.legendary {
+    border: 2px solid #ffcc00 !important;
+    background: rgba(255, 204, 0, 0.05) !important;
+}
+
+.legendary .btn-redeem {
+    background: linear-gradient(135deg, #ffcc00 0%, #ff6600 100%);
+}.btn-buy:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Animación de pulso para el botón pendiente */
+.btn-buy[style*="background: rgb(243, 156, 18)"] {
+    animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(243, 156, 18, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+}.aviso-presencial {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a; /* Fondo oscuro minimalista */
+    border-left: 5px solid #00ffcc; /* Color Neón de Alonixz-Group */
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.aviso-icon {
+    font-size: 40px;
+    margin-right: 20px;
+}
+
+.aviso-contenido h3 {
+    margin: 0 0 5px 0;
+    color: #00ffcc;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.aviso-contenido p {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.badge-proximamente {
+    display: inline-block;
+    margin-top: 10px;
+    background: rgba(0, 255, 204, 0.1);
+    color: #00ffcc;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid #00ffcc;
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="shop-header">
+            <div class="brand">
+                <h1>ALONIXZ STORE</h1>
+            </div>
+         <div class="user-controls">
+    <div class="balance-card">
+        <span>💰 Saldo:</span>
+        <span id="userBalance">Cargando...</span>
+    </div>
+    <!-- Botón de Cerrar Sesión -->
+    <button id="btnLogout" class="btn-logout" title="Cerrar Sesión">
+        <span class="icon">🚪</span> Salir
+    </button>
+</div>
+        </header>
+<!-- Formulario Temporal de Acceso -->
+<div id="login-box" class="card" style="margin-bottom: 20px; padding: 20px; text-align: center;">
+    <h3>Acceso EduSolve</h3>
+    <input type="email" id="email" placeholder="Correo" style="padding: 8px; margin: 5px; border-radius: 5px; border: 1px solid #ccc;">
+    <input type="password" id="pass" placeholder="Contraseña" style="padding: 8px; margin: 5px; border-radius: 5px; border: 1px solid #ccc;">
+    <button onclick="loginManual()" class="btn btn-primary">Entrar a mi Cuenta</button>
+</div><!-- Banner de Instrucciones de Acceso EduSolve -->
+<div class="auth-instruction-banner">
+    <div class="banner-icon">🔐</div>
+    <div class="banner-content">
+        <h4>Acceso de Prueba EduSolve</h4>
+        <p>Para usar la tienda, inicia sesión con el siguiente formato:</p>
+        <div class="credentials-box">
+            <div class="credential-item">
+                <span class="label">USUARIO:</span>
+                <code class="value">usuario@alonixz.com</code>
+            </div>
+            <div class="credential-item">
+                <span class="label">CONTRASEÑA:</span>
+                <code class="value">######</code> <!-- O la que tú definas -->
+            </div>
+        </div>
+        <small>* Los puntos se sincronizan automáticamente con tu perfil.</small>
+    </div>
+</div>
+  <div class="user-delivery-info" style="margin-bottom: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px;">
+    <label style="color: #00ffcc; display: block; margin-bottom: 8px;">📱 Contacto para entrega (WhatsApp o ID de Juego):</label>
+    <input type="text" id="userContact" placeholder="Ej: +51 987... o ID: 12345678" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff;">
+</div>  <!-- Anuncio de Venta Presencial - Alonixz-Group -->
+<div class="aviso-presencial">
+    <div class="aviso-icon">📍</div>
+    <div class="aviso-contenido">
+        <h3>Venta de Puntos Presencial</h3>
+        <p>Por el momento, la compra de códigos de activación se realiza de forma <strong>presencial</strong> directamente conmigo.</p>
+        <span class="badge-proximamente">Próximamente: Pagos en línea 💳</span>
+    </div>
+</div>      <!-- Main Store Grid -->
+    <main class="shop-grid">
+
+    <!-- SECCIÓN: RECOMENDADOS (LO MÁS BUSCADO) -->
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">🔥 Los Más Top (Recomendados)</h2>
+        <p class="section-subtitle">Lo más canjeado por los Yaperos este mes.</p>
+    </div>
+
+    <!-- Free Fire 100 -->
+    <div class="product-card featured">
+        <span class="badge">OFERTA</span>
+        <span class="product-icon">💎</span>
+        <h3>Free Fire: 100 Diams</h3>
+        <p>Recarga rápida + 10% de Bonus.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="20500">20,500 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="ff_100">Canjear</button>
+    </div>
+
+    <!-- Roblox 400 -->
+    <div class="product-card featured">
+        <span class="product-icon">🧱</span>
+        <h3>Roblox: 400 Robux</h3>
+        <p>Pack ideal para skins básicas y pases.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="110000">110,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="rbx_400">Canjear</button>
+    </div>
+
+    <!-- SECCIÓN: ROBLOX (MÚLTIPLES PRECIOS) -->
+    <hr class="section-divider" style="grid-column: 1 / -1;">
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">🟥 Roblox</h2>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">📦</span>
+        <h3>Roblox: 80 Robux</h3>
+        <p>El pack más pequeño para accesorios.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="30000">30,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="rbx_80">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">📦</span>
+        <h3>Roblox: 800 Robux</h3>
+        <p>Equivale a una Gift Card de $10.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="225000">225,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="rbx_800">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">📦</span>
+        <h3>Roblox: 1700 Robux</h3>
+        <p>Pack Pro para jugadores frecuentes.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="450000">450,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="rbx_1700">Canjear</button>
+    </div>
+
+    <!-- SECCIÓN: FREE FIRE (MÚLTIPLES PRECIOS) -->
+    <hr class="section-divider" style="grid-column: 1 / -1;">
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">🔥 Garena Free Fire</h2>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">💎</span>
+        <h3>310 Diamantes</h3>
+        <p>Perfecto para comprar cajas de armas.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="58500">58,500 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="ff_310">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">💎</span>
+        <h3>520 Diamantes</h3>
+        <p>Suficiente para el Pase de Batalla actual.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="97500">97,500 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="ff_520">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">💎</span>
+        <h3>1060 Diamantes</h3>
+        <p>Recarga premium con bonificación de Yape.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="195000">195,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="ff_1060">Canjear</button>
+    </div>
+
+    <!-- SECCIÓN: CONSOLAS Y GIFT CARDS -->
+    <hr class="section-divider" style="grid-column: 1 / -1;">
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">🎮 Gift Cards</h2>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">🎮</span>
+        <h3>PlayStation Store $10</h3>
+        <p>Saldo para PS4 y PS5 (Cuenta USA).</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="210000">210,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="psn_10">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">🕹️</span>
+        <h3>Steam S/ 10 (Perú)</h3>
+        <p>Añade saldo exacto a tu cartera de Steam.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="50000">50,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="steam_10">Canjear</button>
+    </div>
+
+    <div class="product-card">
+        <span class="product-icon">🍄</span>
+        <h3>Nintendo eShop $10</h3>
+        <p>Para juegos digitales en tu Switch.</p>
+        <div class="price-wrapper">
+            <span class="price" data-cost="215000">215,000 Puntos</span>
+        </div>
+        <button class="btn-buy" data-item="nintendo_10">Canjear</button>
+    </div>
+
+</main><main class="shop-grid">
+
+    <!-- SECCIÓN: RECARGAS BÁSICAS -->
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">⚡ Recargas Rápidas</h2>
+        <p class="section-subtitle">Paquetes económicos para compras pequeñas.</p>
+    </div>
+
+    <!-- S/ 1.00 -->
+    <div class="product-card">
+        <span class="product-icon">🪙</span>
+        <h3>Pack Bronce</h3>
+        <p>Recibe: <b>5,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 1.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_5k">
+            <button class="btn-redeem" onclick="validarCanje('pts_5k')">Activar Puntos</button>
+        </div>
+    </div>
+
+    <!-- S/ 5.00 -->
+    <div class="product-card">
+        <span class="product-icon">💰</span>
+        <h3>Pack Plata</h3>
+        <p>Recibe: <b>25,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 5.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_25k">
+            <button class="btn-redeem" onclick="validarCanje('pts_25k')">Activar Puntos</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: RECARGAS PRO (MAS PUNTOS) -->
+    <hr class="section-divider" style="grid-column: 1 / -1;">
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">💎 Recargas Pro (Más Puntos)</h2>
+    </div>
+
+    <!-- S/ 20.00 -->
+    <div class="product-card featured">
+        <span class="product-icon">🔥</span>
+        <h3>Pack Oro</h3>
+        <p>Recibe: <b>100,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 20.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_100k">
+            <button class="btn-redeem" onclick="validarCanje('pts_100k')">Activar Puntos</button>
+        </div>
+    </div>
+
+    <!-- S/ 50.00 -->
+    <div class="product-card featured">
+        <span class="product-icon">🌌</span>
+        <h3>Pack Diamante</h3>
+        <p>Recibe: <b>250,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 50.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_250k">
+            <button class="btn-redeem" onclick="validarCanje('pts_250k')">Activar Puntos</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: NIVEL LEYENDA (MAXIMOS PUNTOS) -->
+    <hr class="section-divider" style="grid-column: 1 / -1;">
+    <div class="section-header" style="grid-column: 1 / -1;">
+        <h2 class="section-title">👑 Nivel Leyenda</h2>
+    </div>
+
+    <!-- S/ 100.00 -->
+    <div class="product-card legendary">
+        <span class="badge">MEJOR VALOR</span>
+        <span class="product-icon">🏆</span>
+        <h3>Pack Inmortal</h3>
+        <p>Recibe: <b>500,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 100.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_500k">
+            <button class="btn-redeem" onclick="validarCanje('pts_500k')">Activar Puntos</button>
+        </div>
+    </div>
+
+    <!-- S/ 200.00 -->
+    <div class="product-card legendary">
+        <span class="product-icon">🔱</span>
+        <h3>Pack Alonixz-Group</h3>
+        <p>Recibe: <b>1,000,000 Puntos</b></p>
+        <p class="price-tag">Precio: S/ 200.00</p>
+        <div class="redeem-box">
+            <input type="text" class="redeem-input" placeholder="Código de Canje" id="input_pts_1m">
+            <button class="btn-redeem" onclick="validarCanje('pts_1m')">Activar Puntos</button>
+        </div>
+    </div>
+
+</main>
+
+        <footer style="text-align: center; margin-top: 40px; color: rgba(255,255,255,0.4); font-size: 0.8rem;">
+            &copy; 2024 Alonixz-Group | Potenciando tu productividad
+        </footer>
+    </div>
+
+    <!-- El script de Firebase iría aquí, conectando con los IDs userBalance y btn-buy -->
+   <!-- 1. Cargar Librerías de Firebase SDK v8 -->
+<!-- 1. Cargar librerías de Firebase SDK v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<!-- Pon esto arriba de TODO en el <head> o al inicio del <body> -->
+<script src="./codes-db.js"></script>
+<script>
+  // 2. Configuración de EduSolve - Alonixz-Group
+  const firebaseConfig = {
+    apiKey: "AIzaSyDffVQzP6yaiUX4SsE3ghoBBBGyr7thMFs",
+    authDomain: "edusolve-947c1.firebaseapp.com",
+    projectId: "edusolve-947c1",
+    storageBucket: "edusolve-947c1.firebasestorage.app",
+    messagingSenderId: "1089784819674",
+    appId: "1:1089784819674:web:5f0e310b0a8ae699191ae3"
+  };
+
+  // Inicializar Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+// Configurar el botón de Logout
+document.getElementById('btnLogout').addEventListener('click', () => {
+    auth.signOut().then(() => {
+        // Éxito al cerrar sesión
+        console.log("Sesión cerrada en EduSolve");
+        alert("Has salido de tu cuenta de Alonixz-Group");
+        
+        // Opcional: Redirigir al login principal
+        // window.location.href = "login.html"; 
+    }).catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+    });
+});
+  // 3. Monitor de Sesión y Saldo
+  auth.onAuthStateChanged((user) => {
+    const balanceDisplay = document.getElementById('userBalance');
+
+    if (user) {
+      // El usuario está logueado, escuchamos su documento (UID)
+      const userRef = db.collection("usuarios").doc(user.uid);
+
+      userRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const saldoActual = doc.data().puntos || 0;
+          balanceDisplay.innerText = `${saldoActual} Pts`;
+          
+          // Activamos la lógica de compra pasando el UID y saldo fresco
+          configurarTienda(user.uid, saldoActual);
+        } else {
+          balanceDisplay.innerText = "Error: Sin Perfil";
+          console.warn("No existe un documento para el UID: " + user.uid);
+        }
+      }, (error) => {
+        console.error("Error al leer puntos:", error);
+        balanceDisplay.innerText = "Error de red";
+      });
+    } else {
+      // Si no hay sesión, protegemos la tienda
+      balanceDisplay.innerText = "Inicia Sesión";
+      bloquearBotones();
+    }// Variable para rastrear el estado anterior y no repetir el alert
+
+  });
+let comprasPrevias = {};
+
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        const userRef = db.collection("usuarios").doc(user.uid);
+
+        userRef.onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                const comprasActuales = data.compras || {};
+                const saldoActual = data.puntos || 0;
+                
+                // EXTRAEMOS EL NOMBRE DINÁMICO (Si no tiene, ponemos "Usuario")
+                const nombreUsuario = data.n || user.displayName || "Usuario";
+
+                // 1. Actualizar el saldo en pantalla
+                document.getElementById('userBalance').innerText = `${saldoActual} Pts`;
+
+                // 2. LÓGICA DE NOTIFICACIÓN DE ÉXITO
+                for (let item in comprasPrevias) {
+                    // Si antes estaba en true y ahora es false o desapareció
+                    if (comprasPrevias[item] === true && (comprasActuales[item] === false || !comprasActuales[item])) {
+                        
+                        // MENSAJE DINÁMICO: Cambiamos "ALONSO" por ${nombreUsuario}
+                        alert(`🎊 ¡FELICIDADES ${nombreUsuario.toUpperCase()}! 🎊\n\nTu pedido de "${item}" ha sido entregado con éxito.\n\n¡Gracias por confiar en Alonixz-Group!`);
+                        
+                        configurarTienda(user.uid, saldoActual);
+                    }
+                }
+
+                // Guardamos el estado actual para la próxima comparación
+                comprasPrevias = { ...comprasActuales };
+
+                // Activamos la tienda con datos frescos
+                configurarTienda(user.uid, saldoActual);
+            }
+        });
+    }
+});
+
+ function configurarTienda(uid, saldo) {
+    const btns = document.querySelectorAll('.btn-buy');
+    const contactInput = document.getElementById('userContact');
+
+    btns.forEach(btn => {
+        btn.onclick = async () => {
+            const itemNombre = btn.getAttribute('data-item');
+            const precio = parseInt(btn.parentElement.querySelector('.price').innerText.replace(/[^0-9]/g, ''));
+            const contacto = contactInput.value.trim();
+
+            if (!contacto) {
+                alert("⚠️ Por favor, ingresa tu contacto o ID para enviarte el producto.");
+                contactInput.focus();
+                return;
+            }
+
+            if (saldo < precio) {
+                alert("❌ Puntos insuficientes.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Procesando...";
+
+            try {
+                const batch = db.batch(); 
+                const userRef = db.collection("usuarios").doc(uid);
+
+                // A.1 Restar puntos al usuario
+                batch.update(userRef, {
+                    puntos: firebase.firestore.FieldValue.increment(-precio)
+                });
+
+                // A.2 REGISTRAR EN EL PERFIL DEL USUARIO (Esto faltaba)
+                // Usamos dot notation para actualizar solo ese item dentro del objeto compras
+                batch.update(userRef, {
+                    [`compras.${itemNombre}`]: true 
+                });
+
+                // B. Crear el pedido para el administrador (ALONSO)
+                const pedidoRef = db.collection("pedidos_pendientes").doc();
+                batch.set(pedidoRef, {
+                    usuarioId: uid,
+                    producto: itemNombre,
+                    precioPuntos: precio,
+                    contactoEntrega: contacto,
+                    estado: "PENDIENTE",
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await batch.commit();
+
+                alert(`✅ ¡Pedido registrado! Tu compra de ${itemNombre} aparece como PENDIENTE en tu perfil.`);
+                btn.innerText = "En Espera...";
+                btn.style.background = "#f39c12"; 
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Ocurrió un error. Intenta de nuevo.");
+                btn.disabled = false;
+                btn.innerText = "Comprar";
+            }
+        };
+    });
+}
+
+  function bloquearBotones() {
+    document.querySelectorAll('.btn-buy').forEach(btn => {
+      btn.disabled = true;
+      btn.innerText = "Bloqueado";
+    });
+  }async function loginManual() {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('pass').value;
+    
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, pass);
+        const user = userCredential.user;
+
+        const userDoc = await db.collection("usuarios").doc(user.uid).get();
+        
+        // CAMBIO AQUÍ: Buscamos 'n' en lugar de 'nombre'
+        let nombreParaSaludar = "Usuario";
+        if (userDoc.exists && userDoc.data().n) {
+            nombreParaSaludar = userDoc.data().n;
+        }
+
+        document.getElementById('login-box').style.display = 'none'; 
+        alert(`¡Bienvenido a Alonixz-Group, ${nombreParaSaludar}!`);
+        
+    } catch (error) {
+        alert("Error: " + error.message);
+    }
+}
+
+async function validarCanje(paqueteId) {
+    // Verificar si el archivo de códigos ya cargó
+    if (!window.PUNTOS_DB) {
+        alert("❌ Error: La base de datos de códigos aún no ha cargado. Reintenta en 2 segundos.");
+        return;
+    }
+
+    const user = firebase.auth().currentUser;
+    const input = document.getElementById(`input_${paqueteId}`);
+    if (!input) return;
+
+    const codigoIngresado = input.value.trim().toUpperCase();
+
+    if (!user) {
+        alert("❌ Inicia sesión en EduSolve para continuar.");
+        return;
+    }
+
+    // Buscamos en la variable global que viene del otro archivo
+    if (window.PUNTOS_DB[paqueteId] && window.PUNTOS_DB[paqueteId].includes(codigoIngresado)) {
+        
+        const valores = {
+            "pts_5k": 5000, "pts_25k": 25000, "pts_100k": 100000,
+            "pts_250k": 250000, "pts_500k": 500000, "pts_1m": 1000000
+        };
+
+        try {
+            const userRef = firebase.firestore().collection("usuarios").doc(user.uid);
+            
+            await userRef.update({
+                puntos: firebase.firestore.FieldValue.increment(valores[paqueteId])
+            });
+
+            // Borramos el código de la memoria para esta sesión
+            const index = window.PUNTOS_DB[paqueteId].indexOf(codigoIngresado);
+            window.PUNTOS_DB[paqueteId].splice(index, 1);
+
+            alert("✅ ¡Código procesado! Tus puntos han sido enviados a la nube.");
+            input.value = ""; 
+
+        } catch (error) {
+            alert("❌ Error al conectar con Firebase.");
+        }
+    } else {
+        alert("❌ Código incorrecto. Asegúrate de haberlo escrito bien.");
+    }
+}
+</script>
+</body>
+</html>
