@@ -212,7 +212,7 @@ body.dark-mode .maintenance-ribbon {
         </h1>
         <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
             <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Cloud Active</span>
-            <p style="color: #64748b; margin: 0; font-size: 0.85rem; font-weight: 500;">EduSolve PRO v3.5.4</p>
+            <p style="color: #64748b; margin: 0; font-size: 0.85rem; font-weight: 500;">EduSolve PRO v3.5.5</p>
         </div>
     </div>
 
@@ -680,18 +680,15 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (mensaje === "") return;
 
-    // Recuperar datos de identidad
-    // IMPORTANTE: Asegúrate de que estas claves existan en tu localStorage
     const userUID = localStorage.getItem('user_uid'); 
-    const nombreReal = localStorage.getItem('user_name') || localStorage.getItem('eduSolve_User') || "Invitado";
+    const nombreReal = localStorage.getItem('user_name') || "Invitado";
     const fotoReal = localStorage.getItem('user_photo_base64') || "";
 
-    // Formatear hora local
     const ahora = new Date();
     const horaEnvio = ahora.getHours().toString().padStart(2, '0') + ":" + 
                      ahora.getMinutes().toString().padStart(2, '0');
 
-    // REFERENCIA A REALTIME DATABASE (Mensajes)
+    // REFERENCIA A REALTIME DATABASE
     const chatRef = db.ref('mensajes').push();
     
     chatRef.set({
@@ -701,31 +698,28 @@ function enviarMensaje() {
         time: horaEnvio,
         timestamp: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-        console.log("✅ Mensaje enviado al chat.");
-
-        // --- LÓGICA DE PUNTOS (Firestore) ---
-        if (userUID) {
-            // Referencia exacta a tu colección 'usuarios'
-            const userRef = firebase.firestore().collection("usuarios").doc(userUID);
-            
-            userRef.update({
-                puntos: firebase.firestore.FieldValue.increment(100)
-            }).then(() => {
-                console.log("💰 +100 puntos acreditados a:", userUID);
-            }).catch((err) => {
-                console.error("❌ Error al actualizar puntos en Firestore:", err);
+        // --- SONIDO DE NOTIFICACIÓN ---
+        if (sonidoEnvio) {
+            // Reiniciamos el audio por si se envía muy rápido
+            sonidoEnvio.currentTime = 0; 
+            sonidoEnvio.play().catch(e => {
+                console.log("El navegador bloqueó el audio. Haz clic en la página primero.");
             });
-        } else {
-            console.warn("⚠️ No se sumaron puntos porque 'user_uid' no existe en localStorage.");
         }
 
-        // Feedback visual y limpieza
+        // --- LÓGICA DE PUNTOS FIRESTORE ---
+        if (userUID) {
+            firebase.firestore().collection("usuarios").doc(userUID).update({
+                puntos: firebase.firestore.FieldValue.increment(100)
+            }).then(() => {
+                console.log("💰 +100 puntos acreditados.");
+            }).catch(err => console.error("Error Firestore:", err));
+        }
+
         input.value = ""; 
         input.focus();
-        if(typeof sonidoEnvio !== 'undefined') sonidoEnvio.play().catch(()=>{});
-
     }).catch((error) => {
-        console.error("❌ Error crítico al enviar el mensaje:", error);
+        console.error("Error al enviar:", error);
     });
 }
 
