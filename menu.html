@@ -665,14 +665,8 @@ function escucharNoticias() {
     });
 }
 
-// 1. ESCUCHA DE TECLA ENTER
-document.getElementById('chat-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        enviarMensaje();
-    }
-});
 
-// 2. FUNCIÓN DE ENVÍO
+
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     if (!input) return;
@@ -680,17 +674,19 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (mensaje === "") return;
 
-    const userUID = localStorage.getItem('user_uid'); 
-    const nombreReal = localStorage.getItem('user_name') || "Invitado";
+    // 1. OBTENER IDENTIDAD (Intentar varias fuentes para el UID)
+    const userAuth = firebase.auth().currentUser;
+    const userUID = userAuth ? userAuth.uid : localStorage.getItem('user_uid');
+    
+    const nombreReal = localStorage.getItem('user_name') || (userAuth ? userAuth.displayName : "Invitado");
     const fotoReal = localStorage.getItem('user_photo_base64') || "";
 
     const ahora = new Date();
     const horaEnvio = ahora.getHours().toString().padStart(2, '0') + ":" + 
                      ahora.getMinutes().toString().padStart(2, '0');
 
-    // REFERENCIA A REALTIME DATABASE
+    // 2. ENVIAR A REALTIME DATABASE
     const chatRef = db.ref('mensajes').push();
-    
     chatRef.set({
         user: nombreReal,
         text: mensaje,
@@ -698,30 +694,39 @@ function enviarMensaje() {
         time: horaEnvio,
         timestamp: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-        // --- SONIDO DE NOTIFICACIÓN ---
+        // --- SONIDO ---
         if (sonidoEnvio) {
-            // Reiniciamos el audio por si se envía muy rápido
-            sonidoEnvio.currentTime = 0; 
-            sonidoEnvio.play().catch(e => {
-                console.log("El navegador bloqueó el audio. Haz clic en la página primero.");
-            });
+            sonidoEnvio.currentTime = 0;
+            sonidoEnvio.play().catch(() => {});
         }
 
-        // --- LÓGICA DE PUNTOS FIRESTORE ---
+        // --- SUMAR PUNTOS EN FIRESTORE ---
         if (userUID) {
-            firebase.firestore().collection("usuarios").doc(userUID).update({
+            // Importante: collection("usuarios") en minúsculas como en tu foto
+            const userRef = firebase.firestore().collection("usuarios").doc(userUID);
+            
+            userRef.update({
                 puntos: firebase.firestore.FieldValue.increment(100)
             }).then(() => {
-                console.log("💰 +100 puntos acreditados.");
-            }).catch(err => console.error("Error Firestore:", err));
+                console.log("💰 Puntos actualizados en Firestore para:", userUID);
+            }).catch((error) => {
+                console.error("Error al actualizar puntos (¿Existe el documento?):", error);
+                // Si el documento no existe, usamos 'set' con merge
+                userRef.set({ puntos: 100 }, { merge: true });
+            });
+        } else {
+            console.error("No se sumaron puntos: No se detectó UID del usuario.");
         }
 
         input.value = ""; 
         input.focus();
-    }).catch((error) => {
-        console.error("Error al enviar:", error);
     });
 }
+
+// Escuchar la tecla Enter
+document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') enviarMensaje();
+});
 
 // 3. FIX PARA EL ERROR DE MODAL (Evita que el script se detenga)
 function gestionarModalV34() {
