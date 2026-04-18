@@ -1006,14 +1006,14 @@ export const iniciarAdvertencia = () => {
             font-weight: 700;
             cursor: not-allowed;
             transition: all 0.3s ease;
-        ">Esperar (3s)</button>
+        ">Esperar (6s)</button>
     `;
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
     const btn = document.getElementById('btn-cerrar-aviso');
-    let segundos = 3;
+    let segundos = 6;
 
     // Lógica del temporizador
     const cuentaRegresiva = setInterval(() => {
